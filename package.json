@@ -1,0 +1,29 @@
+{
+  "name": "gryfer",
+  "version": "1.0.0",
+  "description": "Carpooling app with a bid system.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinghul/gryfer.git"
+  },
+  "keywords": [
+    "carpool",
+    "passenger",
+    "bid",
+    "rider"
+  ],
+  "author": "Chads",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jinghul/gryfer/issues"
+  },
+  "homepage": "https://github.com/jinghul/gryfer#readme",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "handlebars": "^4.1.0"
+  }
+}
