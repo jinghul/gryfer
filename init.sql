@@ -79,3 +79,13 @@ CREATE TABLE Bid (
 	FOREIGN KEY (uid) REFERENCES Passengers,
 	FOREIGN KEY (aid) REFERENCES Advertisement
 );
+
+CREATE TABLE CarProfile (
+	cid				INTEGER,
+	make			VARCHAR(60),
+	model			VARCHAR(60),
+	modelYear		VARCHAR(60),
+	milesDriven		VARCHAR(60),
+	PRIMARY KEY (cid),
+	FOREIGN KEY (cid) REFERENCES Car
+);

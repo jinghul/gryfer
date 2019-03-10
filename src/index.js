@@ -4,6 +4,8 @@ const app = express()
 const port = 3000
 const pg = require('pg')
 const db = require('./queries')
+const User = require('./models/user.js')
+
 
 // const conString = "postgres://" + config.username + ":" + config.password + "@localhost:5432/" + config.api
 
@@ -27,6 +29,9 @@ app.post('/users', db.createUser)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
 
+app.post('/signup', User.signup)
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)
 })
+
