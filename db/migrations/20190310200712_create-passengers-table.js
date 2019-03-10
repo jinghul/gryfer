@@ -1,5 +1,6 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `CREATE TABLE Passengers (
+  let createQuery = `DROP TABLE IF EXISTS Passengers;
+  CREATE TABLE Passengers (
 	uid 			INTEGER NOT NULL REFERENCES Users(uid),
 	tripsTaken		INTEGER NOT NULL,
 	rating			FLOAT,

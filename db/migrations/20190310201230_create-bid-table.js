@@ -1,9 +1,10 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `CREATE TABLE Bid (
+  let createQuery = `DROP TABLE IF EXISTS Bid;
+  CREATE TABLE Bid (
 	uid 			INTEGER,
 	aid				INTEGER,
 	bidPrice		FLOAT NOT NULL,
-	PRIMARY KEY (uid, aid)
+	PRIMARY KEY (uid, aid),
 	FOREIGN KEY (uid) REFERENCES Passengers,
 	FOREIGN KEY (aid) REFERENCES Advertisement
 )`;

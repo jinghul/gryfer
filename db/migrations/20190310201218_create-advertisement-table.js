@@ -1,5 +1,6 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `CREATE TABLE Advertisement (
+  let createQuery = `DROP TABLE IF EXISTS Advertisement;
+  CREATE TABLE Advertisement (
 	aid				INTEGER,
 	minBidPrice		FLOAT,
 	fromAddress		VARCHAR(60),

@@ -1,5 +1,6 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `CREATE TABLE SavedDestinations (
+  let createQuery = `DROP TABLE IF EXISTS SavedDestinations;
+  CREATE TABLE SavedDestinations (
 	nickname		VARCHAR(20),
 	address			VARCHAR(60),
 	PRIMARY KEY (nickname)

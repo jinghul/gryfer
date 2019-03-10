@@ -2,9 +2,7 @@ CREATE TABLE Users (
 	uid				INTEGER,
 	fname 			VARCHAR(60),
 	lname			VARCHAR(60),
-	password		VARCHAR(64),
-	PRIMARY KEY (uid),
-	FOREIGN KEY (uid, password) REFERENCES Account
+	PRIMARY KEY (uid)
 );
 
 CREATE TABLE UserProfile (
@@ -41,7 +39,7 @@ CREATE TABLE SavedDestinations (
 CREATE TABLE Drivers (
 	uid 			INTEGER NOT NULL REFERENCES Users(uid),
 	tripsDriven		INTEGER NOT NULL,
-	Rating			FLOAT,
+	Rating			NUMERIC,
 	cid				INTEGER,
 	PRIMARY KEY (uid),
 	FOREIGN KEY (cid) REFERENCES Car
@@ -49,14 +47,12 @@ CREATE TABLE Drivers (
 
 CREATE TABLE Car (
 	cid 			INTEGER,
-	uid				INTEGER NOT NULL,
-	PRIMARY KEY (cid),
-	FOREIGN KEY (uid) REFERENCES Drivers
+	PRIMARY KEY (cid)
 );
 
 CREATE TABLE Advertisement (
 	aid				INTEGER,
-	minBidPrice		FLOAT,
+	minBidPrice		NUMERIC,
 	fromAddress		VARCHAR(60),
 	toAddress 		VARCHAR(60),
 	uid			INTEGER NOT NULL,
@@ -67,14 +63,14 @@ CREATE TABLE Advertisement (
 CREATE TABLE Passengers (
 	uid 			INTEGER NOT NULL REFERENCES Users(uid),
 	tripsTaken		INTEGER NOT NULL,
-	rating			FLOAT,
+	rating			NUMERIC,
 	PRIMARY KEY (uid)	
 );
 
 CREATE TABLE Bid (
 	uid 			INTEGER,
 	aid				INTEGER,
-	bidPrice		FLOAT NOT NULL,
+	bidPrice		NUMERIC NOT NULL,
 	PRIMARY KEY (uid, aid)
 	FOREIGN KEY (uid) REFERENCES Passengers,
 	FOREIGN KEY (aid) REFERENCES Advertisement

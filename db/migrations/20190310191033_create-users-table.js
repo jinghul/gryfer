@@ -1,11 +1,10 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `CREATE TABLE Users (
+  let createQuery = `DROP TABLE IF EXISTS Users;
+  CREATE TABLE Users (
   uid       INTEGER,
   fname       VARCHAR(60),
   lname     VARCHAR(60),
-  password    VARCHAR(64),
-  PRIMARY KEY (uid),
-  FOREIGN KEY (uid, password) REFERENCES Account
+  PRIMARY KEY (uid)
 )`;
   return knex.raw(createQuery);
 };

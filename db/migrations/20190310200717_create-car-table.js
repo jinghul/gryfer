@@ -1,9 +1,8 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `CREATE TABLE Car (
+  let createQuery = `DROP TABLE IF EXISTS Car;
+  CREATE TABLE Car (
 	cid 			INTEGER,
-	uid				INTEGER NOT NULL,
-	PRIMARY KEY (cid),
-	FOREIGN KEY (uid) REFERENCES Drivers
+	PRIMARY KEY (cid)
 )`;
   return knex.raw(createQuery);
 };
