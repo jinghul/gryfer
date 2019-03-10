@@ -2,10 +2,9 @@
 A carpool app where passengers can bid on rides.
 
 
-## Initializing DB with Knex
-npm install knex
-npx knex migrate:latest
+## Backend
+1. Run `npm install` to install dependencies.
 
-## Testing stuff w/ Automated Server Reloads
-npm install nodemon
-nodemon index.js
+2. Run `npx knex migrate:latest` to initialize database.
+
+3. Run `nodemon index.js` to start the backend server.
