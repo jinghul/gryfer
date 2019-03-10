@@ -33,14 +33,18 @@
 }
 
 /********* AUTH *********/
-#register {
+#register, #reg-splash {
     display: none;
 }
 
 #auth-splash {
     margin-left: 15px;
-    background-image: url("../img/auth-splash.jpeg");
+    background-image: url("../img/signin-splash.jpeg");
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
     background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+.auth-form {
+    margin-top: 5%;
 }
