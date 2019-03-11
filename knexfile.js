@@ -3,7 +3,7 @@ const config = require('./config.json');
 module.exports = {
   development: {
     client: 'pg',
-    connection:'postgres://jinghu:password@localhost/' + config.api,
+    connection:'postgres://' + config.username + ':' + config.password + '@localhost/' + config.database,
     migrations: {
       directory: './db/migrations'
     },
@@ -15,7 +15,7 @@ module.exports = {
 
   test: {
     client: 'pg',
-    connection:'postgres://jinghu:password@localhost/secrets_test',
+    connection:'postgres://' + config.username + ':' + config.password + '@localhost/secrets_test',
     migrations: {
       directory: './db/migrations'
     },
