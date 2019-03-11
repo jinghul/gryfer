@@ -10,7 +10,7 @@ const pool = new Pool({
 })
 
 const getUsers = (request, response) => {
-  pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
+  pool.query('SELECT * FROM users ORDER BY uid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -21,7 +21,7 @@ const getUsers = (request, response) => {
 const getUserById = (request, response) => {
   const id = parseInt(request.params.id)
 
-  pool.query('SELECT * FROM users WHERE id = $1', [id], (error, results) => {
+  pool.query('SELECT * FROM users WHERE uid = $1', [id], (error, results) => {
     if (error) {
       throw error
     }
@@ -31,14 +31,14 @@ const getUserById = (request, response) => {
 
 
 const createUser = (request, response) => {
-  const { name, email } = request.body
+  const { firstName, lastName, email, pssword } = request.body
 
-  pool.query('INSERT INTO users (name, email) VALUES ($1, $2) RETURNING *', [name, email], (error, results) => {
+  pool.query('INSERT INTO users (fname, lname, email) VALUES ($1, $2, $3) RETURNING *', [firstName, lastName, email], (error, results) => {
     if (error) {
       throw error
     }
     console.log(results.rows)
-    response.status(201).send(`User added with ID: ${results.rows[0].id}`)
+    response.status(201).send(`User added with ID: ${results.rows[0].uid}`)
   })
 }
 

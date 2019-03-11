@@ -1,9 +1,10 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Users;
   CREATE TABLE Users (
-  uid       		INTEGER,
-  fname       		VARCHAR(60),
-  lname     		VARCHAR(60),
+  uid               SERIAL,
+  fname             VARCHAR(60),
+  lname             VARCHAR(60),
+  email             VARCHAR(60) UNIQUE,
   PRIMARY KEY (uid)
 )`;
   return knex.raw(createQuery);

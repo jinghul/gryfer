@@ -9,15 +9,32 @@ A carpool app where passengers can bid on rides.
 
 2. `psql postgres`
 
-3. `CREATE ROLE me WITH LOGIN PASSWORD 'password';`
+3. `CREATE ROLE [username] WITH LOGIN PASSWORD ['password'];`
 
-4. `ALTER ROLE me CREATEDB;`
+4. `ALTER ROLE [username] CREATEDB;`
 
 5. Exit with `\q`
 
-6. Connect `psql -d postgres -U me`
+6. Connect `psql -d postgres -U [username]`
 
-7. Create the database using `CREATE DATABASE api;`.
+7. Create the database using `CREATE DATABASE [name of db];`.
+
+### Granting permission to edit database.
+1. Connect to database as admin: `psql -d [name of db]`
+
+2. Grant privileges: `grant all privileges on all tables in schema public to [username];`
+
+### Create config file.
+1. Create `config.json` in the root directory
+
+2. Write a json file as follows:
+```
+{
+	"username" : "[username]",
+    "password" : "[password]",
+    "api": "[name of db]"
+}
+```
 
 ### Setting up backend and initializing tables.
 1. Run `npm install` to install dependencies.
