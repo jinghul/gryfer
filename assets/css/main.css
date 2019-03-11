@@ -6,8 +6,9 @@
     border-bottom: 0.05rem black solid;
 }
 
-.nav > .nav-link {
+.nav > .nav-link, .nav > .navbar-brand {
     color: black;
+    line-height: 50px;
 }
 
 .display-5 {
@@ -33,12 +34,13 @@
 }
 
 /********* AUTH *********/
-#register, #reg-splash {
+#register {
     display: none;
 }
 
 #auth-splash {
-    margin-left: 15px;
+    margin-left: 30px;
+    filter: drop-shadow(0 0 0.5rem #000);
     background-image: url("../img/signin-splash.jpeg");
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
@@ -46,5 +48,5 @@
 }
 
 .auth-form {
-    margin-top: 5%;
+    margin-top: 7%;
 }

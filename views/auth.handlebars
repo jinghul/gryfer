@@ -1,0 +1,66 @@
+<div class="container-fluid h-100">
+    {{> nav}}
+    <div class="row mt-4" style="height: 85%">
+        <div id="auth-splash" class="col h-100"></div>
+        <div class="col">
+            <div id="sign-in">
+                <h1 class="display-5 text-center" style="margin-top:15%">
+                    Ride or Drive
+                </h1>
+                <form id="form-si" class="auth-form w-75 mx-auto">
+                    <div class="form-group">
+                        <label for="email-input">Email address</label>
+                        <input type="email" class="form-control" id="email-input" placeholder="email" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password-input">Password</label>
+                        <input type="password" class="form-control" id="password-input" placeholder="password" />
+                    </div>
+
+                    <div role="group">
+                        <button id="submit-si" type="submit" class="btn btn-primary w-25">
+                            Sign In
+                        </button>
+                        <button id="si-to-reg" type="button" class="btn btn-link">
+                            Register
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="register">
+                <h1 class="display-5 text-center" style="margin-top:5%">
+                    Register
+                </h1>
+                <form id="form-reg" class="auth-form w-75 mx-auto">
+                    <div class="form-group">
+                        <label for="first-name-input-reg">First Name</label>
+                        <input type="text" class="form-control" id="first-name-input-reg" placeholder="john" />
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name-input-reg">Last Name</label>
+                        <input type="text" class="form-control" id="last-name-input-reg" placeholder="doe" />
+                    </div>
+                    <div class="form-group">
+                        <label for="email-input-reg">Email</label>
+                        <input type="email" class="form-control" id="email-input-reg"
+                            placeholder="jdoe1234@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password-input-reg">Password</label>
+                        <input type="password" class="form-control" id="password-input-reg" placeholder="******" />
+                    </div>
+
+                    <div role="group">
+                        <button type="submit" class="btn btn-primary w-25" id="submit-reg">
+                            Register
+                        </button>
+                        <button id="reg-to-si" type="button" class="btn btn-link">
+                            Back
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="./js/auth.js"></script>
