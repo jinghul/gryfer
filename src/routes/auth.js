@@ -4,7 +4,7 @@ const database = require('knex')(configuration);           // define database ba
 const bcrypt = require('bcrypt')                         // bcrypt will encrypt passwords to be saved in db
 const crypto = require('crypto')                         // built-in encryption node module
 
-const signup = (request, response) => {
+const register = (request, response) => {
   const user = request.body
   hashPassword(user.password)
     .then((hashedPassword) => {
@@ -19,11 +19,6 @@ const signup = (request, response) => {
       response.status(201).json({ user })
     })
     .catch((err) => console.error(err))
-}
-
-// don't forget to export!
-module.exports = {
-  signup,
 }
 
 const hashPassword = (password) => {
@@ -52,6 +47,10 @@ const createToken = () => {
       err ? reject(err) : resolve(data.toString('base64'))
     })
   })
+}
+
+module.exports = {
+  register,
 }
 
 

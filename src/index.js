@@ -1,16 +1,16 @@
-const express = require('express')
-const bodyParser = require('body-parser')
+const express = require('express');
 const app = express()
-const port = 3000
-const pg = require('pg')
-const db = require('./queries')
-const User = require('./models/user.js')
 
+/* Utils */
+const bodyParser = require('body-parser')
+const config = require('../config.json')
+const pg = require('pg'),
+      session = require('express-session'),
+      pgSession = require('connect-pg-simple')(session)
 
-// const conString = "postgres://" + config.username + ":" + config.password + "@localhost:5432/" + config.api
-
-// var client = new pg.Client(conString)
-// client.connect();
+/* Routes */
+const users = require('./routes/users')
+const auth = require('./routes/auth')
 
 app.use(bodyParser.json())
 app.use(
@@ -19,19 +19,32 @@ app.use(
   })
 )
 
+var pgPool = new pg.Pool({
+  user: config.username,
+  database: config.database,
+  password: config.password,
+  host: config.app.host,
+  port: config.app.port,
+})
+
+app.use(session({
+  store: new pgSession({
+    pool : pgPool,                // Connection pool
+    tableName : 'user_sessions'   // Use another table-name than the default "session" one
+  }),
+  secret: config.app.secret,
+  resave: false,
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 } // 30 days
+}))
+
 app.get('/', (request, response) => {
   response.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
-app.get('/users', db.getUsers)
-app.get('/users/:id', db.getUserById)
-app.post('/users', db.createUser)
-app.put('/users/:id', db.updateUser)
-app.delete('/users/:id', db.deleteUser)
+app.use('/users', users)
+app.post('/register', auth)
 
-app.post('/signup', User.signup)
-
-app.listen(port, () => {
-  console.log(`App running on port ${port}.`)
+app.listen(config.app_port, () => {
+  console.log(`App running on port ${config.app_port}.`)
 })
 
