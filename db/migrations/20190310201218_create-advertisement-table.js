@@ -1,13 +1,14 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Advertisement;
   CREATE TABLE Advertisement (
-	aid				INTEGER,
+	aid				SERIAL,
 	minBidPrice		FLOAT,
 	fromAddress		VARCHAR(60),
 	toAddress 		VARCHAR(60),
+	time			timestamp,
 	uid			INTEGER NOT NULL,
 	PRIMARY KEY (aid),
-	FOREIGN KEY (uid) REFERENCES Drivers
+	FOREIGN KEY (uid) REFERENCES Users
 )`;
   return knex.raw(createQuery);
 };

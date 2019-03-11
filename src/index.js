@@ -4,6 +4,7 @@ const app = express()
 const port = 3000
 const pg = require('pg')
 const db = require('./queries')
+const ads = require('./models/advertisements')
 const User = require('./models/user.js')
 
 
@@ -28,6 +29,9 @@ app.get('/users/:id', db.getUserById)
 app.post('/users', db.createUser)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
+
+app.post('/make_advertisement', ads.createAdvertisement)
+
 
 app.post('/signup', User.signup)
 

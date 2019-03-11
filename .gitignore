@@ -61,3 +61,7 @@ typings/
 .next
 
 config.json
+
+#Mac stuff
+.DS_Store
+
