@@ -35,9 +35,10 @@ const hashPassword = (password) => {
 }
 
 const createUser = (user) => {
+  console.log(user)
   return database.raw(
-    "INSERT INTO users (username, password_digest, token, created_at) VALUES (?, ?, ?, ?) RETURNING id, username, created_at, token",
-    [user.username, user.password_digest, user.token, new Date()]
+    "INSERT INTO UserProfile (username, uid, passwordHash, userToken, dateJoined) VALUES (?, ?, ?, ?, ?) RETURNING username, uid, userToken",
+    [user.username, user.uid, user.password_digest, user.userToken, new Date()]
   )
   .then((data) => data.rows[0])
 }
