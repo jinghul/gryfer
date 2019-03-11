@@ -3,7 +3,9 @@ exports.up = function(knex, Promise) {
   CREATE TABLE SavedDestinations (
 	nickname		VARCHAR(20),
 	address			VARCHAR(60),
-	PRIMARY KEY (nickname)
+	uid				INTEGER NOT NULL,
+	PRIMARY KEY (nickname),
+	FOREIGN KEY (uid) REFERENCES Account
 )`;
   return knex.raw(createQuery);
 };

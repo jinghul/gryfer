@@ -6,11 +6,11 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE UserProfile (
-	username		VARCHAR(20),
-	dateJoined		DATE,
-	uid				INTEGER NOT NULL,
-	PRIMARY KEY (username),
-	FOREIGN KEY (uid) REFERENCES Users
+  username      	VARCHAR(20),
+  uid           	INTEGER NOT NULL,
+  dateJoined		TIMESTAMP,
+  PRIMARY KEY (username),
+  FOREIGN KEY (uid) REFERENCES Users
 );
 
 CREATE TABLE History (
@@ -25,6 +25,7 @@ CREATE TABLE Account (
 	uid				INTEGER NOT NULL,
 	password		VARCHAR(64),
 	nickname		VARCHAR(20),
+	dateCreated		TIMESTAMP,
 	PRIMARY KEY (uid, password),
 	FOREIGN KEY (uid) REFERENCES Users,
 	FOREIGN KEY (nickname) REFERENCES SavedDestinations
