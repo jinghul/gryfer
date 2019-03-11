@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
   CREATE TABLE UserProfile (
   username        VARCHAR(20),
   uid             INTEGER NOT NULL,
-  dateJoined    TIMESTAMP,
+  dateJoined      TIMESTAMP,
   PRIMARY KEY (username),
   FOREIGN KEY (uid) REFERENCES Users
 )`;
