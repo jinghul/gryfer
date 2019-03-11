@@ -36,6 +36,11 @@ A carpool app where passengers can bid on rides.
 }
 ```
 
+3. Inside knexfile.js, update the connections to be:
+```
+postgresql://[user]:[password]@[netloc][:port][/dbname]
+```
+
 ### Setting up backend and initializing tables.
 1. Run `npm install` to install dependencies.
 
