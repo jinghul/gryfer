@@ -30,8 +30,6 @@ const signup = (request, response) => {
 
 const signin = (request, response) => {
   const userReq = request.body
-  let user
-
   findUser(userReq)
     .then(foundUser => {
       user = foundUser
@@ -122,16 +120,11 @@ const createToken = () => {
 }
 
 const findUser = (userReq) => {
-  let x = pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username], (error, results) => {
-    if (error) {
-      throw error
-    }
-    console.log(results.rows[0])
-    return results.rows[0]
-  })
-  console.log(x)
-  return x
+  return pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username])
+  .then((results) => results.rows[0])
+  .catch((error) => console.error(error.stack))
 }
+
 
 const checkPassword = (reqPassword, foundUser) => {
   return new Promise((resolve, reject) =>
