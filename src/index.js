@@ -61,11 +61,10 @@ app.use('/users', users);
 app.use('/ads', advertisements);
 
 // Register + Sign in
-// TODO: sign in auth
 app.get('/auth', (req, res) => {
     res.render('auth', {title: 'Sign In'})
 })
-app.post('/register', auth);
+app.use('/auth', auth);
 
 app.use(express.static(path.join(__dirname, '../assets/')));
 
