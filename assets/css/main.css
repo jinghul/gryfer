@@ -6,8 +6,13 @@
     border-bottom: 0.05rem black solid;
 }
 
-.nav > .nav-link {
+.nav > .nav-link, .nav > .navbar-brand {
     color: black;
+    line-height: 50px;
+}
+
+.nav > .nav-link:hover {
+    filter: drop-shadow(0 0 0.5rem #000);
 }
 
 .display-5 {
@@ -17,6 +22,7 @@
 
 /********* HOME *********/
 #main-splash {
+    margin-top: 30px;
     background-image: url("../img/main-splash-res.jpg");
     height: 600px; /* You must set a specified height */
     background-position: center; /* Center the image */
@@ -35,12 +41,19 @@
 /********* AUTH *********/
 #register {
     display: none;
+    overflow-y: auto;
+    padding: 0 0 15px 0;
 }
 
 #auth-splash {
-    margin-left: 15px;
-    background-image: url("../img/auth-splash.jpeg");
+    margin-left: 30px;
+    filter: drop-shadow(0 0 0.5rem #000);
+    background-image: url("../img/signin-splash.jpeg");
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
     background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+.auth-form {
+    margin-top: 7%;
 }

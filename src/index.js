@@ -1,42 +1,73 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const app = express()
-const port = 3000
-const pg = require('pg')
-const db = require('./queries')
-const ads = require('./models/advertisements')
-const User = require('./models/user.js')
+const express = require('express');
+const app = express();
 
-app.use(bodyParser.json())
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-)
+/* Utils */
+const path = require('path');
+const config = require('../config.json');
+const pg = require('pg'),
+    session = require('express-session'),
+    pgSession = require('connect-pg-simple')(session);
 
-app.get('/', (request, response) => {
-  response.json({ info: 'Node.js, Express, and Postgres API' })
+var pgPool = new pg.Pool({
+    user: config.username,
+    database: config.api,
+    password: config.password,
+    host: config.host,
+    port: config.port,
+});
+
+app.use(session({
+  store: new pgSession({
+      pool: pgPool
+  }),
+  saveUninitialized: false,
+  secret: config.app.secret,
+  resave: false,
+  cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
+}))
+
+const exphbs = require('express-handlebars');
+app.engine(
+    'handlebars',
+    exphbs({
+        extname: 'handlebars',
+        layoutDir: path.join(__dirname, "../views/layouts"),
+        defaultLayout: 'full',
+        helpers: path.join(__dirname, "views/helpers"),
+        partialsDir: path.join(__dirname, "../views/partials"),
+    })
+);
+app.set('view engine', 'handlebars');
+app.set('views', path.join(__dirname, "../views"));
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/* Routes */
+const users = require('./routes/users');
+const advertisements = require('./routes/advertisements');
+const auth = require('./routes/auth');
+
+app.get('/', (req, res) => {
+    res.redirect('/home')
 })
+app.get('/home', (req, res) => {
+    res.render('home', {title: 'Gryfer', layout: 'main'});
+});
 
-app.get('/users', db.getUsers)
-app.get('/users/:id', db.getUserById)
-app.post('/users', db.createUser)
-app.put('/users/:id', db.updateUser)
-app.delete('/users/:id', db.deleteUser)
+// API
+app.use('/users', users);
+app.use('/ads', advertisements);
 
-app.post('/make_advertisement', ads.createAdvertisement)
-app.get('/advertisements', ads.getAdvertisements)
-app.get('/advertisements/:aid', ads.getAdvertisementByAdId)
-app.get('/user_advertisements/:uid', ads.getAdvertisementByUserId)
-app.put('/advertisements/:aid', ads.updateAdvertisement)
-app.delete('/advertisements/:aid', ads.deleteAdvertisement)
-
-
-app.post('/signup', User.signup)
-
-app.post('/signin', User.signin)
-
-app.listen(port, () => {
-  console.log(`App running on port ${port}.`)
+// Register + Sign in
+app.get('/auth', (req, res) => {
+    res.render('auth', {title: 'Sign In'})
 })
+app.use('/auth', auth);
 
+app.use(express.static(path.join(__dirname, '../assets/')));
+
+app.listen(config.app.port, () => {
+    console.log(`App running on port ${config.app.port}.`);
+});
