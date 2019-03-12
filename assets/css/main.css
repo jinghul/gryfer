@@ -24,7 +24,7 @@
 #main-splash {
     margin-top: 30px;
     background-image: url("../img/main-splash-res.jpg");
-    height: 600px; /* You must set a specified height */
+    height: 85%; /* You must set a specified height */
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Do not repeat the image */
     background-size: cover; /* Resize the background image to cover the entire container */
