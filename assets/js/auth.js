@@ -27,7 +27,22 @@ function reg_to_si() {
 }
 
 // Register a user into the database
-function register() {}
+function register() {
+    data = {}
+    $('#form-reg :input').each(
+        function(){  
+            var input = $(this);
+            data[input.attr('name')] = input.val();
+        }
+    );
+
+    $.post('http://localhost:3000/register',
+        JSON.stringify(data),
+        function(data, status) {
+            alert(data);
+        },
+    "json");
+}
 
 // Sign an user into the system
 function signin() {}

@@ -9,15 +9,15 @@
                 </h1>
                 <form id="form-si" class="auth-form w-75 mx-auto needs-validation" novalidate>
                     <div class="form-group">
-                        <label for="email-input">Email address</label>
-                        <input type="email" class="form-control" id="email-input" placeholder="email" required />
+                        <label for="email-si">Email address</label>
+                        <input type="email" class="form-control" id="email-input" name="email" placeholder="email" required />
                         <div class="invalid-feedback">
                             Please enter an email.
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="password-input">Password</label>
-                        <input type="password" class="form-control" id="password-input" placeholder="password"
+                        <label for="password-si">Password</label>
+                        <input type="password" class="form-control" id="password-input" name="password" placeholder="password"
                             required />
                         <div class="invalid-feedback">
                             Please enter a password.
@@ -38,19 +38,19 @@
                 <h1 class="display-5 text-center" style="margin-top:5%">
                     Register
                 </h1>
-                <form id="form-reg" class="auth-form w-75 mx-auto needs-validation" novalidate>
+                <form id="form-reg" class="auth-form w-75 mx-auto needs-validation" onsubmit="register()" novalidate>
                     <div class="form-row">
                         <div class="form-group col-md-6 mb-3">
-                            <label for="first-name-input-reg">First Name</label>
-                            <input type="text" class="form-control" id="first-name-input-reg" placeholder="john"
+                            <label for="fn-reg">First Name</label>
+                            <input type="text" class="form-control" name="fname" placeholder="john"
                                 required />
                             <div class="invalid-feedback">
                                 Please enter a first name.
                             </div>
                         </div>
                         <div class="form-group col-md-6 mb-3">
-                            <label for="last-name-input-reg">Last Name</label>
-                            <input type="text" class="form-control" id="last-name-input-reg" placeholder="doe"
+                            <label for="ln-reg">Last Name</label>
+                            <input type="text" class="form-control" name="lname" placeholder="doe"
                                 required />
                             <div class="invalid-feedback">
                                 Please enter a last name.
@@ -59,24 +59,24 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-4 mb-3">
-                            <label for="email-input-reg">Email</label>
-                            <input type="email" class="form-control" id="email-input-reg"
+                            <label for="email-reg">Email</label>
+                            <input type="email" class="form-control" id="email-reg" name="email"
                                 placeholder="jdoe1234@email.com" required />
                             <div class="invalid-feedback">
                                 Please enter an email.
                             </div>
                         </div>
                         <div class="form-group col-md-4 mb-3">
-                            <label for="user-input-reg">Username</label>
-                            <input type="text" class="form-control" id="user-input-reg" placeholder="jdoe1234"
+                            <label for="user-reg">Username</label>
+                            <input type="text" class="form-control" id="user-reg" name="username" placeholder="jdoe1234"
                                 required />
                             <div class="invalid-feedback">
                                 Please choose an username.
                             </div>
                         </div>
                         <div class="form-group col-md-4 mb-3">
-                            <label for="password-input-reg">Password</label>
-                            <input type="password" class="form-control" id="password-input-reg" placeholder="******"
+                            <label for="password-reg">Password</label>
+                            <input type="password" class="form-control" name="password" id="password-reg" placeholder="******"
                                 required />
                             <div class="invalid-feedback">
                                 Please choose a password.
