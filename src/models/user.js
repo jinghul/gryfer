@@ -1,9 +1,15 @@
-const environment = process.env.NODE_ENV || 'development';    
-const configuration = require('../../knexfile')[environment];
-const database = require('knex')(configuration);
-const knex = require('knex')
+const environment = process.env.NODE_ENV || 'development';
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const config = require('../../config.json')
+const Pool = require('pg').Pool
+const pool = new Pool({
+  user: config.username,
+  host: 'localhost',
+  database: config.api,
+  password: config.password,
+  port: 5432,
+})
 
 const signup = (request, response) => {
   const user = request.body
@@ -27,6 +33,24 @@ module.exports = {
   signup,
 }
 
+const signin = (request, response) => {
+  const userReq = request.body
+  let user
+
+  findUser(userReq)
+    .then(foundUser => {
+      user = foundUser
+      return checkPassword(userReq.password, foundUser)
+    })
+    .then((res) => createToken())
+    .then(token => updateUserToken(token, user))
+    .then(() => {
+      delete user.password_digest
+      response.status(200).json(user)
+    })
+    .catch((err) => console.error(err))
+}
+
 const hashPassword = (password) => {
   return new Promise((resolve, reject) =>
     bcrypt.hash(password, 10, (err, hash) => {
@@ -36,60 +60,53 @@ const hashPassword = (password) => {
 }
 
 const createUser = (user) => {
-  console.log(user)
-  try {
-    var t = database.transaction()
-    try {
-      database("Users")
-        .transacting(t)
-        .insert({fname: user.fname, lname: user.lname})
-      database('UserProfile')
-          .insert({username: user.username, uid: 1, dateJoined: new Date()})
-      database('Account')
-          .insert({uid: 1, password: user.password_digest, userToken: user.userToken})
-      t.commit()
+  pool.connect((err, client, done) => {
+    const shouldAbort = (err) => {
+      if (err) {
+        console.error('Error in transaction', err.stack)
+        client.query('ROLLBACK', (err) => {
+          if (err) {
+            console.error('Error rolling back client', err.stack)
+          }
+          // release the client back to the pool
+          done()
+        })
+      }
+      return !!err
     }
-    catch (e) {
-      t.rollback()
-      throw e
-    }
-  }
-  catch (e) {
-    throw e
-  }
-  // return database.transaction(function(t) {
-  //   return database('Users')
-  //   .transacting(t)
-  //   .insert({fname: user.fname, lname: user.lname})
-  //   .then(function() {
-  //     return database('UserProfile')
-  //         .insert({username: user.username, uid: 1, dateJoined: new Date()})
-  //         .then (function() {
-  //           return database('Account')
-  //               .insert({uid: 1, password: user.password_digest, userToken: user.userToken})
-  //         })
-  //   })
-  //   .then(t.commit)
-  //   .catch(function (e) {
-  //     t.rollback();
-  //     throw e;
-  //   })
-  // })
-  // .then((data) => data.rows[0])
-  // .catch(function(e) {
-  //   throw e;
-  // })
-  
-  // database.raw(
-  //   "BEGIN; \
-  //    INSERT INTO Users (fname, lname) VALUES ('" + user.fname + "', '" + user.lname + "'); \
-  //    INSERT INTO UserProfile (username, uid, dateJoined) VALUES ('" + user.username + "', currval(pg_get_serial_sequence('Users', 'uid')), ?); \
-  //    INSERT INTO Account (uid, password, userToken) VALUES (currval(pg_get_serial_sequence('Users', 'uid')), '" + user.password_digest  + "', '" + user.userToken + "') RETURNING uid, userToken; \
-  //    COMMIT; \
-  //   ",
-  //    [new Date()]
-  // )
-  // .then((data) => data.rows[0])
+
+    client.query('BEGIN', (err) => {
+      if (shouldAbort(err))  {
+        return
+      }
+      client.query('INSERT INTO Users (fname, lname, email) VALUES($1, $2, $3) RETURNING uid', [user.fname, user.lname, user.email], (err, res) => {
+        if (shouldAbort(err))  {
+          return
+        }
+        const insertUserProfileText = "INSERT INTO UserProfile (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)"
+        const insertUserProfileValues = [user.username, new Date()]
+        client.query(insertUserProfileText, insertUserProfileValues, (err, res) => {
+          if (shouldAbort(err)) {
+            return
+          }
+          const insertAccountText = "INSERT INTO Account (uid, password, userToken) VALUES (currval('users_uid_seq'), $1, $2)"
+          const insertAccountValues = [user.password_digest, user.userToken]
+          client.query(insertAccountText, insertAccountValues, (err, res) => {
+            if (shouldAbort(err)) {
+              return
+            }
+            client.query('COMMIT', (err) => {
+              if (err) {
+                console.error("Error committing transaction", err.stack)
+              }
+              done()
+            })
+          })
+        })
+      })
+    })
+  })
+  return user
 }
 
 const createToken = () => {
@@ -98,6 +115,36 @@ const createToken = () => {
       err ? reject(err) : resolve(data.toString('base64'))
     })
   })
+}
+
+const findUser = (userReq) => {
+  return pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username], (error, results) => {
+    if (error) {
+      throw error
+    }
+    return results.rows[0]
+  })
+    
+}
+
+const checkPassword = (reqPassword, foundUser) => {
+  return new Promise((resolve, reject) =>
+    bcrypt.compare(reqPassword, foundUser.password_digest, (err, response) => {
+        if (err) {
+          reject(err)
+        }
+        else if (response) {
+          resolve(response)
+        } else {
+          reject(new Error('Passwords do not match.'))
+        }
+    })
+  )
+}
+
+const updateUserToken = (token, user) => {
+  return database.raw("UPDATE users SET token = ? WHERE id = ? RETURNING id, username, token", [token, user.id])
+    .then((data) => data.rows[0])
 }
 
 
