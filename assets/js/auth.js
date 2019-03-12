@@ -43,8 +43,8 @@ function register() {
         }
     );
 
-    $.post('http://localhost:3000/register',
-        JSON.stringify(data),
+    $.post('http://localhost:3000/auth/register',
+        data,
         function(data, status) {
             alert(data);
         },
@@ -66,9 +66,10 @@ $('document').ready(function() {
         form.addEventListener(
             'submit',
             function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                event.preventDefault();
+                event.stopPropagation();
+                if (form.checkValidity() === true) {
+                    register();
                 }
                 form.classList.add('was-validated');
             },

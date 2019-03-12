@@ -47,7 +47,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 /* Routes */
 const users = require('./routes/users');
 const advertisements = require('./routes/advertisements');
-const auth = require('./routes/auth');
+const auth = require('./routes/client_auth');
 
 app.get('/', (req, res) => {
     res.redirect('/home')
