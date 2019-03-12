@@ -2,19 +2,26 @@
     {{> nav}}
     <div class="row mt-4" style="height: 85%">
         <div id="auth-splash" class="col h-100"></div>
-        <div class="col">
+        <div class="col h-100">
             <div id="sign-in">
                 <h1 class="display-5 text-center" style="margin-top:15%">
                     Ride or Drive
                 </h1>
-                <form id="form-si" class="auth-form w-75 mx-auto">
+                <form id="form-si" class="auth-form w-75 mx-auto needs-validation" novalidate>
                     <div class="form-group">
                         <label for="email-input">Email address</label>
-                        <input type="email" class="form-control" id="email-input" placeholder="email" />
+                        <input type="email" class="form-control" id="email-input" placeholder="email" required />
+                        <div class="invalid-feedback">
+                            Please enter an email.
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="password-input">Password</label>
-                        <input type="password" class="form-control" id="password-input" placeholder="password" />
+                        <input type="password" class="form-control" id="password-input" placeholder="password"
+                            required />
+                        <div class="invalid-feedback">
+                            Please enter a password.
+                        </div>
                     </div>
 
                     <div role="group">
@@ -27,30 +34,57 @@
                     </div>
                 </form>
             </div>
-            <div id="register">
+            <div id="register" class="h-100">
                 <h1 class="display-5 text-center" style="margin-top:5%">
                     Register
                 </h1>
-                <form id="form-reg" class="auth-form w-75 mx-auto">
-                    <div class="form-group">
-                        <label for="first-name-input-reg">First Name</label>
-                        <input type="text" class="form-control" id="first-name-input-reg" placeholder="john" />
+                <form id="form-reg" class="auth-form w-75 mx-auto needs-validation" novalidate>
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-3">
+                            <label for="first-name-input-reg">First Name</label>
+                            <input type="text" class="form-control" id="first-name-input-reg" placeholder="john"
+                                required />
+                            <div class="invalid-feedback">
+                                Please enter a first name.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6 mb-3">
+                            <label for="last-name-input-reg">Last Name</label>
+                            <input type="text" class="form-control" id="last-name-input-reg" placeholder="doe"
+                                required />
+                            <div class="invalid-feedback">
+                                Please enter a last name.
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="last-name-input-reg">Last Name</label>
-                        <input type="text" class="form-control" id="last-name-input-reg" placeholder="doe" />
-                    </div>
-                    <div class="form-group">
-                        <label for="email-input-reg">Email</label>
-                        <input type="email" class="form-control" id="email-input-reg"
-                            placeholder="jdoe1234@email.com" />
-                    </div>
-                    <div class="form-group">
-                        <label for="password-input-reg">Password</label>
-                        <input type="password" class="form-control" id="password-input-reg" placeholder="******" />
+                    <div class="form-row">
+                        <div class="form-group col-md-4 mb-3">
+                            <label for="email-input-reg">Email</label>
+                            <input type="email" class="form-control" id="email-input-reg"
+                                placeholder="jdoe1234@email.com" required />
+                            <div class="invalid-feedback">
+                                Please enter an email.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4 mb-3">
+                            <label for="user-input-reg">Username</label>
+                            <input type="text" class="form-control" id="user-input-reg" placeholder="jdoe1234"
+                                required />
+                            <div class="invalid-feedback">
+                                Please choose an username.
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4 mb-3">
+                            <label for="password-input-reg">Password</label>
+                            <input type="password" class="form-control" id="password-input-reg" placeholder="******"
+                                required />
+                            <div class="invalid-feedback">
+                                Please choose a password.
+                            </div>
+                        </div>
                     </div>
 
-                    <div role="group">
+                    <div class="mt-4" role="group">
                         <button type="submit" class="btn btn-primary w-25" id="submit-reg">
                             Register
                         </button>
