@@ -7,12 +7,6 @@ const db = require('./queries')
 const ads = require('./models/advertisements')
 const User = require('./models/user.js')
 
-
-// const conString = "postgres://" + config.username + ":" + config.password + "@localhost:5432/" + config.api
-
-// var client = new pg.Client(conString)
-// client.connect();
-
 app.use(bodyParser.json())
 app.use(
   bodyParser.urlencoded({
@@ -39,6 +33,8 @@ app.delete('/advertisements/:aid', ads.deleteAdvertisement)
 
 
 app.post('/signup', User.signup)
+
+app.post('/signin', User.signin)
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`)

@@ -28,11 +28,6 @@ const signup = (request, response) => {
     .catch((err) => console.error(err))
 }
 
-// don't forget to export!
-module.exports = {
-  signup,
-}
-
 const signin = (request, response) => {
   const userReq = request.body
   let user
@@ -51,7 +46,13 @@ const signin = (request, response) => {
     .catch((err) => console.error(err))
 }
 
-const hashPassword = (password) => {
+// don't forget to export!
+module.exports = {
+  signup,
+  signin,
+}
+
+const hashPassword = (password, user) => {
   return new Promise((resolve, reject) =>
     bcrypt.hash(password, 10, (err, hash) => {
       err ? reject(err) : resolve(hash)
@@ -60,6 +61,7 @@ const hashPassword = (password) => {
 }
 
 const createUser = (user) => {
+  let user1 = JSON.parse(JSON.stringify(user))
   pool.connect((err, client, done) => {
     const shouldAbort = (err) => {
       if (err) {
@@ -75,22 +77,24 @@ const createUser = (user) => {
       return !!err
     }
 
+
     client.query('BEGIN', (err) => {
+      console.log(user1)
       if (shouldAbort(err))  {
         return
       }
-      client.query('INSERT INTO Users (fname, lname, email) VALUES($1, $2, $3) RETURNING uid', [user.fname, user.lname, user.email], (err, res) => {
+      client.query('INSERT INTO Users (fname, lname, email) VALUES($1, $2, $3) RETURNING uid', [user1.fname, user1.lname, user1.email], (err, res) => {
         if (shouldAbort(err))  {
           return
         }
         const insertUserProfileText = "INSERT INTO UserProfile (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)"
-        const insertUserProfileValues = [user.username, new Date()]
+        const insertUserProfileValues = [user1.username, new Date()]
         client.query(insertUserProfileText, insertUserProfileValues, (err, res) => {
           if (shouldAbort(err)) {
             return
           }
           const insertAccountText = "INSERT INTO Account (uid, password, userToken) VALUES (currval('users_uid_seq'), $1, $2)"
-          const insertAccountValues = [user.password_digest, user.userToken]
+          const insertAccountValues = [user1.password_digest, user1.token]
           client.query(insertAccountText, insertAccountValues, (err, res) => {
             if (shouldAbort(err)) {
               return
@@ -118,18 +122,20 @@ const createToken = () => {
 }
 
 const findUser = (userReq) => {
-  return pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username], (error, results) => {
+  let x = pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username], (error, results) => {
     if (error) {
       throw error
     }
+    console.log(results.rows[0])
     return results.rows[0]
   })
-    
+  console.log(x)
+  return x
 }
 
 const checkPassword = (reqPassword, foundUser) => {
   return new Promise((resolve, reject) =>
-    bcrypt.compare(reqPassword, foundUser.password_digest, (err, response) => {
+    bcrypt.compare(reqPassword, foundUser.password, (err, response) => {
         if (err) {
           reject(err)
         }
@@ -143,8 +149,9 @@ const checkPassword = (reqPassword, foundUser) => {
 }
 
 const updateUserToken = (token, user) => {
-  return database.raw("UPDATE users SET token = ? WHERE id = ? RETURNING id, username, token", [token, user.id])
-    .then((data) => data.rows[0])
+  return pool.query("UPDATE Account SET userToken = $1 WHERE uid = $2 RETURNING uid, username, userToken", [token, user.uid], (error, results) => {
+    return results.rows[0]
+  })
 }
 
 
