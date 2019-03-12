@@ -32,7 +32,7 @@ app.engine(
     exphbs({
         extname: 'handlebars',
         layoutDir: path.join(__dirname, "../views/layouts"),
-        defaultLayout: 'full',
+        defaultLayout: 'main',
         helpers: path.join(__dirname, "views/helpers"),
         partialsDir: path.join(__dirname, "../views/partials"),
     })
@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
     res.redirect('/home')
 })
 app.get('/home', (req, res) => {
-    res.render('home', {title: 'Gryfer', layout: 'main'});
+    res.render('home', {title: 'Gryfer'});
 });
 
 // API
