@@ -10,6 +10,7 @@ const pg = require('pg'),
 
 /* Routes */
 const users = require('./routes/users')
+const advertisements = require('./routes/advertisements')
 const auth = require('./routes/auth')
 
 app.use(bodyParser.json())
@@ -41,7 +42,12 @@ app.get('/', (request, response) => {
   response.json({ info: 'Node.js, Express, and Postgres API' })
 })
 
+// API
 app.use('/users', users)
+app.use('/ads', advertisements)
+
+// Register + Sign in
+// TODO: sign in auth
 app.post('/register', auth)
 
 app.listen(config.app_port, () => {

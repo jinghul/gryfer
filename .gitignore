@@ -62,3 +62,7 @@ typings/
 
 # config
 config.json
+
+#Mac stuff
+.DS_Store
+

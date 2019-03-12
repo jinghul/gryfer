@@ -1,4 +1,4 @@
-const config = require('./config.json');
+const config = require('./config.json')
 
 module.exports = {
   development: {
@@ -12,7 +12,6 @@ module.exports = {
     },
     useNullAsDefault: true
   },
-
   test: {
     client: 'pg',
     connection:'postgres://' + config.username + ':' + config.password + '@localhost/secrets_test',
@@ -36,4 +35,4 @@ module.exports = {
     },
     useNullAsDefault: true
   }
-};
+}
