@@ -4,7 +4,9 @@
   "description": "Carpooling app with a bid system.",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "set NODE_ENV=production&&nodemon src/index.js",
+    "dev-start": "set NODE_ENV=dev&&nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "connect-pg-simple": "^5.0.0",
     "express": "^4.16.4",
     "express-handlebars": "^3.0.2",
+    "express-session": "^1.15.6",
     "handlebars": "^4.1.0",
     "helmet": "^3.15.1",
     "knex": "^0.16.3",

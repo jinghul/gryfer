@@ -97,8 +97,6 @@ const createToken = () => {
   })
 }
 
-module.exports = {
-  register
-}
+module.exports = register
 
 

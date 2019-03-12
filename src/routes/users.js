@@ -1,4 +1,5 @@
 const config = require('../../config.json')
+const express = require('express')
 const pg = require('pg')
 
 // DB connection
@@ -6,8 +7,8 @@ var pgPool = new pg.Pool({
   user: config.username,
   database: config.database,
   password: config.password,
-  host: config.app.host,
-  port: config.app.port,
+  host: config.host,
+  port: config.port,
 })
 
 var router = express.Router();
