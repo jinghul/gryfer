@@ -41,7 +41,9 @@ router.post('/', (request, response) => {
 
   pool.query('INSERT INTO users (fname, lname, email) VALUES ($1, $2, $3) RETURNING *', [firstName, lastName, email], (error, results) => {
     if (error) {
-      throw error
+      console.error('Error executing query', error.stack)
+      response.status(500).send(`Failed to add User`)
+      return
     }
     console.log(results.rows)
     response.status(201).send(`User added with ID: ${results.rows[0].uid}`)
