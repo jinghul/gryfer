@@ -32,7 +32,14 @@ A carpool app where passengers can bid on rides.
 {
 	"username" : "[username]",
     "password" : "[password]",
-    "api": "[name of db]"
+    "api": "[name of db]",
+    "host":"[host]",
+    "port" : [port],
+    "app": {
+        "host" : "[host]",
+        "port" : [port],
+        "secret" : "[secret phrase]"
+    }
 }
 ```
 
@@ -43,4 +50,4 @@ A carpool app where passengers can bid on rides.
 
 3. Run `npx knex migrate:rollback` to unintialize database.
 
-4. Run `nodemon index.js` to start the backend server.
+4. Run `npm start` to start the backend server.

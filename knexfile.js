@@ -1,9 +1,9 @@
-const config = require('./config.json');
+const config = require('./config.json')
 
 module.exports = {
   development: {
     client: 'pg',
-    connection:'postgres://localhost/' + config.api,
+    connection:'postgres://' + config.username + ':' + config.password + '@localhost/' + config.api,
     migrations: {
       directory: './db/migrations'
     },
@@ -12,10 +12,9 @@ module.exports = {
     },
     useNullAsDefault: true
   },
-
   test: {
     client: 'pg',
-    connection:'postgres://localhost/secrets_test',
+    connection:'postgres://' + config.username + ':' + config.password + '@localhost/secrets_test',
     migrations: {
       directory: './db/migrations'
     },
@@ -36,4 +35,4 @@ module.exports = {
     },
     useNullAsDefault: true
   }
-};
+}

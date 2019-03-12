@@ -1,24 +1,28 @@
 const config = require('../../config.json')
+const express = require('express')
+const pg = require('pg')
 
-const Pool = require('pg').Pool
-const pool = new Pool({
+// DB Connection
+const pool = new pg.Pool({
   Advertisement: config.Advertisementname,
-  host: 'localhost',
+  user: config.username,
   database: config.api,
   password: config.password,
-  port: 5432,
+  host: config.host,
+  port: config.port,
 })
 
-const getAdvertisements = (request, response) => {
+var router = express.Router();
+
+router.get('/', (request, response) => {
   pool.query('SELECT * FROM Advertisement ORDER BY aid ASC', (error, results) => {
     if (error) {
       throw error
     }
     response.status(200).json(results.rows)
   })
-}
-
-const getAdvertisementByAdId = (request, response) => {
+})
+router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
   pool.query('SELECT * FROM Advertisement WHERE aid = $1', [aid], (error, results) => {
@@ -27,9 +31,9 @@ const getAdvertisementByAdId = (request, response) => {
     }
     response.status(200).json(results.rows)
   })
-}
+})
 
-const getAdvertisementByUserId = (request, response) => {
+router.get('/user/:uid', (request, response) => {
   const uid = parseInt(request.params.uid)
 
   pool.query('SELECT * FROM Advertisement WHERE uid = $1', [uid], (error, results) => {
@@ -38,10 +42,10 @@ const getAdvertisementByUserId = (request, response) => {
     }
     response.status(200).json(results.rows)
   })
-}
+})
 
 
-const createAdvertisement = (request, response) => {
+router.post('/', (request, response) => {
   const { toAddress, fromAddress, time, minBidPrice, uid } = request.body
 
   pool.query('INSERT INTO Advertisement (fromAddress, toAddress, time, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [fromAddress, toAddress, time, minBidPrice, uid], (error, results) => {
@@ -51,10 +55,10 @@ const createAdvertisement = (request, response) => {
     console.log(results.rows)
     response.status(201).send(`Advertisement added with ID: ${results.rows[0].aid}`)
   })
-}
+})
 
 
-const updateAdvertisement = (request, response) => {
+router.put('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
   const { toAddress, fromAddress, time, minBidPrice } = request.body
 
@@ -68,10 +72,10 @@ const updateAdvertisement = (request, response) => {
       response.status(200).send(`Advertisement modified with AID: ${aid}`)
     }
   )
-}
+})
 
 
-const deleteAdvertisement = (request, response) => {
+router.delete('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
   pool.query('DELETE FROM Advertisement WHERE aid = $1', [aid], (error, results) => {
@@ -80,13 +84,6 @@ const deleteAdvertisement = (request, response) => {
     }
     response.status(200).send(`Advertisement deleted with AID: ${aid}`)
   })
-}
+})
 
-module.exports = {
-  getAdvertisements,
-  getAdvertisementByUserId,
-  getAdvertisementByAdId,
-  createAdvertisement,
-  updateAdvertisement,
-  deleteAdvertisement,
-}
+module.exports = router
