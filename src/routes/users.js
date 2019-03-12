@@ -5,7 +5,7 @@ const pg = require('pg')
 // DB connection
 var pgPool = new pg.Pool({
   user: config.username,
-  database: config.database,
+  database: config.api,
   password: config.password,
   host: config.host,
   port: config.port,

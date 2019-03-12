@@ -6,7 +6,7 @@ const pg = require('pg')
 const pool = new pg.Pool({
   Advertisement: config.Advertisementname,
   user: config.username,
-  database: config.database,
+  database: config.api,
   password: config.password,
   host: config.host,
   port: config.port,

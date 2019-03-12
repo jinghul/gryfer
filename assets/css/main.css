@@ -11,6 +11,10 @@
     line-height: 50px;
 }
 
+.nav > .nav-link:hover {
+    filter: drop-shadow(0 0 0.5rem #000);
+}
+
 .display-5 {
     font-weight:300;
     font-size:2.5rem
@@ -18,6 +22,7 @@
 
 /********* HOME *********/
 #main-splash {
+    margin-top: 30px;
     background-image: url("../img/main-splash-res.jpg");
     height: 600px; /* You must set a specified height */
     background-position: center; /* Center the image */

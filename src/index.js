@@ -10,7 +10,7 @@ const pg = require('pg'),
 
 var pgPool = new pg.Pool({
     user: config.username,
-    database: config.database,
+    database: config.api,
     password: config.password,
     host: config.host,
     port: config.port,

@@ -1,8 +1,10 @@
 // Change from the sign-in page to register
 function si_to_reg() {
-    $('#sign-in').hide(300);
-    // $('#auth-splash').hide(300, function() {
-    // });
+    $('#sign-in').hide(300, function() {
+        si_form = document.getElementById('form-si')
+        si_form.reset();
+        si_form.classList.remove('was-validated');
+    });
     $('#auth-splash').animate(
         { left: '-100%'},
         300,
@@ -22,6 +24,11 @@ function reg_to_si() {
             { left: '0' },
             200,
         );
+
+        reg_form = document.getElementById('form-reg')
+        reg_form.reset();
+        reg_form.classList.remove('was-validated');
+
         $('#sign-in').show(300);
     });
 }
@@ -54,7 +61,6 @@ $('document').ready(function() {
     $('#si-to-reg').bind('click', si_to_reg);
     $('#reg-to-si').bind('click', reg_to_si);
 
-    // TODO: More validation
     var forms = document.getElementsByClassName('needs-validation');
     var validation = Array.prototype.filter.call(forms, function(form) {
         form.addEventListener(
