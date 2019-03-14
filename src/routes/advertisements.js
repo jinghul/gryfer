@@ -12,6 +12,8 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
+// TODO: Search queries e.g. by toaddress, frontaddress, time, price
+
 var router = express.Router();
 
 router.get('/', (request, response) => {

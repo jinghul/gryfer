@@ -1,7 +1,7 @@
 // Change from the sign-in page to register
 function si_to_reg() {
     $('#sign-in').hide(300, function() {
-        si_form = document.getElementById('form-si')
+        var si_form = document.getElementById('form-si')
         si_form.reset();
         si_form.classList.remove('was-validated');
     });
@@ -25,7 +25,7 @@ function reg_to_si() {
             200,
         );
 
-        reg_form = document.getElementById('form-reg')
+        var reg_form = document.getElementById('form-reg')
         reg_form.reset();
         reg_form.classList.remove('was-validated');
 
@@ -35,7 +35,7 @@ function reg_to_si() {
 
 // Register a user into the database
 function register() {
-    data = {}
+    var data = {}
     $('#form-reg :input').each(
         function(){  
             var input = $(this);

@@ -8,7 +8,7 @@ const pg = require('pg'),
     session = require('express-session'),
     pgSession = require('connect-pg-simple')(session);
 
-var pgPool = new pg.Pool({
+var pool = new pg.Pool({
     user: config.username,
     database: config.api,
     password: config.password,
@@ -18,7 +18,7 @@ var pgPool = new pg.Pool({
 
 app.use(session({
   store: new pgSession({
-      pool: pgPool
+      pool: pool
   }),
   saveUninitialized: false,
   secret: config.app.secret,
@@ -55,18 +55,23 @@ app.get('/', (req, res) => {
 app.get('/home', (req, res) => {
     res.render('home', {title: 'Gryfer'});
 });
+app.get('/auth', (req, res) => {
+    res.render('auth', {title: 'Sign In'})
+})
+app.get('/search', (req, res) => {
+    res.render('search', {layout: 'ads', title : 'Find Rides'})
+})
+app.get('/make', (req, res) => {
+    res.render('make', {layout: 'ads', title:'Make Rides'})
+})
 
 // API
 app.use('/users', users);
 app.use('/ads', advertisements);
-
-// Register + Sign in
-app.get('/auth', (req, res) => {
-    res.render('auth', {title: 'Sign In'})
-})
 app.use('/auth', auth);
 
-app.use(express.static(path.join(__dirname, '../assets/')));
+
+app.use(express.static(path.join(__dirname, '../public/')));
 
 app.listen(config.app.port, () => {
     console.log(`App running on port ${config.app.port}.`);

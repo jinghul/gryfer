@@ -1,40 +1,45 @@
 <div class="row" style="height:90%">
-    <div class="col h-100" id="search-col">
-        <div id="search-box" class="w-100 mx-auto">
-            <form id="form-search" class="auth-form w-75 mx-auto needs-validation" novalidate>
-                <div class="form-group form-row">
+    <div id="make-box" class="mx-auto w-75">
+        <h1 class="display-5 text-center" style="margin: 5% 0">Make a Ride</h1>
+        <form id="form-make" class="auth-form needs-validation" novalidate>
+            <div class="form-row mb-3">
+                <div class="form-group col-md-6">
+                    <label for="from-mr">From</label>
                     <div class="input-group">
                         <span class="input-group-prepend">
                             <span class="fas fa-map-marker-alt input-group-text"></span>
                         </span>
-                        <input type="text" class="form-control" id="from-fr" name="from" placeholder="from" required />
+                        <input type="text" class="form-control" id="from-mr" name="fromAddress" placeholder="home" required />
                         <div class="invalid-feedback">
                             Please enter a from location.
                         </div>
                     </div>
                 </div>
-                <div class="form-group form-row">
+                <div class="form-group col-md-6">
+                    <label for="to-mr">Destination</label>
                     <div class="input-group">
                         <span class="input-group-prepend">
                             <span class="input-group-text fas fa-flag-checkered"></span>
                         </span>
-                        <input type="text" class="form-control" id="to-fr" name="to" placeholder="destination"
-                            required />
+                        <input type="text" class="form-control" id="to-mr" name="toAddress" placeholder="downtown" required />
                         <div class="invalid-feedback">
                             Please enter a destination.
                         </div>
                     </div>
                 </div>
-                <div class="form-row form-group">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="date-mr">Time of Departure</label>
                     <div class='input-group'>
                         <span class="input-group-prepend">
                             <span class="input-group-text far fa-calendar-alt"></span>
                         </span>
-                        <input type='text' id='date-fr' class="form-control"/>
+                        <input type='text' id='date-mr' name="time" class="form-control" required />
                     </div>
                     <script type="text/javascript">
                         $(function () {
-                            $('#date-fr').flatpickr({
+                            $('#date-mr').flatpickr({
                                 enableTime: true,
                                 dateFormat: "Y-m-d H:i",
                                 altInput: true,
@@ -44,25 +49,26 @@
                         });
                     </script>
                 </div>
-                <div class="form-row form-group">
+                <div class="form-group col-md-6">
+                    <label for="price-mr">Starting Price</label>
                     <div class='input-group'>
                         <span class="input-group-prepend">
                             <span class="input-group-text fas fa-dollar-sign"></span>
                         </span>
-                        <input type="number" class="form-control" id="price-fr">
+                        <input type="number" class="form-control" name="minBidPrice" id="price-mr">
                     </div>
                 </div>
-                <div role="group" class="form-row">
-                    <button id="submit-fr" type="submit" class="btn btn-block btn-primary">
-                        Search
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="col" id="search-results">
+            </div>
+            <div class="w-100" id="make-but-box">
+                <button id="submit-mr" type="submit" class="half-but w-50 mx-auto btn mt-4 btn-primary">
+                    Create
+                </button>
+                <button id="cancel-mr" type="button" class="half-but mt-2 btn btn-outline-secondary w-50 mx-auto">
+                    Cancel
+                </button>
+            </div>
+        </form>
+        <button id="view-creates" type="button" class="btn btn-link">View Rides</button>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
-<script src="js/ad.template.js"></script>
-<script src="js/search.js"></script>
+<script src="js/make.js"></script>
