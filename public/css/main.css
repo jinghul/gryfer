@@ -42,6 +42,10 @@
     padding: 0 0 15px 0;
 }
 
+.none {
+    display: none;
+}
+
 /********* HOME *********/
 #main-splash {
     margin-top: 30px;
@@ -116,6 +120,7 @@
 #search-col {
    max-width: 40%;
    border-right: 1px solid #d3d3d3;
+   overflow-y: auto;
 }
 
 #search-box {

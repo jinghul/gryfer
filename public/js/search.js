@@ -1,5 +1,5 @@
 function display(results) {
-    $("#search-results").empty();
+    $(".ad-result").remove();
 
     // Some date parsing
     var date = new Date("2019-03-14T06:00:00.000Z");
@@ -15,8 +15,9 @@ function display(results) {
             "date" : dateString,
             "time" : timeString,
         }
-        var item = template(context);
+        var item = $(template(context));
         $("#search-results").append(item);
+        item.fadeIn(300);
     });
 }
 

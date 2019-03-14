@@ -45,14 +45,35 @@ function register() {
 
     $.post('http://localhost:3000/auth/register',
         data,
-        function(data, status) {
-            alert(data);
+        function() {
+            reg_to_si();
         },
-    "json");
+    "json").fail(function() {
+
+        // TODO: handle errors
+        console.log("registration fail...");
+    });
 }
 
 // Sign an user into the system
-function signin() {}
+function signin() {
+    var data = {}
+    $('#form-si :input').each(
+        function(){  
+            var input = $(this);
+            data[input.attr('name')] = input.val();
+        }
+    );
+
+    $.post('http://localhost:3000/auth/signin',
+        data,
+        function() {
+            console.log("success!");
+        },
+    "json").fail(function() {
+        console.log("incorrect username or pass");
+    });
+}
 
 // Reset user entries
 function reset(form) {}
