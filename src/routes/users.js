@@ -23,6 +23,26 @@ router.get('/', (request, response) => {
   })
 })
 
+// GET drivers
+router.get('/drivers', (request, response) => {
+  pool.query('SELECT * FROM drivers ORDER by uid ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+})
+
+// GET passengers
+router.get('/passengers', (request, response) => {
+  pool.query('SELECT * FROM passengers ORDER by uid ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+})
+
 // GET a user with id = id
 router.get('/:id', (request, response) => {
   const id = parseInt(request.params.id)
@@ -36,18 +56,37 @@ router.get('/:id', (request, response) => {
 })
 
 // CREATE user
+// Add to drivers table if driver = true, else add to passengers table
+// If driver, need to put cid as well
 router.post('/', (request, response) => {
-  const { firstName, lastName, email, pssword } = request.body
+  (async () => {
+    const { firstName, lastName, email, pssword, driver, cid } = request.body
 
-  pool.query('INSERT INTO users (fname, lname, email) VALUES ($1, $2, $3) RETURNING *', [firstName, lastName, email], (error, results) => {
-    if (error) {
-      console.error('Error executing query', error.stack)
-      response.status(500).send(`Failed to add User`)
-      return
+    const client = await pool.connect()
+
+    try {
+      await client.query('BEGIN')
+      const { rows } = await client.query('INSERT INTO users (fname, lname, email) VALUES ($1, $2, $3) RETURNING uid', [firstName, lastName, email])
+
+      if (driver) {
+        console.log("Creating a driver...")
+        await client.query('INSERT INTO drivers (uid, tripsDriven, cid) VALUES ($1, $2, $3)', [rows[0].uid, 0, cid])
+      }
+      else {
+        console.log("Creating a passenger")
+        await client.query('INSERT INTO passengers (uid, tripsTaken) VALUES ($1, $2)', [rows[0].uid, 0])
+      }
+
+      await client.query('COMMIT')
+
+    } catch(e) {
+      await client.query('ROLLBACK')
+      throw e
+    } finally {
+      client.release()
+      response.status(200).send('User successfully created.')
     }
-    console.log(results.rows)
-    response.status(201).send(`User added with ID: ${results.rows[0].uid}`)
-  })
+  })().catch(e => console.error(e.stack))
 })
 
 // UPDATE user id = id
