@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
 	time			timestamp,
 	uid			INTEGER NOT NULL,
 	PRIMARY KEY (aid),
-	FOREIGN KEY (uid) REFERENCES Users
+	FOREIGN KEY (uid) REFERENCES Drivers
 )`;
   return knex.raw(createQuery);
 };

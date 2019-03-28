@@ -12,9 +12,53 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-// TODO: Search queries e.g. by toaddress, frontaddress, time, price
+// TODO: Search queries e.g. by toaddress, fromaddress, time, price
 
 var router = express.Router();
+
+router.get('/:minBidPrice', (request, response) => {
+  const minBidPrice = request.params.minBidPrice
+
+  pool.query('SELECT * FROM Advertisement WHERE minBidPrice = $1', [minBidPrice], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+})
+
+router.get('/:toAddress', (request, response) => {
+  const toAddress = request.params.toAddress
+
+  pool.query('SELECT * FROM Advertisement WHERE toAddress = $1', [toAddress], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+})
+
+router.get('/:fromAddress', (request, response) => {
+  const fromAddress = request.params.fromAddress
+
+  pool.query('SELECT * FROM Advertisement WHERE fromAddress = $1', [fromAddress], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+})
+
+router.get('/:time', (request, response) => {
+  const time = request.params.time
+
+  pool.query('SELECT * FROM Advertisement WHERE time = $1', [time], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+})
 
 router.get('/', (request, response) => {
   pool.query('SELECT * FROM Advertisement ORDER BY aid ASC', (error, results) => {
