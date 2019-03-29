@@ -48,6 +48,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const users = require('./routes/users');
 const advertisements = require('./routes/advertisements');
 const auth = require('./routes/auth');
+const bids = require('./routes/bids');
 
 app.get('/', (req, res) => {
     res.redirect('/home')
@@ -69,7 +70,7 @@ app.get('/make', (req, res) => {
 app.use('/users', users);
 app.use('/ads', advertisements);
 app.use('/auth', auth);
-
+app.use('/bids', bids);
 
 app.use(express.static(path.join(__dirname, '../public/')));
 
