@@ -23,10 +23,18 @@ router.get('/', (request, response) => {
   })
 })
 
+// GET all accepted bids
+router.get('/accepted', (request, response) => {
+  pool.query('SELECT * FROM accepted', (error, results) => {
+    if (error) throw error
+    return response.status(200).json(results.rows)
+  })
+})
+
 // CREATE bid (only passenger can create bid)
 // body requires uid (of a passenger), aid of an advertisement, and bidPrice
 // trigger should check to make sure constraints are satisfied
-router.post('/', (request, response) => {
+router.post('/create', (request, response) => {
   const { uid, aid, bidPrice } = request.body
   pool.query(
     'INSERT INTO bid (uid, aid, bidPrice) VALUES ($1, $2, $3) RETURNING *',
@@ -40,6 +48,18 @@ router.post('/', (request, response) => {
     })
 })
 
-
+// ACCEPT a bid (only drivers can accept a bid)
+// Trigger will add the advertisement to history of driver and passenger
+router.post('/accept', (request, response) => {
+  const { uid, aid, price } = request.body
+  pool.query(
+    'INSERT INTO accepted (aid, uid, price) VALUES ($1, $2, $3) RETURNING *',
+    [aid, uid, price],
+    (error, results) => {
+      if (error) throw error
+      console.log(results.rows[0])
+      return response.status(200).send('Bid for advertisement ' + aid + ' accepted.')
+    })
+})
 
 module.exports = router
