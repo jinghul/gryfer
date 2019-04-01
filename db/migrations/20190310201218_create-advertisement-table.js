@@ -6,7 +6,8 @@ exports.up = function(knex, Promise) {
 	fromAddress		VARCHAR(60),
 	toAddress 		VARCHAR(60),
 	time			timestamp,
-	uid			INTEGER NOT NULL,
+	uid				INTEGER NOT NULL,
+	UNIQUE (aid, uid),
 	PRIMARY KEY (aid),
 	FOREIGN KEY (uid) REFERENCES Drivers
 )`;

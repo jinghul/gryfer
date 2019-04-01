@@ -1,10 +1,10 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS History;
   CREATE TABLE History (
-	username 		VARCHAR(20),
+	uid 			INTEGER NOT NULL,
 	aid				INTEGER,
-	PRIMARY KEY (username, aid),
-	FOREIGN KEY (username) REFERENCES UserProfile,
+	PRIMARY KEY (uid, aid),
+	FOREIGN KEY (uid) REFERENCES UserProfile,
 	FOREIGN KEY (aid) REFERENCES Advertisement
 )`;
   return knex.raw(createQuery);
