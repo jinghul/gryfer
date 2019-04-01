@@ -59,7 +59,7 @@ app.get('/auth', (req, res) => {
     res.render('auth', {title: 'Sign In'})
 })
 app.get('/search', (req, res) => {
-    res.render('search', {layout: 'ads', title : 'Find Rides'})
+    res.render('search', {layout: 'ads', title : 'Find Rides', username: req.session.username})
 })
 app.get('/make', (req, res) => {
     res.render('make', {layout: 'ads', title:'Make Rides'})
