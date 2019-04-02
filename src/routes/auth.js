@@ -44,6 +44,8 @@ router.post('/signin', (request, response) => {
     .then(token => updateUserToken(token, user))
     .then(() => {
       delete user.password_digest
+      request.session.uid = user.uid;
+      request.session.username = user.username;
       response.status(200).json(user)
     })
     .catch((err) => console.error(err))

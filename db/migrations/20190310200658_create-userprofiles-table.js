@@ -4,7 +4,7 @@ exports.up = function(knex, Promise) {
   username        VARCHAR(20),
   uid             INTEGER NOT NULL,
   dateJoined      TIMESTAMP,
-  PRIMARY KEY (username),
+  PRIMARY KEY (uid),
   FOREIGN KEY (uid) REFERENCES Users
 )`;
   return knex.raw(createQuery);

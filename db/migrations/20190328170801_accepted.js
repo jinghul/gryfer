@@ -2,11 +2,12 @@ exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Accepted;
   CREATE TABLE Accepted (
 	aid				SERIAL,
-	uid				INTEGER,
+	puid			INTEGER,
+	duid			INTEGER,
 	price			FLOAT NOT NULL,
-	PRIMARY KEY (aid, uid),
-	FOREIGN KEY (aid) REFERENCES Advertisement,
-	FOREIGN KEY (uid, aid, price) REFERENCES Bid
+	PRIMARY KEY (aid, puid, duid),
+	FOREIGN KEY (aid, duid) REFERENCES Advertisement (aid, uid),
+	FOREIGN KEY (puid, aid, price) REFERENCES Bid (uid, aid, bidPrice)
 )`;
   return knex.raw(createQuery);
 };

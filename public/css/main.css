@@ -120,7 +120,6 @@
 #search-col {
    max-width: 40%;
    border-right: 1px solid #d3d3d3;
-   overflow-y: auto;
 }
 
 #search-box {
@@ -129,6 +128,7 @@
 
 #search-results {
     padding: 15px;
+    overflow-y: auto;
 }
 
 .input-group-prepend > span {
@@ -151,6 +151,10 @@
 
 .from-place {
     color: #800000;
+}
+
+.ad-result {
+    margin-bottom: 10px;
 }
 
 /* MAKE */
