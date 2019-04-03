@@ -15,8 +15,8 @@ const pool = new pg.Pool({
 var router = express.Router();
 
 // Search by toaddress, fromaddress, time,  and/or maxPrice
-router.get('/', (request, response) => {
-  const { toAddress, fromAddress, time, maxPrice } = request.body
+router.get('/search', (request, response) => {
+  const { toAddress, fromAddress, departureTime, maxPrice } = request.body
   var whereStrings = []
   var results = []
   var paramCounter = 1
@@ -30,9 +30,9 @@ router.get('/', (request, response) => {
     results.push(fromAddress)
     paramCounter++
   }
-  if (time) {
-    whereStrings.push('time = $' + paramCounter.toString())
-    results.push(time)
+  if (departureTime) {
+    whereStrings.push('departureTime = $' + paramCounter.toString())
+    results.push(departureTime)
     paramCounter++
   }
   if (maxPrice) {
