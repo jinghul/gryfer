@@ -42,12 +42,8 @@ exports.up = function(knex, Promise) {
 	(10.0, '28 college avenue east', 'marina bay sands', NOW()::timestamp, 3),
 	(15.0, '8 college avenue east', 'clarke quay somewhere', NOW()::timestamp, 4);
 
-	INSERT INTO History (uid, aid) VALUES
-	(3, 1),
-	(4, 2);
-
 	INSERT INTO Bid (uid, aid, bidPrice) VALUES
-	(1, 1, 10.0),
+	(1, 1, 9.0),
 	(2, 2, 18.0),
 	(1, 2, 19.0),
 	(2, 1, 11.0);
@@ -58,7 +54,11 @@ exports.up = function(knex, Promise) {
 
 	INSERT INTO Accepted (aid, puid, duid, price) VALUES
 	(2, 1, 4, 19.0),
-	(1, 2, 3, 11.0);`;
+	(1, 2, 3, 11.0);
+
+	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
+	(4, 2, 1, 9.0);
+	`;
   return knex.raw(createQuery);
 };
 

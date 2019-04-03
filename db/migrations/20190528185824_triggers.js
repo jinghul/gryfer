@@ -7,11 +7,11 @@ exports.up = function(knex, Promise) {
     BEGIN
         INSERT INTO
             History(uid, aid)
-            VALUES(new.puid,new.aid);
+            VALUES(NEW.puid,NEW.aid);
         INSERT INTO
             History(uid, aid)
-            VALUES(new.duid,new.aid);
-        RETURN new;
+            VALUES(NEW.duid,NEW.aid);
+        RETURN NEW;
     END;
     $$
     LANGUAGE plpgsql;
@@ -36,6 +36,8 @@ exports.up = function(knex, Promise) {
             RAISE NOTICE 'Bid price too low';
             RETURN NULL;
         END IF;
+
+        RETURN NEW;
     END;
     $$
     LANGUAGE plpgsql ;
@@ -64,6 +66,8 @@ exports.up = function(knex, Promise) {
         SET tripsDriven = num_trips + 1,
             rating = (num_trips * prev_rating + NEW.rating)/(num_trips + 1)
         WHERE NEW.forUid = Drivers.uid;
+
+        RETURN NEW;
     END;
     $$
     LANGUAGE plpgsql ;
@@ -92,6 +96,8 @@ exports.up = function(knex, Promise) {
         SET tripsTaken = num_trips + 1,
             rating = (num_trips * prev_rating + NEW.rating)/(num_trips + 1)
         WHERE NEW.forUid = Passengers.uid;
+
+        RETURN NEW;
     END;
     $$
     LANGUAGE plpgsql ;
