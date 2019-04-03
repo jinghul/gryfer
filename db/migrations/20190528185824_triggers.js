@@ -23,6 +23,7 @@ exports.up = function(knex, Promise) {
     EXECUTE PROCEDURE add_bid_to_history();
 
 
+
     CREATE OR REPLACE FUNCTION check_min_bid()
     RETURNS TRIGGER AS
     $$
@@ -49,22 +50,27 @@ exports.up = function(knex, Promise) {
     EXECUTE PROCEDURE check_min_bid();
 
 
+
+
     CREATE OR REPLACE FUNCTION update_rating_driver()
     RETURNS TRIGGER AS
     $$
-    DECLARE num_trips INTEGER;
+    DECLARE num_reviews INTEGER;
             prev_rating NUMERIC;
 
     BEGIN
-        SELECT rating, tripsDriven INTO prev_rating, num_trips
+        SELECT rating INTO prev_rating
         FROM Drivers
         WHERE NEW.forUid = Drivers.uid;
+
+        SELECT count(*) INTO num_reviews
+        FROM DriverRatings
+        WHERE DriverRatings.forUid = NEW.forUid;
 
         prev_rating = COALESCE(prev_rating, 0);
 
         UPDATE Drivers
-        SET tripsDriven = num_trips + 1,
-            rating = (num_trips * prev_rating + NEW.rating)/(num_trips + 1)
+        SET rating = (num_reviews * prev_rating + NEW.rating)/(num_reviews + 1)
         WHERE NEW.forUid = Drivers.uid;
 
         RETURN NEW;
@@ -72,32 +78,35 @@ exports.up = function(knex, Promise) {
     $$
     LANGUAGE plpgsql ;
 
-
     CREATE TRIGGER update_rating_driver
     BEFORE INSERT OR UPDATE
     ON DriverRatings
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating_driver();
 
+
+
+
     CREATE OR REPLACE FUNCTION update_rating_passenger()
     RETURNS TRIGGER AS
     $$
-    DECLARE num_trips INTEGER;
+    DECLARE num_reviews INTEGER;
             prev_rating NUMERIC;
 
     BEGIN
-        SELECT rating, tripsTaken INTO prev_rating, num_trips
+        SELECT rating INTO prev_rating
         FROM Passengers
         WHERE NEW.forUid = Passengers.uid;
+
+        SELECT count(*) INTO num_reviews
+        FROM PassengerRatings
+        WHERE PassengerRatings.forUid = NEW.forUid;
 
         prev_rating = COALESCE(prev_rating, 0);
 
         UPDATE Passengers
-        SET tripsTaken = num_trips + 1,
-            rating = (num_trips * prev_rating + NEW.rating)/(num_trips + 1)
+        SET rating = (num_reviews * prev_rating + NEW.rating)/(num_reviews + 1)
         WHERE NEW.forUid = Passengers.uid;
-
-        RETURN NEW;
     END;
     $$
     LANGUAGE plpgsql ;
@@ -107,7 +116,45 @@ exports.up = function(knex, Promise) {
     ON PassengerRatings
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating_passenger();
+
+
+
+
+    CREATE OR REPLACE FUNCTION update_num_trips()
+    RETURNS TRIGGER AS
+    $$
+    DECLARE num_trips INTEGER;
+
+    BEGIN
+        SELECT tripsTaken INTO num_trips
+        FROM Passengers
+        WHERE NEW.puid = Passengers.uid;
+
+        UPDATE Passengers
+        SET tripsTaken = num_trips + 1
+        WHERE NEW.puid = Passengers.uid;
+
+        SELECT tripsDriven INTO num_trips
+        FROM Drivers
+        WHERE NEW.duid = Drivers.uid;
+
+        UPDATE Drivers
+        SET tripsDriven = num_trips + 1
+        WHERE NEW.duid = Drivers.uid;
+
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+
+    CREATE TRIGGER update_num_trips
+    BEFORE INSERT OR UPDATE
+    ON Accepted
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_num_trips();
     `;
+
+
   return knex.raw(createQuery);
 
 

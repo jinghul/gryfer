@@ -12,16 +12,16 @@ exports.up = function(knex, Promise) {
 	('bingboo', 4, NOW()::timestamp);
 
 	INSERT INTO Passengers (uid, tripsTaken, rating) VALUES
-	(1, 4, 4.5),
-	(2, 1, 5.0);
+	(1, 0, 4.5),
+	(2, 0, 5.0);
 
 	INSERT INTO Car (cid) VALUES
 	(100),
 	(101);
 
-	INSERT INTO Drivers (uid, tripsDriven, rating, cid) VALUES
-	(3, 3, 2.0, 100),
-	(4, 2, 4.5, 101);
+	INSERT INTO Drivers (uid, tripsDriven, cid) VALUES
+	(3, 0, 100),
+	(4, 0, 101);
 
 	INSERT INTO Account (uid, password, userToken) VALUES
 	(1, 'what', 'usertoken1'),
