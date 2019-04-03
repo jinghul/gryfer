@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
   CREATE TABLE Bid (
 	uid 			INTEGER,
 	aid				INTEGER,
-	bidPrice		FLOAT NOT NULL,
+	bidPrice		NUMERIC NOT NULL,
 	PRIMARY KEY (uid, aid, bidPrice),
 	FOREIGN KEY (uid) REFERENCES Passengers,
 	FOREIGN KEY (aid) REFERENCES Advertisement

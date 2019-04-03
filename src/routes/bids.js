@@ -51,10 +51,10 @@ router.post('/create', (request, response) => {
 // ACCEPT a bid (only drivers can accept a bid)
 // Trigger will add the advertisement to history of driver and passenger
 router.post('/accept', (request, response) => {
-  const { uid, aid, price } = request.body
+  const { puid, duid, aid, price } = request.body
   pool.query(
-    'INSERT INTO accepted (aid, uid, price) VALUES ($1, $2, $3) RETURNING *',
-    [aid, uid, price],
+    'INSERT INTO accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *',
+    [aid, puid, duid, price],
     (error, results) => {
       if (error) throw error
       console.log(results.rows[0])

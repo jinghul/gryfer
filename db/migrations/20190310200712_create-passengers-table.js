@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
   CREATE TABLE Passengers (
 	uid 			INTEGER NOT NULL REFERENCES Users(uid),
 	tripsTaken		INTEGER NOT NULL,
-	rating			FLOAT,
+	rating			NUMERIC,
 	PRIMARY KEY (uid)	
 )`;
   return knex.raw(createQuery);

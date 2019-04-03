@@ -12,47 +12,43 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-// TODO: Search queries e.g. by toaddress, fromaddress, time, price
-
 var router = express.Router();
 
-router.get('/:minBidPrice', (request, response) => {
-  const minBidPrice = request.params.minBidPrice
+// Search by toaddress, fromaddress, time,  and/or maxPrice
+router.get('/', (request, response) => {
+  const { toAddress, fromAddress, time, maxPrice } = request.body
+  var whereStrings = []
+  var results = []
+  var paramCounter = 1
+  if (toAddress) {
+    whereStrings.push('toAddress = $' + paramCounter.toString())
+    results.push(toAddress)
+    paramCounter++
+  }
+  if (fromAddress) {
+    whereStrings.push('fromAddress = $' + paramCounter.toString())
+    results.push(fromAddress)
+    paramCounter++
+  }
+  if (time) {
+    whereStrings.push('time = $' + paramCounter.toString())
+    results.push(time)
+    paramCounter++
+  }
+  if (maxPrice) {
+    whereStrings.push('minBidPrice <= $' + paramCounter.toString())
+    console.log('minBidPrice <= $' + paramCounter.toString())
+    results.push(maxPrice)
+  }
 
-  pool.query('SELECT * FROM Advertisement WHERE minBidPrice = $1', [minBidPrice], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-})
+  var queryString = 'SELECT * FROM Advertisement WHERE '
+  for (let i = 0; i < whereStrings.length; i++) {
+    queryString += whereStrings[i] + ' AND '
+  }
+  queryString = queryString.slice(0, -5)
+  console.log(queryString)
 
-router.get('/:toAddress', (request, response) => {
-  const toAddress = request.params.toAddress
-
-  pool.query('SELECT * FROM Advertisement WHERE toAddress = $1', [toAddress], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-})
-
-router.get('/:fromAddress', (request, response) => {
-  const fromAddress = request.params.fromAddress
-
-  pool.query('SELECT * FROM Advertisement WHERE fromAddress = $1', [fromAddress], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-})
-
-router.get('/:time', (request, response) => {
-  const time = request.params.time
-
-  pool.query('SELECT * FROM Advertisement WHERE time = $1', [time], (error, results) => {
+  pool.query(queryString, results, (error, results) => {
     if (error) {
       throw error
     }

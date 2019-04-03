@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
 	make			VARCHAR(60),
 	model			VARCHAR(60),
 	modelYear		VARCHAR(60),
-	milesDriven		VARCHAR(60),
+	milesDriven		NUMERIC,
 	PRIMARY KEY (cid),
 	FOREIGN KEY (cid) REFERENCES Car
 )`;

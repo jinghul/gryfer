@@ -2,10 +2,10 @@ exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Advertisement;
   CREATE TABLE Advertisement (
 	aid				SERIAL,
-	minBidPrice		FLOAT,
+	minBidPrice		NUMERIC,
 	fromAddress		VARCHAR(60),
 	toAddress 		VARCHAR(60),
-	time			timestamp,
+	departureTime	TIMESTAMP,
 	uid				INTEGER NOT NULL,
 	UNIQUE (aid, uid),
 	PRIMARY KEY (aid),

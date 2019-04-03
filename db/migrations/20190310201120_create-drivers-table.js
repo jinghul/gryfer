@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
   CREATE TABLE Drivers (
 	uid 			INTEGER NOT NULL REFERENCES Users(uid),
 	tripsDriven		INTEGER NOT NULL,
-	Rating			FLOAT,
+	rating			NUMERIC,
 	cid				INTEGER,
 	PRIMARY KEY (uid),
 	FOREIGN KEY (cid) REFERENCES Car
