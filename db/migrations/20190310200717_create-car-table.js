@@ -1,6 +1,6 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `DROP TABLE IF EXISTS Car;
-  CREATE TABLE Car (
+  let createQuery = `DROP TABLE IF EXISTS Cars;
+  CREATE TABLE Cars (
 	cid 			SERIAL,
 	PRIMARY KEY (cid)
 )`;
@@ -8,6 +8,6 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  let dropQuery = `DROP TABLE Car`;
+  let dropQuery = `DROP TABLE Cars`;
   return knex.raw(dropQuery);
 };

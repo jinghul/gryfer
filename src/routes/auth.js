@@ -89,28 +89,28 @@ const createUser = user => {
                     if (shouldAbort(err)) {
                         return;
                     }
-                    const insertUserProfileText =
-                        "INSERT INTO UserProfile (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)";
-                    const insertUserProfileValues = [
+                    const insertUserProfilesText =
+                        "INSERT INTO UserProfiles (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)";
+                    const insertUserProfilesValues = [
                         user1.username,
                         new Date(),
                     ]
                     client.query(
-                        insertUserProfileText,
-                        insertUserProfileValues,
+                        insertUserProfilesText,
+                        insertUserProfilesValues,
                         (err, res) => {
                             if (shouldAbort(err)) {
                                 return
                             }
-                            const insertAccountText =
-                                "INSERT INTO Account (uid, password, userToken) VALUES (currval('users_uid_seq'), $1, $2)";
-                            const insertAccountValues = [
+                            const insertAccountsText =
+                                "INSERT INTO Accounts (uid, password, userToken) VALUES (currval('users_uid_seq'), $1, $2)";
+                            const insertAccountsValues = [
                                 user1.password_digest,
                                 user1.token,
                             ]
                             client.query(
-                                insertAccountText,
-                                insertAccountValues,
+                                insertAccountsText,
+                                insertAccountsValues,
                                 (err, res) => {
                                     if (shouldAbort(err)) {
                                         return;
@@ -145,7 +145,7 @@ const createToken = () => {
 }
 
 const findUser = (userReq) => {
-  return pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username])
+  return pool.query("SELECT * FROM Accounts NATURAL JOIN Users NATURAL JOIN UserProfiles WHERE UserProfiles.username = $1", [userReq.username])
   .then((results) => results.rows[0])
   .catch((error) => console.error(error.stack))
 }
@@ -166,7 +166,7 @@ const checkPassword = (reqPassword, foundUser) => {
 
 const updateUserToken = (token, user) => {
     return pool.query(
-        'UPDATE Account SET userToken = $1 WHERE uid = $2 RETURNING uid, userToken',
+        'UPDATE Accounts SET userToken = $1 WHERE uid = $2 RETURNING uid, userToken',
         [token, user.uid]
     )
     .then((results) => results.rows[0])

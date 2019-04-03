@@ -1,6 +1,6 @@
 exports.up = function(knex, Promise) {
-  let createQuery = ` DROP TABLE IF EXISTS UserProfile;
-  CREATE TABLE UserProfile (
+  let createQuery = ` DROP TABLE IF EXISTS UserProfiles;
+  CREATE TABLE UserProfiles (
   username        VARCHAR(20),
   uid             INTEGER NOT NULL,
   dateJoined      TIMESTAMP,
@@ -11,6 +11,6 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  let dropQuery = `DROP TABLE UserProfile`;
+  let dropQuery = `DROP TABLE UserProfiles`;
   return knex.raw(dropQuery);
 };

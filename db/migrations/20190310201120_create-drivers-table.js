@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
 	cid					INTEGER,
 	license				VARCHAR(10),
 	PRIMARY KEY (uid),
-	FOREIGN KEY (cid) REFERENCES Car
+	FOREIGN KEY (cid) REFERENCES Cars
 )`;
   return knex.raw(createQuery);
 };

@@ -3,12 +3,12 @@ exports.up = function(knex, Promise) {
   CREATE TABLE DriverRatings (
 	forUid 			INTEGER NOT NULL,
 	aid				INTEGER NOT NULL,
-	by				INTEGER NOT NULL,
+	byUid				INTEGER NOT NULL,
 	rating 			NUMERIC NOT NULL,
 	PRIMARY KEY (forUid, aid),
 	FOREIGN KEY (forUid) REFERENCES Drivers,
-	FOREIGN KEY (by)  REFERENCES Passengers,
-	FOREIGN KEY (aid) REFERENCES Advertisement
+	FOREIGN KEY (byUid)  REFERENCES Passengers,
+	FOREIGN KEY (aid) REFERENCES Advertisements
 )`;
   return knex.raw(createQuery);
 };
