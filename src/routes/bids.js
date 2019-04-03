@@ -15,7 +15,7 @@ var router = express.Router();
 
 // GET all bids
 router.get('/', (request, response) => {
-  pool.query('SELECT * FROM bid ORDER BY uid ASC', (error, results) => {
+  pool.query('SELECT * FROM Bids ORDER BY uid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -37,7 +37,7 @@ router.get('/accepted', (request, response) => {
 router.post('/create', (request, response) => {
   const { uid, aid, bidPrice } = request.body
   pool.query(
-    'INSERT INTO bid (uid, aid, bidPrice) VALUES ($1, $2, $3) RETURNING *',
+    'INSERT INTO Bids (uid, aid, bidPrice) VALUES ($1, $2, $3) RETURNING *',
     [uid, aid, bidPrice],
     (error, results) => {
       if (error) {

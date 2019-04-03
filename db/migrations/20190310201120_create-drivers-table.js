@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
 	rating			NUMERIC,
 	cid				INTEGER,
 	PRIMARY KEY (uid),
-	FOREIGN KEY (cid) REFERENCES Car
+	FOREIGN KEY (cid) REFERENCES Cars
 )`;
   return knex.raw(createQuery);
 };

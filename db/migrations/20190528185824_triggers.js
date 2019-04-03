@@ -6,10 +6,10 @@ exports.up = function(knex, Promise) {
     $$
     BEGIN
         INSERT INTO
-            History(uid, aid)
+            Histories(uid, aid)
             VALUES(NEW.puid,NEW.aid);
         INSERT INTO
-            History(uid, aid)
+            Histories(uid, aid)
             VALUES(NEW.duid,NEW.aid);
         RETURN NEW;
     END;
@@ -30,8 +30,8 @@ exports.up = function(knex, Promise) {
     DECLARE min_bid NUMERIC;
     BEGIN
         SELECT minBidPrice into min_bid
-        FROM Advertisement
-        WHERE NEW.aid = Advertisement.aid;
+        FROM Advertisements
+        WHERE NEW.aid = Advertisements.aid;
 
         IF NEW.bidPrice < min_bid THEN
             RAISE NOTICE 'Bid price too low';
@@ -45,7 +45,7 @@ exports.up = function(knex, Promise) {
 
     CREATE TRIGGER check_min_bid
     BEFORE INSERT OR UPDATE
-    ON Bid
+    ON Bids
     FOR EACH ROW
     EXECUTE PROCEDURE check_min_bid();
 
@@ -142,7 +142,7 @@ exports.up = function(knex, Promise) {
         SET tripsDriven = num_trips + 1
         WHERE NEW.duid = Drivers.uid;
 
-        RETURN NEW;
+        RETURN NEW; 
     END;
     $$
     LANGUAGE plpgsql ;

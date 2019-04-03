@@ -6,8 +6,8 @@ exports.up = function(knex, Promise) {
 	duid			INTEGER,
 	price			NUMERIC NOT NULL,
 	PRIMARY KEY (aid, puid, duid),
-	FOREIGN KEY (aid, duid) REFERENCES Advertisement (aid, uid),
-	FOREIGN KEY (puid, aid, price) REFERENCES Bid (uid, aid, bidPrice)
+	FOREIGN KEY (aid, duid) REFERENCES Advertisements (aid, uid),
+	FOREIGN KEY (puid, aid, price) REFERENCES Bids (uid, aid, bidPrice)
 )`;
   return knex.raw(createQuery);
 };
