@@ -11,13 +11,13 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-var router = express.Router();
+var router = express.Router()
 router.use((request, response, next) => {
-  console.log(request.path);
+  console.log(request.path)
   if (request.path.slice(0,7) != '/exists' && request.session.uid === undefined) {
-    response.status(401).end();
+    response.status(401).end()
   } else {
-    next();
+    next()
   }
 })
 
@@ -53,7 +53,7 @@ router.get('/passengers', (request, response) => {
 
 // Return personal profile only if logged in
 router.get('/profile', (request, response) => {
-  pool.query('SELECT * FROM (users NATURAL JOIN UserProfile NATURAL JOIN Account) where uid = $1', [req.session.uid], (error, results) => {
+  pool.query('SELECT * FROM (users NATURAL JOIN UserProfiles NATURAL JOIN Accounts) where uid = $1', [req.session.uid], (error, results) => {
     if (error) {
       throw error
     }
@@ -78,21 +78,21 @@ router.get('/exists/:username', (request, response) => {
   const username = request.params.username;
   pool.query('SELECT * FROM UserProfiles WHERE username = $1', [username], (error, results) => {
     if (error) {
-      console.log(error);
-      response.status(500).end();
+      console.log(error)
+      response.status(500).end()
     } else {
-        response.status(200).json(results.rowCount != 0);
+        response.status(200).json(results.rowCount != 0)
     }
   })
-});
+})
 
 // CREATE user -- Should not be callable directly, use register
 // Add to drivers table if driver = true, else add to passengers table
 // If driver, need to put cid as well
 router.post('/', (request, response) => {
   (async () => {
-    response.status(401).end();
-    return;
+    response.status(401).end()
+    return
 
     const { firstName, lastName, email, pssword, driver, cid } = request.body
 
@@ -121,7 +121,7 @@ router.post('/', (request, response) => {
       response.status(200).send('User successfully created.')
     }
   })().catch(e => {
-    response.status(500).end();
+    response.status(500).end()
     console.error(e.stack)
   })
 })

@@ -11,7 +11,7 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-const router = express.Router();
+const router = express.Router()
 
 // GET all bids
 router.get('/', (request, response) => {

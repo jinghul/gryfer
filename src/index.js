@@ -56,8 +56,8 @@ app.get('/', (req, res) => {
     res.redirect('/home')
 })
 app.get('/home', (req, res) => {
-    res.render('home', {title: 'Gryfer', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable});
-});
+    res.render('home', {title: 'Gryfer', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+})
 app.get('/search', (req, res) => {
     res.render('search', {layout: 'ads', title : 'Find Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
 })
