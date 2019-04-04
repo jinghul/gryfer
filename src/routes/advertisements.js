@@ -12,8 +12,6 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-// TODO: Search queries e.g. by toaddress, fromaddress, time, price
-
 const router = express.Router()
 router.use((request, response, next) => {
   if (!request.session.uid) {
