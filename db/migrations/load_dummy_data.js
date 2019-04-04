@@ -19,9 +19,9 @@ exports.up = function(knex, Promise) {
 	(100),
 	(101);
 
-	INSERT INTO Drivers (uid, tripsDriven, cid) VALUES
-	(3, 0, 100),
-	(4, 0, 101);
+	INSERT INTO Drivers (uid, tripsDriven, rating, cid, license) VALUES
+	(3, 3, 2.0, 100, 'S918841412'),
+	(4, 2, 4.5, 101, 'S847189374');
 
 	INSERT INTO Accounts (uid, password, userToken) VALUES
 	(1, 'what', 'usertoken1'),

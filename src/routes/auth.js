@@ -27,6 +27,7 @@ router.post('/register', (request, response) => {
         .then(token => (user.token = token))
         .then(() => createUser(user))
         .then(user => {
+            console.log("right before delete password_digest")
             delete user.password_digest
             response.status(201).json({ user });
         })
@@ -76,7 +77,7 @@ const createUser = user => {
             return !!err;
         }
 
-        client.query('BEGIN', err => {
+        client.query('BEGIN', (err, res) => {
             console.log(user1)
             if (shouldAbort(err)) {
                 return;
@@ -131,6 +132,7 @@ const createUser = user => {
             )
         })
     })
+    console.log("right before return user")
     return user;
 }
 
