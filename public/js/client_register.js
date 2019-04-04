@@ -3,7 +3,7 @@ function check_then_register() {
     $.get(
         'http://localhost:3000/users/exists/' + $('#user-reg').val(),
         function(exists) {
-            if (exists && !$('#exist-account').attr('loggedin') == 'true') {
+            if (exists) {
                 $('#user-reg').addClass('is-invalid');
                 $('#user-taken-text').show();
 

@@ -76,8 +76,9 @@ router.get('/:id', (request, response) => {
 // Check if user with username exists
 router.get('/exists/:username', (request, response) => {
   const username = request.params.username;
-  pool.query('SELECT * FROM UserProfile WHERE username = $1', [username], (error, results) => {
+  pool.query('SELECT * FROM UserProfiles WHERE username = $1', [username], (error, results) => {
     if (error) {
+      console.log(error);
       response.status(500).end();
     } else {
         response.status(200).json(results.rowCount != 0);
