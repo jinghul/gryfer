@@ -50,6 +50,7 @@ const advertisements = require('./routes/advertisements')
 const auth = require('./routes/auth')
 const bids = require('./routes/bids')
 const destinations = require('./routes/destinations')
+const ratings = require('./routes/ratings')
 
 app.get('/', (req, res) => {
     res.redirect('/home')
@@ -70,6 +71,7 @@ app.use('/ads', advertisements)
 app.use('/auth', auth)
 app.use('/bids', bids)
 app.use('/destinations', destinations)
+app.use('/ratings', ratings)
 
 app.use(express.static(path.join(__dirname, '../public/')))
 

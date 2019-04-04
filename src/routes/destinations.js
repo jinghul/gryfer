@@ -43,10 +43,12 @@ router.post('/create', (request, response) => {
     [uid, nickname, address],
     (error, results) => {
       if (error) {
-        throw error
+        response.status(400).send('Database rejection')
+        console.log(error);
+        return;
       }
       console.log(results.rows[0])
-      response.status(200).send('Destinatoin saved: ' + results.rows[0])
+      response.status(200).send('Destination saved: ' + results.rows[0])
     })
 })
 
