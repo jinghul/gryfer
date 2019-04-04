@@ -1,12 +1,12 @@
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
 
 /* Utils */
-const path = require('path');
-const config = require('../config.json');
+const path = require('path')
+const config = require('../config.json')
 const pg = require('pg'),
     session = require('express-session'),
-    pgSession = require('connect-pg-simple')(session);
+    pgSession = require('connect-pg-simple')(session)
 
 var pool = new pg.Pool({
     user: config.username,
@@ -14,7 +14,7 @@ var pool = new pg.Pool({
     password: config.password,
     host: config.host,
     port: config.port,
-});
+})
 
 app.use(session({
   store: new pgSession({
@@ -26,7 +26,7 @@ app.use(session({
   cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 }, // 30 days
 }))
 
-const exphbs = require('express-handlebars');
+const exphbs = require('express-handlebars')
 app.engine(
     'handlebars',
     exphbs({
@@ -36,26 +36,27 @@ app.engine(
         helpers: path.join(__dirname, "views/helpers"),
         partialsDir: path.join(__dirname, "../views/partials"),
     })
-);
-app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, "../views"));
+)
+app.set('view engine', 'handlebars')
+app.set('views', path.join(__dirname, "../views"))
 
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const bodyParser = require('body-parser')
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 /* Routes */
-const users = require('./routes/users');
-const advertisements = require('./routes/advertisements');
-const auth = require('./routes/auth');
-const bids = require('./routes/bids');
+const users = require('./routes/users')
+const advertisements = require('./routes/advertisements')
+const auth = require('./routes/auth')
+const bids = require('./routes/bids')
+const destinations = require('./routes/destinations')
 
 app.get('/', (req, res) => {
     res.redirect('/home')
 })
 app.get('/home', (req, res) => {
-    res.render('home', {title: 'Gryfer'});
-});
+    res.render('home', {title: 'Gryfer'})
+})
 app.get('/auth', (req, res) => {
     res.render('auth', {title: 'Sign In'})
 })
@@ -67,13 +68,14 @@ app.get('/make', (req, res) => {
 })
 
 // API
-app.use('/users', users);
-app.use('/ads', advertisements);
-app.use('/auth', auth);
-app.use('/bids', bids);
+app.use('/users', users)
+app.use('/ads', advertisements)
+app.use('/auth', auth)
+app.use('/bids', bids)
+app.use('/destinations', destinations)
 
-app.use(express.static(path.join(__dirname, '../public/')));
+app.use(express.static(path.join(__dirname, '../public/')))
 
 app.listen(config.app.port, () => {
-    console.log(`App running on port ${config.app.port}.`);
-});
+    console.log(`App running on port ${config.app.port}.`)
+})
