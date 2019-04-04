@@ -85,7 +85,7 @@ router.get('/register/drive', (request, response) => {
 
 router.post('/switch', (request, response) => {
     if (request.session.switchable) {
-        pool.query('UPDATE Account SET mode = $1 where uid = $2', [!request.session.mode, request.session.uid])
+        pool.query('UPDATE Accounts SET mode = $1 where uid = $2', [!request.session.mode, request.session.uid])
         .then(() => {
             request.session.mode = !request.session.mode
             response.status(200).send('Switched.').end()
@@ -102,7 +102,7 @@ router.post('/register', (request, response) => {
 
     if (request.session.uid !== undefined) {
         insertRole(user, request.session.uid).then(() => {
-            return pool.query('UPDATE Account SET mode = $1 where uid = $2', [user.driver, request.session.uid])
+            return pool.query('UPDATE Accounts SET mode = $1 where uid = $2', [user.driver, request.session.uid])
         }).then(() => {
             if (user.driver) {
                 request.session.candrive = true
@@ -172,9 +172,9 @@ const insertRole = async (user, uid) => {
     try {
         await client.query('BEGIN')
         if (user.driver) {
-            var result = await client.query('INSERT INTO Car (cid) VALUES (DEFAULT) RETURNING cid')
+            var result = await client.query('INSERT INTO Cars (cid) VALUES (DEFAULT) RETURNING cid')
             cid = result.rows[0].cid
-            await client.query('INSERT INTO CarProfile (cid, license, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user.carlicense, user.make, user.model, user.year, 0])
+            await client.query('INSERT INTO CarProfiles (cid, license, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user.carlicense, user.make, user.model, user.year, 0])
             await client.query("INSERT INTO drivers (uid, tripsDriven, cid) VALUES ($1, $2, $3)", [uid, 0, cid])
         } else {
             await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (#1, $2)", [uid, 0])
@@ -200,14 +200,14 @@ const createUser = async (user) => {
         // save user.uid to return
         user1.uid = result.rows[0].uid
 
-        await client.query("INSERT INTO UserProfile (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)", [user1.username, new Date()])
-        await client.query("INSERT INTO Account (uid, password, userToken, mode) VALUES (currval('users_uid_seq'), $1, $2, $3)", [user1.password_digest, user1.token, user1.driver])
+        await client.query("INSERT INTO UserProfiles (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)", [user1.username, new Date()])
+        await client.query("INSERT INTO Accounts (uid, password, userToken, mode) VALUES (currval('users_uid_seq'), $1, $2, $3)", [user1.password_digest, user1.token, user1.driver])
         
         console.log(user1.driver)
         if (user1.driver) {
-            result  = await client.query('INSERT INTO Car (cid) VALUES (DEFAULT) RETURNING cid')
+            result  = await client.query('INSERT INTO Cars (cid) VALUES (DEFAULT) RETURNING cid')
             cid = result.rows[0].cid
-            await client.query('INSERT INTO CarProfile (cid, license, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user1.carlicense, user1.make, user1.model, user1.year, 0])
+            await client.query('INSERT INTO CarProfiles (cid, license, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user1.carlicense, user1.make, user1.model, user1.year, 0])
             await client.query("INSERT INTO drivers (uid, tripsDriven, cid) VALUES (currval('users_uid_seq'), $1, $2)", [0, cid])
         } else {
             await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (currval('users_uid_seq'), $1)", [0])
@@ -298,7 +298,7 @@ const createToken = () => {
 const findUser = userReq => {
     return pool
         .query(
-            'SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1',
+            'SELECT * FROM Accounts NATURAL JOIN Users NATURAL JOIN UserProfiles WHERE UserProfiles.username = $1',
             [userrequest.username]
         )
         .then(results => results.rows[0])
@@ -325,7 +325,7 @@ const checkPassword = (reqPassword, foundUser) => {
 const updateUserToken = (token, user) => {
     return pool
         .query(
-            'UPDATE Account SET userToken = $1 WHERE uid = $2 RETURNING uid, userToken',
+            'UPDATE Accounts SET userToken = $1 WHERE uid = $2 RETURNING uid, userToken',
             [token, user.uid]
         )
         .then(results => results.rows[0])
