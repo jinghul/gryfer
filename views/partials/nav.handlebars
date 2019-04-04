@@ -1,6 +1,6 @@
 <nav class="nav navbar-expand-lg navbar-light bg-white">
     <a class="navbar-brand mr-auto" href="#">
-        <img src="./img/logo.png" height="40">
+        <img src="http://localhost:3000/img/logo.png" height="40">
     </a>
     <button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#top-nav"
         aria-controls="top-nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,26 +9,77 @@
     <div class="collapse navbar-collapse" id="top-nav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="./home">Home</a>
+                <a class="nav-link" href="http://localhost:3000/home">Home</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="./home#about">About</a>
+                <a class="nav-link" href="http://localhost:3000/home#about">About</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="./search">Find Rides</a>
+                <a class="nav-link" href="http://localhost:3000/search">Find Rides</a>
             </li>
+            {{#if driver}}
             <li class="nav-item">
-                <a class="nav-link" href="./make">Make Rides</a>
+                <a class="nav-link" href="http://localhost:3000/make">Make Rides</a>
             </li>
+            {{/if}}
             {{#if username}}
-            <li class="nav-item">
-                <a class="nav-link" href="./auth">{{username}}</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                    aria-expanded="false"><b>{{fname}}</b></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="http://localhost:3000/profile">Profile</a>
+                    {{#if driver}}
+                    {{#if switchable}}
+                    <a class="dropdown-item" id="d-to-r">Switch to Rider Mode</a>
+                    {{else}}
+                    <a class="dropdown-item" id="d-to-rr">Register to Ride</a>
+                    {{/if}}
+                    {{else}}
+                    {{#if switchable}}
+                    <a class="dropdown-item" id="r-to-d">Switch to Driver Mode</a>
+                    {{else}}
+                    <a class="dropdown-item" id="r-to-dr">Register to Drive</a>
+                    {{/if}}
+                    {{/if}}
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" id="signout-but">Sign Out</a>
+                </div>
             </li>
             {{else}}
             <li class="nav-item">
-                <a class="nav-link" href="./auth">Sign In</a>
+                <a class="nav-link" href="http://localhost:3000/auth">Sign In</a>
             </li>
             {{/if}}
         </ul>
+        <script>
+            $('document').ready(function() {
+                $('#signout-but').bind('click', function() {
+                    console.log('called')
+                    $.post('http://localhost:3000/auth/signout', function() {
+                        window.location = 'http://localhost:3000/home';
+                    })
+                });
+                $('#d-to-r').bind('click', function() {
+                    console.log('driver to rider');
+                    $.post('http://localhost:3000/auth/switch', function() {
+                        window.location = 'http://localhost:3000/search';
+                    })
+                });
+                $('#d-to-rr').bind('click', function() {
+                    console.log('driver to rider reg.')
+                    window.location = 'http://localhost:3000/auth/register/ride';
+                })
+                $('#r-to-d').bind('click', function() {
+                    console.log('rider to driver')
+                    $.post('http://localhost:3000/auth/switch', function() {
+                        window.location = 'http://localhost:3000/make';
+                    })
+                })
+                $('#r-to-dr').bind('click', function() {
+                    console.log('driver to rider reg.')
+                    window.location = 'http://localhost:3000/auth/register/drive';
+                })
+            });
+        </script>
     </div>
 </nav>
