@@ -12,7 +12,6 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-<<<<<<< HEAD
 // TODO: Search queries e.g. by toaddress, fromaddress, time, price
 
 const router = express.Router();
@@ -24,46 +23,6 @@ router.use((request, response, next) => {
     next();
   }
 })
-
-router.get('/:minBidPrice', (request, response) => {
-  const minBidPrice = request.params.minBidPrice
-
-  pool.query('SELECT * FROM Advertisement WHERE minBidPrice = $1', [minBidPrice], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-})
-
-router.get('/:toAddress', (request, response) => {
-  const toAddress = request.params.toAddress
-
-  pool.query('SELECT * FROM Advertisement WHERE toAddress = $1', [toAddress], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-})
-
-router.get('/:fromAddress', (request, response) => {
-  const fromAddress = request.params.fromAddress
-
-  pool.query('SELECT * FROM Advertisement WHERE fromAddress = $1', [fromAddress], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows)
-  })
-})
-
-router.get('/:time', (request, response) => {
-  const time = request.params.time
-
-  pool.query('SELECT * FROM Advertisement WHERE time = $1', [time], (error, results) => {
-=======
-const router = express.Router();
 
 // Search by toaddress, fromaddress, time,  and/or maxPrice
 router.get('/search', (request, response) => {
@@ -100,7 +59,6 @@ router.get('/search', (request, response) => {
   console.log(queryString)
 
   pool.query(queryString, results, (error, results) => {
->>>>>>> c95146175741715841e74cd4ea17a2227aefc04e
     if (error) {
       throw error
     }
