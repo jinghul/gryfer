@@ -34,7 +34,7 @@ exports.up = function(knex, Promise) {
         WHERE NEW.aid = Advertisements.aid;
 
         IF NEW.bidPrice < min_bid THEN
-            RAISE NOTICE 'Bid price too low';
+            RAISE EXCEPTION 'Bid price too low';
             RETURN NULL;
         END IF;
 
@@ -152,6 +152,93 @@ exports.up = function(knex, Promise) {
     ON Accepted
     FOR EACH ROW
     EXECUTE PROCEDURE update_num_trips();
+    
+    
+    
+    
+    
+    CREATE OR REPLACE FUNCTION check_review_driver()
+    RETURNS TRIGGER AS
+    $$
+    DECLARE ad_puid INTEGER;
+            ad_duid INTEGER;
+            count INTEGER;
+    BEGIN
+    
+        SELECT count(*) into count
+        FROM Accepted
+        WHERE NEW.aid = Accepted.aid;
+        
+        IF count = 0 THEN
+          RAISE EXCEPTION 'Ad not accepted';
+          RETURN NULL;
+        END IF;
+        
+        SELECT puid, duid INTO ad_puid, ad_duid
+        FROM Accepted
+        WHERE NEW.aid = Accepted.aid;
+
+        IF NEW.byUid <> ad_puid THEN
+            RAISE EXCEPTION 'Incorrect Passenger';
+            RETURN NULL;
+        ELSIF NEW.forUid <> ad_duid THEN
+            RAISE EXCEPTION 'Incorrect Driver';
+            RETURN NULL;
+        END IF;
+
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql;
+
+    CREATE TRIGGER check_review_driver
+    BEFORE INSERT OR UPDATE
+    ON DriverRatings
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_review_driver();
+    
+    
+    
+    CREATE OR REPLACE FUNCTION check_review_passenger()
+    RETURNS TRIGGER AS
+    $$
+    DECLARE ad_puid INTEGER;
+            ad_duid INTEGER;
+            count INTEGER;
+    BEGIN
+    
+        SELECT count(*) into count
+        FROM Accepted
+        WHERE NEW.aid = Accepted.aid;
+        
+        IF count = 0 THEN
+          RAISE EXCEPTION 'Ad not accepted';
+          RETURN NULL;
+        END IF;
+        
+        SELECT puid, duid INTO ad_puid, ad_duid
+        FROM Accepted
+        WHERE NEW.aid = Accepted.aid;
+
+        IF NEW.forUid <> ad_puid THEN
+            RAISE EXCEPTION 'Incorrect Passenger';
+            RETURN NULL;
+        ELSIF NEW.byUid <> ad_duid THEN
+            RAISE EXCEPTION 'Incorrect Driver';
+            RETURN NULL;
+        END IF;
+
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql;
+    
+    CREATE TRIGGER check_review_passenger
+    BEFORE INSERT OR UPDATE
+    ON PassengerRatings
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_review_passenger();
+    
     `;
 
 
