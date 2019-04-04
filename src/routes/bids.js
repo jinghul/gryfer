@@ -3,7 +3,7 @@ const express = require('express')
 const pg = require('pg')
 
 // DB connection
-var pool = new pg.Pool({
+const pool = new pg.Pool({
   user: config.username,
   database: config.api,
   password: config.password,
@@ -11,7 +11,7 @@ var pool = new pg.Pool({
   port: config.port,
 })
 
-var router = express.Router();
+const router = express.Router();
 
 // GET all bids
 router.get('/', (request, response) => {

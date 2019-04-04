@@ -8,7 +8,7 @@ const pg = require('pg'),
     session = require('express-session'),
     pgSession = require('connect-pg-simple')(session)
 
-var pool = new pg.Pool({
+const pool = new pg.Pool({
     user: config.username,
     database: config.api,
     password: config.password,

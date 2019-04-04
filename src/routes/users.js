@@ -3,7 +3,7 @@ const express = require('express')
 const pg = require('pg')
 
 // DB connection
-var pool = new pg.Pool({
+const pool = new pg.Pool({
   user: config.username,
   database: config.api,
   password: config.password,
@@ -11,7 +11,7 @@ var pool = new pg.Pool({
   port: config.port,
 })
 
-var router = express.Router();
+const router = express.Router();
 
 // GET users
 router.get('/', (request, response) => {
@@ -95,7 +95,7 @@ router.post('/:id', (request, response) => {
   const { name, email } = request.body
 
   pool.query(
-    'UPDATE Users SET name = $1, email = $2 WHERE id = $3',
+    'UPDATE Users SET name = $1, email = $2 WHERE uid = $3',
     [name, email, id],
     (error, results) => {
       if (error) {
@@ -110,7 +110,7 @@ router.post('/:id', (request, response) => {
 router.delete('/:id', (request, response) => {
   const id = parseInt(request.params.id)
 
-  pool.query('DELETE FROM Users WHERE id = $1', [id], (error, results) => {
+  pool.query('DELETE FROM Users WHERE uid = $1', [id], (error, results) => {
     if (error) {
       throw error
     }

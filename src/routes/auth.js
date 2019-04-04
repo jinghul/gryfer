@@ -14,7 +14,7 @@ const pool = new pg.Pool({
 })
 
 const express = require('express')
-var router = express.Router()
+const router = express.Router()
 
 router.post('/register', (request, response) => {
     const user = request.body;

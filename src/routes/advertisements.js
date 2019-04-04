@@ -12,14 +12,14 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-var router = express.Router();
+const router = express.Router();
 
 // Search by toaddress, fromaddress, time,  and/or maxPrice
 router.get('/search', (request, response) => {
   const { toAddress, fromAddress, departureTime, maxPrice } = request.body
-  var whereStrings = []
-  var results = []
-  var paramCounter = 1
+  let whereStrings = []
+  let results = []
+  let paramCounter = 1
   if (toAddress) {
     whereStrings.push('toAddress = $' + paramCounter.toString())
     results.push(toAddress)
@@ -41,7 +41,7 @@ router.get('/search', (request, response) => {
     results.push(maxPrice)
   }
 
-  var queryString = 'SELECT * FROM Advertisement WHERE '
+  let queryString = 'SELECT * FROM Advertisement WHERE '
   for (let i = 0; i < whereStrings.length; i++) {
     queryString += whereStrings[i] + ' AND '
   }
