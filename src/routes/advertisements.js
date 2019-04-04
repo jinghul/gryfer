@@ -41,7 +41,7 @@ router.get('/search', (request, response) => {
     results.push(maxPrice)
   }
 
-  let queryString = 'SELECT * FROM Advertisement WHERE '
+  let queryString = 'SELECT * FROM Advertisements WHERE '
   for (let i = 0; i < whereStrings.length; i++) {
     queryString += whereStrings[i] + ' AND '
   }
@@ -57,7 +57,7 @@ router.get('/search', (request, response) => {
 })
 
 router.get('/', (request, response) => {
-  pool.query('SELECT * FROM Advertisement ORDER BY aid ASC', (error, results) => {
+  pool.query('SELECT * FROM Advertisements ORDER BY aid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -67,7 +67,7 @@ router.get('/', (request, response) => {
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
-  pool.query('SELECT * FROM Advertisement WHERE aid = $1', [aid], (error, results) => {
+  pool.query('SELECT * FROM Advertisements WHERE aid = $1', [aid], (error, results) => {
     if (error) {
       throw error
     }
@@ -78,7 +78,7 @@ router.get('/:aid', (request, response) => {
 router.get('/user/:uid', (request, response) => {
   const uid = parseInt(request.params.uid)
 
-  pool.query('SELECT * FROM Advertisement WHERE uid = $1', [uid], (error, results) => {
+  pool.query('SELECT * FROM Advertisements WHERE uid = $1', [uid], (error, results) => {
     if (error) {
       throw error
     }
@@ -90,7 +90,7 @@ router.get('/user/:uid', (request, response) => {
 router.post('/', (request, response) => {
   const { toAddress, fromAddress, time, minBidPrice, uid } = request.body
 
-  pool.query('INSERT INTO Advertisement (fromAddress, toAddress, time, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [fromAddress, toAddress, time, minBidPrice, uid], (error, results) => {
+  pool.query('INSERT INTO Advertisements (fromAddress, toAddress, time, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [fromAddress, toAddress, time, minBidPrice, uid], (error, results) => {
     if (error) {
       throw error
     }
@@ -105,7 +105,7 @@ router.put('/:aid', (request, response) => {
   const { toAddress, fromAddress, time, minBidPrice } = request.body
 
   pool.query(
-    'UPDATE Advertisement SET toAddress = $1, fromAddress = $2, time = $3, minBidPrice = $4 WHERE aid = $5',
+    'UPDATE Advertisements SET toAddress = $1, fromAddress = $2, time = $3, minBidPrice = $4 WHERE aid = $5',
     [toAddress, fromAddress, time, minBidPrice, aid],
     (error, results) => {
       if (error) {
@@ -120,7 +120,7 @@ router.put('/:aid', (request, response) => {
 router.delete('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
-  pool.query('DELETE FROM Advertisement WHERE aid = $1', [aid], (error, results) => {
+  pool.query('DELETE FROM Advertisements WHERE aid = $1', [aid], (error, results) => {
     if (error) {
       throw error
     }
