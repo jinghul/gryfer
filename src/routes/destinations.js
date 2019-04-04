@@ -11,7 +11,7 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
-const router = express.Router();
+const router = express.Router()
 
 // GET all saved destinations
 router.get('/', (request, response) => {
@@ -44,8 +44,8 @@ router.post('/create', (request, response) => {
     (error, results) => {
       if (error) {
         response.status(400).send('Database rejection')
-        console.log(error);
-        return;
+        console.log(error)
+        return
       }
       console.log(results.rows[0])
       response.status(200).send('Destination saved: ' + results.rows[0])

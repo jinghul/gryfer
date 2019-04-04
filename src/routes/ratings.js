@@ -11,7 +11,7 @@ const pool = new pg.Pool({
     port: config.port,
 })
 
-const router = express.Router();
+const router = express.Router()
 
 // GET all ratings for all drivers
 router.get('/drivers', (request, response) => {
@@ -74,6 +74,7 @@ router.post('/passengers', (request, response) => {
 // Create new rating for a driver
 router.post('/drivers', (request, response) => {
     const {byUid, forUid, aid, rating} = request.body
+    console.log(byUid, forUid)
     pool.query(
         'INSERT INTO DriverRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *',
         [byUid, forUid, aid, rating],
@@ -81,7 +82,7 @@ router.post('/drivers', (request, response) => {
             if (error) {
                 response.status(400).send('Database rejection')
                 console.log( error)
-                return;
+                return
             }
             console.log(results.rows[0])
             response.status(200).send('Rating saved: ' + results.rows[0])

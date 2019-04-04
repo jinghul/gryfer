@@ -14,13 +14,13 @@ const pool = new pg.Pool({
 
 // TODO: Search queries e.g. by toaddress, fromaddress, time, price
 
-const router = express.Router();
+const router = express.Router()
 router.use((request, response, next) => {
   if (!request.session.uid) {
-    response.status(401).end();
-    return;
+    response.status(401).end()
+    return
   } else {
-    next();
+    next()
   }
 })
 
@@ -99,12 +99,12 @@ router.get('/user/:uid', (request, response) => {
 
 router.post('/', (request, response) => {
   if (!request.session.mode) {
-    response.status(401).end();
-    return;
+    response.status(401).end()
+    return
   }
 
   const { toAddress, fromAddress, time, minBidPrice } = request.body
-  const uid = request.session.uid;
+  const uid = request.session.uid
   pool.query('INSERT INTO Advertisement (fromAddress, toAddress, time, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [fromAddress, toAddress, time, minBidPrice, uid], (error, results) => {
     if (error) {
       throw error
