@@ -12,6 +12,7 @@ const pool = new pg.Pool({
   port: config.port,
 })
 
+<<<<<<< HEAD
 // TODO: Search queries e.g. by toaddress, fromaddress, time, price
 
 const router = express.Router();
@@ -61,6 +62,45 @@ router.get('/:time', (request, response) => {
   const time = request.params.time
 
   pool.query('SELECT * FROM Advertisement WHERE time = $1', [time], (error, results) => {
+=======
+const router = express.Router();
+
+// Search by toaddress, fromaddress, time,  and/or maxPrice
+router.get('/search', (request, response) => {
+  const { toAddress, fromAddress, departureTime, maxPrice } = request.body
+  let whereStrings = []
+  let results = []
+  let paramCounter = 1
+  if (toAddress) {
+    whereStrings.push('toAddress = $' + paramCounter.toString())
+    results.push(toAddress)
+    paramCounter++
+  }
+  if (fromAddress) {
+    whereStrings.push('fromAddress = $' + paramCounter.toString())
+    results.push(fromAddress)
+    paramCounter++
+  }
+  if (departureTime) {
+    whereStrings.push('departureTime = $' + paramCounter.toString())
+    results.push(departureTime)
+    paramCounter++
+  }
+  if (maxPrice) {
+    whereStrings.push('minBidPrice <= $' + paramCounter.toString())
+    console.log('minBidPrice <= $' + paramCounter.toString())
+    results.push(maxPrice)
+  }
+
+  let queryString = 'SELECT * FROM Advertisement WHERE '
+  for (let i = 0; i < whereStrings.length; i++) {
+    queryString += whereStrings[i] + ' AND '
+  }
+  queryString = queryString.slice(0, -5)
+  console.log(queryString)
+
+  pool.query(queryString, results, (error, results) => {
+>>>>>>> c95146175741715841e74cd4ea17a2227aefc04e
     if (error) {
       throw error
     }

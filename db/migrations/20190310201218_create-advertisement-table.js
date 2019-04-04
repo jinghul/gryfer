@@ -1,12 +1,13 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `DROP TABLE IF EXISTS Advertisement;
-  CREATE TABLE Advertisement (
+  let createQuery = `DROP TABLE IF EXISTS Advertisements;
+  CREATE TABLE Advertisements (
 	aid				SERIAL,
-	minBidPrice		FLOAT,
+	minBidPrice		NUMERIC,
 	fromAddress		VARCHAR(60),
 	toAddress 		VARCHAR(60),
-	time			timestamp,
-	uid			INTEGER NOT NULL,
+	departureTime	TIMESTAMP,
+	uid				INTEGER NOT NULL,
+	UNIQUE (aid, uid),
 	PRIMARY KEY (aid),
 	FOREIGN KEY (uid) REFERENCES Drivers
 )`;
@@ -14,6 +15,6 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  let dropQuery = `DROP TABLE Advertisement`;
+  let dropQuery = `DROP TABLE Advertisements`;
   return knex.raw(dropQuery);
 };

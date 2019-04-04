@@ -4,8 +4,8 @@ exports.up = function(knex, Promise) {
 	nickname		VARCHAR(20),
 	address			VARCHAR(60),
 	uid				INTEGER NOT NULL,
-	PRIMARY KEY (nickname),
-	FOREIGN KEY (uid) REFERENCES Account
+	PRIMARY KEY (nickname, uid),
+	FOREIGN KEY (uid) REFERENCES Accounts
 )`;
   return knex.raw(createQuery);
 };

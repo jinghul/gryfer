@@ -3,7 +3,7 @@ const express = require('express')
 const pg = require('pg')
 
 // DB connection
-var pool = new pg.Pool({
+const pool = new pg.Pool({
   user: config.username,
   database: config.api,
   password: config.password,
@@ -23,7 +23,7 @@ router.use((request, response, next) => {
 
 // GET users
 router.get('/', (request, response) => {
-  pool.query('SELECT * FROM users ORDER BY uid ASC', (error, results) => {
+  pool.query('SELECT * FROM Users ORDER BY uid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -33,7 +33,7 @@ router.get('/', (request, response) => {
 
 // GET drivers
 router.get('/drivers', (request, response) => {
-  pool.query('SELECT * FROM drivers ORDER by uid ASC', (error, results) => {
+  pool.query('SELECT * FROM Drivers ORDER by uid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -43,7 +43,7 @@ router.get('/drivers', (request, response) => {
 
 // GET passengers
 router.get('/passengers', (request, response) => {
-  pool.query('SELECT * FROM passengers ORDER by uid ASC', (error, results) => {
+  pool.query('SELECT * FROM Passengers ORDER by uid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -65,7 +65,7 @@ router.get('/profile', (request, response) => {
 router.get('/:id', (request, response) => {
   const id = parseInt(request.params.id)
 
-  pool.query('SELECT * FROM users WHERE uid = $1', [id], (error, results) => {
+  pool.query('SELECT * FROM Users WHERE uid = $1', [id], (error, results) => {
     if (error) {
       throw error
     }
@@ -99,15 +99,15 @@ router.post('/', (request, response) => {
 
     try {
       await client.query('BEGIN')
-      const { rows } = await client.query('INSERT INTO users (fname, lname, email) VALUES ($1, $2, $3) RETURNING uid', [firstName, lastName, email])
+      const { rows } = await client.query('INSERT INTO Users (fname, lname, email) VALUES ($1, $2, $3) RETURNING uid', [firstName, lastName, email])
 
       if (driver) {
         console.log("Creating a driver...")
-        await client.query('INSERT INTO drivers (uid, tripsDriven, cid) VALUES ($1, $2, $3)', [rows[0].uid, 0, cid])
+        await client.query('INSERT INTO Drivers (uid, tripsDriven, cid) VALUES ($1, $2, $3)', [rows[0].uid, 0, cid])
       }
       else {
         console.log("Creating a passenger")
-        await client.query('INSERT INTO passengers (uid, tripsTaken) VALUES ($1, $2)', [rows[0].uid, 0])
+        await client.query('INSERT INTO Passengers (uid, tripsTaken) VALUES ($1, $2)', [rows[0].uid, 0])
       }
 
       await client.query('COMMIT')
@@ -131,7 +131,7 @@ router.post('/:id', (request, response) => {
   const { name, email } = request.body
 
   pool.query(
-    'UPDATE users SET name = $1, email = $2 WHERE id = $3',
+    'UPDATE Users SET name = $1, email = $2 WHERE uid = $3',
     [name, email, id],
     (error, results) => {
       if (error) {
@@ -146,7 +146,7 @@ router.post('/:id', (request, response) => {
 router.delete('/:id', (request, response) => {
   const id = parseInt(request.params.id)
 
-  pool.query('DELETE FROM users WHERE id = $1', [id], (error, results) => {
+  pool.query('DELETE FROM Users WHERE uid = $1', [id], (error, results) => {
     if (error) {
       throw error
     }

@@ -1,16 +1,16 @@
 exports.up = function(knex, Promise) {
-  let createQuery = `DROP TABLE IF EXISTS History;
-  CREATE TABLE History (
-	username 		VARCHAR(20),
+  let createQuery = `DROP TABLE IF EXISTS Histories;
+  CREATE TABLE Histories (
+	uid 			INTEGER NOT NULL,
 	aid				INTEGER,
-	PRIMARY KEY (username, aid),
-	FOREIGN KEY (username) REFERENCES UserProfile,
-	FOREIGN KEY (aid) REFERENCES Advertisement
+	PRIMARY KEY (uid, aid),
+	FOREIGN KEY (uid) REFERENCES UserProfiles,
+	FOREIGN KEY (aid) REFERENCES Advertisements
 )`;
   return knex.raw(createQuery);
 };
 
 exports.down = function(knex, Promise) {
-  let dropQuery = `DROP TABLE History`;
+  let dropQuery = `DROP TABLE Histories`;
   return knex.raw(dropQuery);
 };

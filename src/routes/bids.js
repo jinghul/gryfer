@@ -3,7 +3,7 @@ const express = require('express')
 const pg = require('pg')
 
 // DB connection
-var pool = new pg.Pool({
+const pool = new pg.Pool({
   user: config.username,
   database: config.api,
   password: config.password,
@@ -11,11 +11,11 @@ var pool = new pg.Pool({
   port: config.port,
 })
 
-var router = express.Router();
+const router = express.Router();
 
 // GET all bids
 router.get('/', (request, response) => {
-  pool.query('SELECT * FROM bid ORDER BY uid ASC', (error, results) => {
+  pool.query('SELECT * FROM Bids ORDER BY uid ASC', (error, results) => {
     if (error) {
       throw error
     }
@@ -37,7 +37,7 @@ router.get('/accepted', (request, response) => {
 router.post('/create', (request, response) => {
   const { uid, aid, bidPrice } = request.body
   pool.query(
-    'INSERT INTO bid (uid, aid, bidPrice) VALUES ($1, $2, $3) RETURNING *',
+    'INSERT INTO Bids (uid, aid, bidPrice) VALUES ($1, $2, $3) RETURNING *',
     [uid, aid, bidPrice],
     (error, results) => {
       if (error) {
@@ -51,10 +51,10 @@ router.post('/create', (request, response) => {
 // ACCEPT a bid (only drivers can accept a bid)
 // Trigger will add the advertisement to history of driver and passenger
 router.post('/accept', (request, response) => {
-  const { uid, aid, price } = request.body
+  const { puid, duid, aid, price } = request.body
   pool.query(
-    'INSERT INTO accepted (aid, uid, price) VALUES ($1, $2, $3) RETURNING *',
-    [aid, uid, price],
+    'INSERT INTO accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *',
+    [aid, puid, duid, price],
     (error, results) => {
       if (error) throw error
       console.log(results.rows[0])
