@@ -1,7 +1,7 @@
-const bcrypt = require('bcrypt')
-const crypto = require('crypto')
-const config = require('../../config.json')
-const pg = require('pg')
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const config = require('../../config.json');
+const pg = require('pg');
 
 // DB Connection
 const pool = new pg.Pool({
@@ -11,164 +11,325 @@ const pool = new pg.Pool({
     password: config.password,
     host: config.host,
     port: config.port,
+});
+
+const express = require('express');
+var router = express.Router();
+
+router.get('/', (request, response) => {
+    response.redirect('auth/signin');
+});
+
+// Render Sign-in page
+router.get('/signin', (request, response) => {
+    console.log(request.session.uid)
+    if (request.session.uid != undefined) {
+        if (request.session.mode) {
+            response.redirect('../../make');
+        } else {
+            response.redirect('../../search');
+        }
+    } else {
+        response.render('signin', { title: 'Sign In' });
+    }
+});
+
+// Render rider registration page
+router.get('/register/ride', (request, response) => {
+    if (request.session.uid != undefined) {
+        if (request.session.canride) {
+            response.redirect('../../search');
+        } else {
+            response.render('register', {
+                title: 'Start Riding',
+                page: 'Ride',
+                username: request.session.username,
+                email: request.session.email,
+                fname: request.session.fname,
+                lname: request.session.lname,
+                driver: request.session.mode,
+                switchable: request.session.switchable
+            });
+        }
+    } else {
+        response.render('register', { title: 'Start Riding', page: 'Ride' });
+    }
+});
+
+// Render driver registration page
+router.get('/register/drive', (request, response) => {
+    if (request.session.uid != undefined) {
+        if (request.session.candrive) {
+            response.redirect('../../make');
+        } else {
+            response.render('register', {
+                title: 'Start Riding',
+                page: 'Drive',
+                drive: true,
+                username: request.session.username,
+                email: request.session.email,
+                fname: request.session.fname,
+                lname: request.session.lname,
+                driver: request.session.mode,
+                switchable: request.session.switchable
+            });
+        }
+    } else {
+        response.render('register', {
+            title: 'Start Driving',
+            page: 'Drive',
+            drive: true,
+        });
+    }
+});
+
+router.post('/switch', (request, response) => {
+    if (request.session.switchable) {
+        pool.query('UPDATE Account SET mode = $1 where uid = $2', [!request.session.mode, request.session.uid])
+        .then(() => {
+            request.session.mode = !request.session.mode;
+            response.status(200).send('Switched.').end();
+        })
+    } else {
+        response.status(401).send('Not switchable.').end();
+    }
 })
 
-const express = require('express')
-var router = express.Router()
-
+// Register new user
 router.post('/register', (request, response) => {
     const user = request.body;
-    hashPassword(user.password)
+    user.driver = (user.driver == 'true');
+
+    if (request.session.uid !== undefined) {
+        insertRole(user, request.session.uid).then(() => {
+            return pool.query('UPDATE Account SET mode = $1 where uid = $2', [user.driver, request.session.uid]);
+        }).then(() => {
+            if (user.driver) {
+                request.session.candrive = true;
+                console.log("can drive");
+            } else {
+                request.session.canride = true;
+                console.log("can ride");
+            }
+
+            request.session.switchable = true;
+            request.session.mode = user.driver;
+            response.status(201).json(user);
+        }).catch((err) => {
+            console.log(err);
+            response.status(500).end();
+        });
+    } else if (user.username == '' || user.password == '') {
+        response.status(400).send('Missing required fields.').end();
+    } else {
+        hashPassword(user.password)
         .then(hashedPassword => {
             delete user.password;
             user.password_digest = hashedPassword;
         })
-        .then(() => createToken())
-        .then(token => (user.token = token))
-        .then(() => createUser(user))
-        .then(user => {
-            delete user.password_digest
-            response.status(201).json({ user });
+        .then(createToken())
+        .then(token => {
+                (user.token = token)
         })
-        .catch(err => console.error(err))
-})
+        .then(() => {
+            try {
+                return createUser(user);
+            } catch (err) {
+                console.log('caught createuser error!!');
+                reject(err)
+            }
+        })
+        .then(user => {
+            delete user.password_digest;
+
+            if (user.driver) {
+                request.session.candrive = true;
+                console.log("can drive");
+            } else {
+                request.session.canride = true;
+                console.log("can ride");
+            }
+
+            request.session.uid = user.uid;
+            request.session.username = user.username;
+            request.session.mode = user.driver;
+            request.session.fname = user.fname;
+            request.session.lname = user.lname;
+            request.session.email = user.email;
+            request.session.switchable = false;
+
+            response.status(201).json(user);
+        })
+        .catch(err => {
+            console.log(err);
+            response.status(400).end();
+        });
+    }
+});
+
+const insertRole = async (user, uid) => {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        if (user.driver) {
+            var result = await client.query('INSERT INTO Car (cid) VALUES (DEFAULT) RETURNING cid');
+            cid = result.rows[0].cid;
+            await client.query('INSERT INTO CarProfile (cid, license, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user.carlicense, user.make, user.model, user.year, 0]);
+            await client.query("INSERT INTO drivers (uid, tripsDriven, cid) VALUES ($1, $2, $3)", [uid, 0, cid]);
+        } else {
+            await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (#1, $2)", [uid, 0]);
+        }
+        await client.query('COMMIT');
+    } catch (err) {
+        await client.query('ROLLBACK')
+        console.log("rollback: " + err);
+        throw err
+    } finally {
+        client.release();
+    }
+}
+
+const createUser = async (user) => {
+    let user1 = JSON.parse(JSON.stringify(user));
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+        var result = await client.query('INSERT INTO Users (fname, lname, email) VALUES($1, $2, $3) RETURNING uid', [user1.fname, user1.lname, user1.email]);
+        
+        // save user.uid to return
+        user1.uid = result.rows[0].uid;
+
+        await client.query("INSERT INTO UserProfile (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)", [user1.username, new Date()]);
+        await client.query("INSERT INTO Account (uid, password, userToken, mode) VALUES (currval('users_uid_seq'), $1, $2, $3)", [user1.password_digest, user1.token, user1.driver])
+        
+        console.log(user1.driver)
+        if (user1.driver) {
+            result  = await client.query('INSERT INTO Car (cid) VALUES (DEFAULT) RETURNING cid');
+            cid = result.rows[0].cid;
+            await client.query('INSERT INTO CarProfile (cid, license, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user1.carlicense, user1.make, user1.model, user1.year, 0]);
+            await client.query("INSERT INTO drivers (uid, tripsDriven, cid) VALUES (currval('users_uid_seq'), $1, $2)", [0, cid]);
+        } else {
+            await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (currval('users_uid_seq'), $1)", [0]);
+        }
+        await client.query('COMMIT');
+    } catch (err) {
+        await client.query('ROLLBACK')
+        throw err
+    } finally {
+        client.release();
+        return user1;
+    }
+}
 
 router.post('/signin', (request, response) => {
-    const userReq = request.body
+    const userReq = request.body;
+
+    if (userrequest.username == undefined) {
+        response.status(400).end();
+        return;
+    }
+
     findUser(userReq)
-    .then(foundUser => {
-      user = foundUser
-      return checkPassword(userReq.password, foundUser)
-    })
-    .then((res) => createToken())
-    .then(token => updateUserToken(token, user))
-    .then(() => {
-      delete user.password_digest
-      request.session.uid = user.uid;
-      request.session.username = user.username;
-      response.status(200).json(user)
-    })
-    .catch((err) => console.error(err))
-})
+        .then(foundUser => {
+            user = foundUser;
+            return checkPassword(userrequest.password, foundUser);
+        })
+        .then(() => createToken())
+        .then(token => updateUserToken(token, user))
+        .then(() => {
+            delete user.password_digest;
+
+            // keep details in session
+            request.session.uid = user.uid;
+            request.session.username = user.username;
+            request.session.mode = foundUser.mode; // false = rider, true = driver
+            request.session.fname = user.fname;
+            request.session.lname = user.lname;
+            request.session.email = user.email;
+
+            // add mode to user response for correct redirect
+            user.mode = foundUser.mode;
+
+            pool.query('SELECT * FROM drivers where uid = $1', [
+                request.session.uid,
+            ]).then(results => {
+                if (results.rowCount != 0) {
+                    request.session.candrive = true;
+                    console.log('can drive');
+                }
+
+                pool.query('SELECT * FROM passengers where uid = $1', [
+                    request.session.uid,
+                ]).then(results => {
+                    if (results.rowCount != 0) {
+                        request.session.canride = true;
+                        console.log('can ride');
+                    }
+                    request.session.switchable = request.session.canride && request.session.candrive;
+                    response.status(200).json(user);
+                });
+            });
+        })
+        .catch(err => response.status(401).end());
+});
+
+router.post('/signout', (request, response) => {
+    request.session.destroy();
+    response.status(200).end();
+});
 
 const hashPassword = (password, user) => {
     return new Promise((resolve, reject) =>
         bcrypt.hash(password, 10, (err, hash) => {
-            err ? reject(err) : resolve(hash)
+            err ? reject(err) : resolve(hash);
         })
-    )
-}
-
-const createUser = user => {
-    let user1 = JSON.parse(JSON.stringify(user))
-    pool.connect((err, client, done) => {
-        const shouldAbort = err => {
-            if (err) {
-                console.error('Error in transaction', err.stack)
-                client.query('ROLLBACK', err => {
-                    if (err) {
-                        console.error('Error rolling back client', err.stack)
-                    }
-                    // release the client back to the pool
-                    done();
-                })
-            }
-            return !!err;
-        }
-
-        client.query('BEGIN', err => {
-            console.log(user1)
-            if (shouldAbort(err)) {
-                return;
-            }
-            client.query(
-                'INSERT INTO Users (fname, lname, email) VALUES($1, $2, $3) RETURNING uid',
-                [user1.fname, user1.lname, user1.email],
-                (err, res) => {
-                    if (shouldAbort(err)) {
-                        return;
-                    }
-                    const insertUserProfileText =
-                        "INSERT INTO UserProfile (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)";
-                    const insertUserProfileValues = [
-                        user1.username,
-                        new Date(),
-                    ]
-                    client.query(
-                        insertUserProfileText,
-                        insertUserProfileValues,
-                        (err, res) => {
-                            if (shouldAbort(err)) {
-                                return
-                            }
-                            const insertAccountText =
-                                "INSERT INTO Account (uid, password, userToken) VALUES (currval('users_uid_seq'), $1, $2)";
-                            const insertAccountValues = [
-                                user1.password_digest,
-                                user1.token,
-                            ]
-                            client.query(
-                                insertAccountText,
-                                insertAccountValues,
-                                (err, res) => {
-                                    if (shouldAbort(err)) {
-                                        return;
-                                    }
-                                    client.query('COMMIT', err => {
-                                        if (err) {
-                                            console.error(
-                                                'Error committing transaction',
-                                                err.stack
-                                            )
-                                        }
-                                        done()
-                                    })
-                                }
-                            )
-                        }
-                    )
-                }
-            )
-        })
-    })
-    return user;
-}
+    );
+};
 
 const createToken = () => {
     return new Promise((resolve, reject) => {
         crypto.randomBytes(16, (err, data) => {
-            err ? reject(err) : resolve(data.toString('base64'))
-        })
-    })
-}
+            err ? reject(err) : resolve(data.toString('base64'));
+        });
+    });
+};
 
-const findUser = (userReq) => {
-  return pool.query("SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1", [userReq.username])
-  .then((results) => results.rows[0])
-  .catch((error) => console.error(error.stack))
-}
+const findUser = userReq => {
+    return pool
+        .query(
+            'SELECT * FROM Account NATURAL JOIN Users NATURAL JOIN UserProfile WHERE UserProfile.username = $1',
+            [userrequest.username]
+        )
+        .then(results => results.rows[0])
+        .catch(error => console.error(error.stack));
+};
 
 const checkPassword = (reqPassword, foundUser) => {
-    return new Promise((resolve, reject) =>
+    return new Promise((resolve, reject) => {
+        if (foundUser == undefined) {
+            reject(new Error('Undefined user'));
+        }
         bcrypt.compare(reqPassword, foundUser.password, (err, response) => {
             if (err) {
                 reject(err);
             } else if (response) {
                 resolve(response);
             } else {
-                reject(new Error('Passwords do not match.'))
+                reject(new Error('Passwords do not match.'));
             }
-        })
-    )
-}
+        });
+    });
+};
 
 const updateUserToken = (token, user) => {
-    return pool.query(
-        'UPDATE Account SET userToken = $1 WHERE uid = $2 RETURNING uid, userToken',
-        [token, user.uid]
-    )
-    .then((results) => results.rows[0])
-    .catch((error) => console.error(error.stack))
-}
+    return pool
+        .query(
+            'UPDATE Account SET userToken = $1 WHERE uid = $2 RETURNING uid, userToken',
+            [token, user.uid]
+        )
+        .then(results => results.rows[0])
+        .catch(error => console.error(error.stack));
+};
 
 module.exports = router;
