@@ -52,13 +52,15 @@ function signin() {
         data,
         function(res) {
             if (window.location.search.length != 0) {
-                redirectURL = decodeURIComponent(window.location.search.slice(3));
+                redirectURL = decodeURIComponent(window.location.search.split('=')[1]);
+                console.log(redirectURL);
                 window.location = redirectURL
-            } else if (res.mode) {
-                window.location = 'http://localhost:3000/make'
-            } else {
-                window.location = 'http://localhost:3000/search'
-            }
+            } 
+            // else if (res.mode) {
+            //     window.location = 'http://localhost:3000/make'
+            // } else {
+            //     window.location = 'http://localhost:3000/search'
+            // }
         },
         'json'
     ).fail(function() {

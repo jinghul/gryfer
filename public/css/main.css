@@ -116,10 +116,6 @@
     filter: drop-shadow(0 0 0.25rem #000);
 }
 
-.driver-reg-2 {
-
-}
-
 #reg-to-si {
     position: absolute;
     bottom: 5px;
@@ -158,6 +154,20 @@
 #search-results {
     padding: 15px;
     overflow-y: auto;
+    min-width: 500px;
+    min-height: 500px;
+}
+
+#search-map {
+    position: absolute;
+    top:15px;left:15px;bottom:15px;right:15px;
+    width: -webkit-calc(100% - 30px);
+    width:    -moz-calc(100% - 30px);
+    width:         calc(100% - 30px);
+    height: -webkit-calc(100% - 30px);
+    height:    -moz-calc(100% - 30px);
+    height:         calc(100% - 30px);
+    background-color: lightgreen;
 }
 
 .input-group-prepend > span {

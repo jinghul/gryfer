@@ -88,6 +88,13 @@ function toPartOne() {
 }
 
 $('document').ready(function() {
+    $(window).keydown(function(event){
+        if(event.keyCode == 13) {
+          event.preventDefault();
+          return false;
+        }
+    });
+
     $('#continue-form').bind('click', function() {
         $('#form-reg div').each(function() {
             var input = $(this);
