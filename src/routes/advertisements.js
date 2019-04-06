@@ -71,6 +71,15 @@ router.get('/search', (request, response) => {
   })
 })
 
+const getBestBidPrice = (aid)=>{
+    pool.query('SELECT max(bidPrice) FROM Bids WHERE aid=$1',[aid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        return results.rows
+    })
+}
+
 // Get all ads
 router.get('/', (request, response) => {
   pool.query('SELECT * FROM Advertisements ORDER BY aid ASC', (error, results) => {
