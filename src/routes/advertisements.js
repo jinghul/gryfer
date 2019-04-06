@@ -71,6 +71,7 @@ router.get('/search', (request, response) => {
   })
 })
 
+// Get all ads
 router.get('/', (request, response) => {
   pool.query('SELECT * FROM Advertisements ORDER BY aid ASC', (error, results) => {
     if (error) {
@@ -80,6 +81,7 @@ router.get('/', (request, response) => {
   })
 })
 
+// Get ad by id
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
@@ -91,6 +93,7 @@ router.get('/:aid', (request, response) => {
   })
 })
 
+// Get all ads for a user
 router.get('/user/:uid', (request, response) => {
   const uid = parseInt(request.params.uid)
 
@@ -102,7 +105,7 @@ router.get('/user/:uid', (request, response) => {
   })
 })
 
-
+// Create add for a user
 router.post('/', (request, response) => {
   if (!request.session.mode) {
     response.status(401).end()
@@ -120,7 +123,7 @@ router.post('/', (request, response) => {
   })
 })
 
-
+// Update ad by id
 router.put('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
   const { toAddress, fromAddress, time, minBidPrice } = request.body
@@ -137,7 +140,7 @@ router.put('/:aid', (request, response) => {
   )
 })
 
-
+// Delete ad by id
 router.delete('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
