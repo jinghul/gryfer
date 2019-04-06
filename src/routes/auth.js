@@ -225,15 +225,16 @@ const createUser = async (user) => {
 router.post('/signin', (request, response) => {
     const userReq = request.body
 
-    if (userrequest.username == undefined) {
+    if (userReq.username == undefined) {
         response.status(400).end()
         return
     }
 
     findUser(userReq)
         .then(foundUser => {
+            console.log(foundUser)
             user = foundUser
-            return checkPassword(userrequest.password, foundUser)
+            return checkPassword(userReq.password, foundUser)
         })
         .then(() => createToken())
         .then(token => updateUserToken(token, user))
@@ -243,13 +244,11 @@ router.post('/signin', (request, response) => {
             // keep details in session
             request.session.uid = user.uid
             request.session.username = user.username
-            request.session.mode = foundUser.mode // false = rider, true = driver
+            console.log(user.mode);
+            request.session.mode = user.mode // false = rider, true = driver
             request.session.fname = user.fname
             request.session.lname = user.lname
             request.session.email = user.email
-
-            // add mode to user response for correct redirect
-            user.mode = foundUser.mode
 
             pool.query('SELECT * FROM drivers where uid = $1', [
                 request.session.uid,
@@ -271,7 +270,10 @@ router.post('/signin', (request, response) => {
                 })
             })
         })
-        .catch(err => response.status(401).end())
+        .catch(err => {
+            console.log(err)
+            response.status(401).end()
+        })
 })
 
 router.post('/signout', (request, response) => {
@@ -299,7 +301,7 @@ const findUser = userReq => {
     return pool
         .query(
             'SELECT * FROM Accounts NATURAL JOIN Users NATURAL JOIN UserProfiles WHERE UserProfiles.username = $1',
-            [userrequest.username]
+            [userReq.username]
         )
         .then(results => results.rows[0])
         .catch(error => console.error(error.stack))

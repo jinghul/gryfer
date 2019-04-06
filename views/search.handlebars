@@ -3,53 +3,40 @@
         <div id="search-box" class="w-100 mx-auto">
             <form id="form-search" class="auth-form w-75 mx-auto needs-validation" novalidate>
                 <div class="form-group form-row">
+                    <label for="from-fr">From Destination</label>
                     <div class="input-group">
                         <span class="input-group-prepend">
                             <span class="fas fa-map-marker-alt input-group-text"></span>
                         </span>
-                        <input type="text" class="form-control" id="from-fr" name="from" placeholder="from" required />
-                        <div class="invalid-feedback">
-                            Please enter a from location.
-                        </div>
+                        <input type="text" class="form-control" id="from-fr" name="fromAddress" required />
                     </div>
                 </div>
                 <div class="form-group form-row">
+                    <label for="to-fr">To Destination</label>
                     <div class="input-group">
                         <span class="input-group-prepend">
                             <span class="input-group-text fas fa-flag-checkered"></span>
                         </span>
-                        <input type="text" class="form-control" id="to-fr" name="to" placeholder="destination"
+                        <input type="text" class="form-control" id="to-fr" name="toAddress"
                             required />
-                        <div class="invalid-feedback">
-                            Please enter a destination.
-                        </div>
                     </div>
                 </div>
                 <div class="form-row form-group">
+                    <label for="date-fr">Date of Departure</label>
                     <div class='input-group'>
                         <span class="input-group-prepend">
                             <span class="input-group-text far fa-calendar-alt"></span>
                         </span>
-                        <input type='text' id='date-fr' class="form-control"/>
+                        <input type='text' id='date-fr' name="departureTime" placeholder="-" class="form-control"/>
                     </div>
-                    <script type="text/javascript">
-                        $(function () {
-                            $('#date-fr').flatpickr({
-                                enableTime: true,
-                                dateFormat: "Y-m-d H:i",
-                                altInput: true,
-                                altFormat: "F j, Y h:i K",
-                                minDate: "today"
-                            });
-                        });
-                    </script>
                 </div>
                 <div class="form-row form-group">
+                    <label for="price-fr">Max Price</label>
                     <div class='input-group'>
                         <span class="input-group-prepend">
                             <span class="input-group-text fas fa-dollar-sign"></span>
                         </span>
-                        <input type="number" class="form-control" id="price-fr">
+                        <input type="number" name="maxPrice" placeholder="-" class="form-control" id="price-fr">
                     </div>
                 </div>
                 <div role="group" class="form-row">
@@ -61,6 +48,9 @@
         </div>
     </div>
     <div class="col h-100" id="search-results">
+        <div id="search-map">
+            Map HERE
+        </div>
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>

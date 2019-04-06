@@ -23,7 +23,8 @@ router.use((request, response, next) => {
 
 // Search by toaddress, fromaddress, time,  and/or maxPrice
 router.get('/search', (request, response) => {
-  const { toAddress, fromAddress, departureTime, maxPrice } = request.body
+  console.log(request.query);
+  const { toAddress, fromAddress, departureTime, maxPrice } = request.query
   let whereStrings = []
   let results = []
   let paramCounter = 1
@@ -38,22 +39,29 @@ router.get('/search', (request, response) => {
     paramCounter++
   }
   if (departureTime) {
-    whereStrings.push('departureTime = $' + paramCounter.toString())
+    whereStrings.push('(departureTime > now() AND (departureTime BETWEEN $' + paramCounter.toString() + " - interval '30 minute' AND $" + paramCounter.toString() +" + interval '30 minute'))")
     results.push(departureTime)
     paramCounter++
+  } else {
+    whereStrings.push('departureTime > now()')
   }
   if (maxPrice) {
     whereStrings.push('minBidPrice <= $' + paramCounter.toString())
     console.log('minBidPrice <= $' + paramCounter.toString())
     results.push(maxPrice)
+    paramCounter++
   }
 
-  let queryString = 'SELECT * FROM Advertisements WHERE '
+  results.push(request.session.uid)
+
+  let queryString = 'SELECT * FROM (SELECT * FROM Advertisements WHERE '
   for (let i = 0; i < whereStrings.length; i++) {
     queryString += whereStrings[i] + ' AND '
   }
-  queryString = queryString.slice(0, -5)
+  queryString = queryString.slice(0, -5) + ') AS allads NATURAL LEFT JOIN (SELECT aid, bidPrice FROM Bids where uid = $' + paramCounter.toString() + ') AS userbids'
+  queryString = queryString.concat('ORDER BY CASE WHEN bidPrice IS NULL THEN 1 ELSE 0 END, minBidPrice') // minBidPrice should be top-bid << to reflect current
   console.log(queryString)
+  console.log(results)
 
   pool.query(queryString, results, (error, results) => {
     if (error) {
@@ -71,6 +79,7 @@ router.get('/', (request, response) => {
     response.status(200).json(results.rows)
   })
 })
+
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 

@@ -14,14 +14,19 @@
             <li class="nav-item">
                 <a class="nav-link" href="http://localhost:3000/home#about">About</a>
             </li>
+            {{#if username}}
             <li class="nav-item">
                 <a class="nav-link" href="http://localhost:3000/search">Find Rides</a>
             </li>
+            {{/if}}
             {{#if driver}}
             <li class="nav-item">
                 <a class="nav-link" href="http://localhost:3000/make">Make Rides</a>
             </li>
             {{/if}}
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:3000/">Active Rides</a>
+            </li>
             {{#if username}}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
