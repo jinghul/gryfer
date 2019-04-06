@@ -85,6 +85,7 @@ router.get('/:aid', (request, response) => {
   })
 })
 
+
 // Get all ads for a user
 router.get('/user/:uid', (request, response) => {
   const uid = parseInt(request.params.uid)
