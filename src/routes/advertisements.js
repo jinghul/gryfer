@@ -59,7 +59,7 @@ router.get('/search', (request, response) => {
     queryString += whereStrings[i] + ' AND '
   }
   queryString = queryString.slice(0, -5) + ') AS allads NATURAL LEFT JOIN (SELECT aid, bidPrice FROM Bids where uid = $' + paramCounter.toString() + ') AS userbids'
-  queryString = queryString.concat('ORDER BY CASE WHEN bidPrice IS NULL THEN 1 ELSE 0 END, minBidPrice') // minBidPrice should be top-bid << to reflect current
+  queryString = queryString.concat(' ORDER BY CASE WHEN bidPrice IS NULL THEN 1 ELSE 0 END, minBidPrice') // minBidPrice should be top-bid << to reflect current
   console.log(queryString)
   console.log(results)
 

@@ -31,8 +31,6 @@ function display(results) {
 }
 
 function search(params, state) {
-    $('#search-map').hide();
-
     let qurl = 'http://localhost:3000/ads/search';
 
     console.log(JSON.stringify(state));
@@ -62,7 +60,8 @@ function search(params, state) {
     } else if (state !== undefined) {
         $('#from-fr').val(state.fromAddress);
         $('#to-fr').val(state.toAddress);
-        $('#date-fr')
+        if (state.departureTime) {
+            $('#date-fr')
             .flatpickr({
                 enableTime: true,
                 dateFormat: 'Y-m-d H:i',
@@ -71,6 +70,7 @@ function search(params, state) {
                 minDate: 'today',
             })
             .setDate(new Date(state.departureTime));
+        }
         $('#price-fr').val(state.maxPrice);
     }
 
@@ -112,7 +112,6 @@ $('document').ready(function() {
             search(e.state.sp, e.state);
         } else {
             $('.ad-result').remove();
-            $('#search-map').show();
             $('#form-search').trigger('reset');
         }
     };
