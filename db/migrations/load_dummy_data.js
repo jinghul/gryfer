@@ -40,7 +40,7 @@ exports.up = function(knex, Promise) {
 
 	INSERT INTO Advertisements (minBidPrice, fromAddress, toAddress, departureTime, uid) VALUES
 	(10.0, '28 college avenue east', 'marina bay sands', NOW()::timestamp, 3),
-	(15.0, '8 college avenue east', 'clarke quay somewhere', 2019-05-29 17:30, 4);
+	(15.0, '8 college avenue east', 'clarke quay somewhere', NOW()::timestamp, 4);
 
                                                
 	INSERT INTO Bids (uid, aid, bidPrice) VALUES
