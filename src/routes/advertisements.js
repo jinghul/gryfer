@@ -65,13 +65,11 @@ router.get('/search', (request, response, next) => {
   queryString = queryString.concat(' ORDER BY CASE WHEN bidPrice IS NULL THEN 1 ELSE 0 END, coalesce(currPrice, minBidPrice)')
   
   console.log(queryString)
-  console.log(results)
 
   pool.query(queryString, results, (error, results) => {
     if (error) {
       throw error
     }
-    console.log(results.rows)
     response.status(200).json(results.rows)
   })
 })
