@@ -1,4 +1,5 @@
 function create_ad() {
+    let data = {}
     $('#form-make :input').each(
         function(){  
             var input = $(this);

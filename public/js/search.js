@@ -44,19 +44,25 @@ function search(params, state) {
 
         if (params !== '') {
             params = '?' + params;
+            window.history.pushState(
+                {
+                    sp: params,
+                    fromAddress: $('#from-fr').val(),
+                    toAddress: $('#to-fr').val(),
+                    departureTime: $('#date-fr').val(),
+                    maxPrice: $('#price-fr').val(),
+                },
+                'Search',
+                params
+            );
+        } else {
+            window.history.pushState(
+                {},
+                'Search',
+                '/search'
+            );
         }
 
-        window.history.pushState(
-            {
-                sp: params,
-                fromAddress: $('#from-fr').val(),
-                toAddress: $('#to-fr').val(),
-                departureTime: $('#date-fr').val(),
-                maxPrice: $('#price-fr').val(),
-            },
-            'Search',
-            params
-        );
     } else if (state !== undefined) {
         $('#from-fr').val(state.fromAddress);
         $('#to-fr').val(state.toAddress);
@@ -104,7 +110,25 @@ $('document').ready(function() {
             }
         );
         search(window.location.search, state);
+    } else {
+        search();
     }
+
+    $('#form-search :input').each(function() {
+        var input = $(this);
+        if (!input.is('button')) {
+            input.parent().siblings("span").toggle(Boolean(input.val()));
+        }
+    });
+
+    $("input").on('change', function() {
+        $(this).parent().siblings("span").toggle(Boolean($(this).val()));
+    });
+    // $(".searchclear").toggle(Boolean($("#searchinput").val()));
+    $(".search-clear").click(function(){
+        $(this).siblings("div").children("input").val('').focus();
+        $(this).hide();
+    });
 
     window.onpopstate = function(e) {
         console.log('pop: ' + JSON.stringify(e.state));
