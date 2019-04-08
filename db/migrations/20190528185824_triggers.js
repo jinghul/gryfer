@@ -1,29 +1,6 @@
 exports.up = function(knex, Promise) {
   
-  let createQuery = `
-    CREATE OR REPLACE FUNCTION add_bid_to_history()
-    RETURNS TRIGGER AS
-    $$
-    BEGIN
-        INSERT INTO
-            Histories(uid, aid)
-            VALUES(NEW.puid,NEW.aid);
-        INSERT INTO
-            Histories(uid, aid)
-            VALUES(NEW.duid,NEW.aid);
-        RETURN NEW;
-    END;
-    $$
-    LANGUAGE plpgsql;
-
-    CREATE TRIGGER add_bid_to_history
-    AFTER INSERT
-    ON Accepted
-    FOR EACH ROW
-    EXECUTE PROCEDURE add_bid_to_history();
-
-
-
+  let createQuery = `    
     CREATE OR REPLACE FUNCTION check_min_bid()
     RETURNS TRIGGER AS
     $$
@@ -48,6 +25,95 @@ exports.up = function(knex, Promise) {
     ON Bids
     FOR EACH ROW
     EXECUTE PROCEDURE check_min_bid();
+    
+
+    CREATE OR REPLACE FUNCTION check_new_bid_not_accepted()
+    RETURNS TRIGGER AS
+    $$
+    BEGIN
+        IF EXISTS (
+        SELECT 1
+        FROM Accepted
+        WHERE NEW.aid = Accepted.aid) THEN
+            RAISE EXCEPTION 'Bid already accepted';
+            RETURN NULL;
+        END IF;
+
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+
+    CREATE TRIGGER check_new_bid_not_accepted
+    BEFORE INSERT OR UPDATE
+    ON Bids
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_new_bid_not_accepted();
+    
+    
+    
+    CREATE OR REPLACE FUNCTION check_not_too_many_passengers()
+    RETURNS TRIGGER AS
+    $$
+    DECLARE max_pass INTEGER;
+    BEGIN
+        SELECT maxPassengers into max_pass
+        FROM CarProfiles NATURAL JOIN Drivers NATURAL JOIN Advertisements AS CarAd
+        WHERE NEW.aid = CarAd.aid;
+        
+        IF new.numPassengers > max_pass THEN
+            RAISE EXCEPTION 'Too many passengers';
+            RETURN NULL;
+        END IF;
+
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+
+    CREATE TRIGGER check_not_too_many_passengers
+    BEFORE INSERT OR UPDATE
+    ON Bids
+    FOR EACH ROW
+    EXECUTE PROCEDURE check_not_too_many_passengers();
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    CREATE OR REPLACE FUNCTION add_bid_to_history()
+    RETURNS TRIGGER AS
+    $$
+    BEGIN
+        INSERT INTO
+            Histories(uid, aid)
+            VALUES(NEW.puid,NEW.aid);
+        INSERT INTO
+            Histories(uid, aid)
+            VALUES(NEW.duid,NEW.aid);
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql;
+
+    CREATE TRIGGER add_bid_to_history
+    AFTER INSERT
+    ON Accepted
+    FOR EACH ROW
+    EXECUTE PROCEDURE add_bid_to_history();
+
+
+
+    
 
 
 
