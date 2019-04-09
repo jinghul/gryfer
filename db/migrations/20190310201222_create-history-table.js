@@ -2,7 +2,8 @@ exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Histories;
   CREATE TABLE Histories (
 	uid 			INTEGER NOT NULL,
-	aid				INTEGER,
+	aid				INTEGER NOT NULL,
+	numPassengers	INTEGER,
 	PRIMARY KEY (uid, aid),
 	FOREIGN KEY (uid) REFERENCES UserProfiles,
 	FOREIGN KEY (aid) REFERENCES Advertisements

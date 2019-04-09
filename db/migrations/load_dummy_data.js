@@ -41,23 +41,26 @@ exports.up = function(knex, Promise) {
 	INSERT INTO Advertisements (minBidPrice, fromAddress, fromCoords, fromLat, fromLng, toAddress, toLat, toLng, departureTime, uid) VALUES
 	(10.0, '28 College Avenue East', 1.3060616, 103.7719055, 'Marina Bay Sands', 1.2833808, 103.8585377, NOW()::timestamp, 3),
 	(15.0, '8 College Avenue East', 1.3078482, 103.7709924, Clarke Quay', 1.2906078, 103.8442855, NOW()::timestamp, 4);
+	(16.0, 'fine foods', 1.318482, 103.7889924, 'food clique',1.3080616, 103.7719955, NOW()::timestamp, 4);
 
+    INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
+    (100, 'toyota', 'prius', '2016', 124923.1, 4),
+    (101, 'honda', 'crv', '2018', 98752.4, 6);
                                                
-	INSERT INTO Bids (uid, aid, bidPrice) VALUES
-	(2, 2, 18.0),
-	(1, 2, 19.0),
-	(2, 1, 11.0);
+	INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES
+	(2, 2, 1, 18.0),
+	(1, 2, 4, 19.0),
+-- 	(2, 1, 5, 11.0),
+	(1, 3, 3, 19.0);
 
-	INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven) VALUES
-	(100, 'toyota', 'prius', '2016', 124923.1),
-	(101, 'honda', 'civic', '2018', 98752.4);
 
-	INSERT INTO Accepted (aid, puid, duid, price) VALUES
-	(2, 1, 4, 19.0),
-	(1, 2, 3, 11.0);
 
-	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
-	(4, 2, 1, 9.0);
+-- 	INSERT INTO Accepted (aid, puid, duid, price) VALUES
+-- 	(2, 1, 4, 19.0),
+-- 	(1, 2, 3, 11.0);
+
+-- 	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
+-- 	(4, 2, 1, 9.0);
 	`;
   return knex.raw(createQuery);
 };
@@ -68,6 +71,9 @@ exports.up = function(knex, Promise) {
 // (1, 1, 9.0);
 // INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
 // (4, 3, 1, 5.0);
+// ---After the accepted bids---
+// INSERT INTO Bids (uid, aid, bidPrice) VALUES
+// (2, 2, 18.0);
 
 exports.down = function(knex, Promise) {
   let dropQuery = ``;

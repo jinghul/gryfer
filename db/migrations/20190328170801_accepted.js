@@ -1,11 +1,11 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Accepted;
   CREATE TABLE Accepted (
-	aid				SERIAL,
+	aid				INTEGER,
 	puid			INTEGER,
 	duid			INTEGER,
 	price			NUMERIC NOT NULL,
-	PRIMARY KEY (aid, puid, duid),
+	PRIMARY KEY (aid),
 	FOREIGN KEY (aid, duid) REFERENCES Advertisements (aid, uid),
 	FOREIGN KEY (puid, aid, price) REFERENCES Bids (uid, aid, bidPrice)
 )`;

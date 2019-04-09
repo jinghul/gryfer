@@ -22,10 +22,10 @@ router.use((request, response, next) => {
   }
 })
 
-// Search by toaddress, fromaddress, time,  and/or maxPrice
+// Search by toaddress, fromaddress, time, maxPrice, and/or numPassengers
 router.get('/search', (request, response, next) => {
   console.log(request.query);
-  const { toAddress, toLat, toLng, fromAddress, fromLat, fromLng, departureTime, maxPrice } = request.query
+  const { toAddress, toLat, toLng, fromAddress, fromLat, fromLng, departureTime, maxPrice, numPassengers  } = request.query
   let whereStrings = []
   let results = []
   let paramCounter = 1
@@ -39,11 +39,17 @@ router.get('/search', (request, response, next) => {
     results.push(fromAddress)
     paramCounter++
   }
+  if (numPassengers) {
+    whereStrings.push('maxPassengers >= $' + paramCounter.toString())
+    results.push(numPassengers)
+    paramCounter++
+  }
   if (departureTime) {
     whereStrings.push('(departureTime > now()::timestamp AND (departureTime BETWEEN $' + paramCounter.toString() + "::timestamp - interval '30 minute' AND $" + paramCounter.toString() +"::timestamp + interval '30 minute'))")
     results.push(departureTime)
     paramCounter++
-  } else {
+  } 
+  else {
     whereStrings.push('departureTime > now()::timestamp')
   }
 

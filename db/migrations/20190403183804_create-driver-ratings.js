@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
 	PRIMARY KEY (forUid, aid),
 	FOREIGN KEY (forUid) REFERENCES Drivers,
 	FOREIGN KEY (byUid)  REFERENCES Passengers,
-    FOREIGN KEY (aid, byUid, forUid) REFERENCES Accepted (aid, puid, duid)
+    FOREIGN KEY (aid) REFERENCES Accepted (aid)
 )`;
   return knex.raw(createQuery);
 };
