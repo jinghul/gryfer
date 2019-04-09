@@ -34,6 +34,7 @@ exports.up = function(knex, Promise) {
             RAISE EXCEPTION 'Bid already accepted';
             RETURN NULL;
         END IF;
+        
         RETURN NEW;
     END;
     $$
@@ -49,14 +50,24 @@ exports.up = function(knex, Promise) {
     CREATE OR REPLACE FUNCTION check_not_too_many_passengers()
     RETURNS TRIGGER AS
     $$
-    DECLARE max_pass INTEGER;
+    DECLARE max_pass NUMERIC;
     BEGIN
-        SELECT maxPassengers into max_pass
-        FROM CarProfiles NATURAL JOIN Drivers NATURAL JOIN Advertisements AS CarAd
-        WHERE NEW.aid = CarAd.aid;
         
-        IF new.numPassengers > max_pass THEN
-            RAISE EXCEPTION 'Too many passengers';
+        IF NOT EXISTS(
+          SELECT 1
+          FROM (Drivers INNER JOIN  CarProfiles ON CarProfiles.cid=Drivers.cid INNER JOIN Advertisements ON Drivers.uid=Advertisements.uid) AS CarAd
+          WHERE NEW.aid = CarAd.aid
+        ) THEN
+            RAISE EXCEPTION 'No valid car for ads';
+            RETURN NULL;
+        END IF;
+           
+        SELECT CarAd.maxPassengers into max_pass
+        FROM (Drivers INNER JOIN  CarProfiles ON CarProfiles.cid=Drivers.cid INNER JOIN Advertisements ON Drivers.uid=Advertisements.uid) AS CarAd
+        WHERE NEW.aid = CarAd.aid;
+    
+        IF NEW.numPassengers > max_pass THEN
+              RAISE EXCEPTION 'Too many passengers';
             RETURN NULL;
         END IF;
         RETURN NEW;
@@ -68,6 +79,9 @@ exports.up = function(knex, Promise) {
     ON Bids
     FOR EACH ROW
     EXECUTE PROCEDURE check_not_too_many_passengers();
+    
+    
+    
     
     
     

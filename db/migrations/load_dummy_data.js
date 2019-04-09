@@ -38,28 +38,29 @@ exports.up = function(knex, Promise) {
 	('tembu', '28 college avenue east', 4),
 	('fatboys', 'clarke quay somewhere', 4);
 
-	INSERT INTO Advertisements (minBidPrice, fromAddress, toAddress, departureTime, uid, maxPassengers) VALUES
-	(10.0, '28 college avenue east', 'marina bay sands', NOW()::timestamp, 3, 4),
-	(15.0, '8 college avenue east', 'clarke quay somewhere', NOW()::timestamp, 4, 6),
-	(16.0, 'fine foods', 'food clique', NOW()::timestamp, 4, 6);
+	INSERT INTO Advertisements (minBidPrice, fromAddress, toAddress, departureTime, uid) VALUES
+	(10.0, '28 college avenue east', 'marina bay sands', NOW()::timestamp, 3),
+	(15.0, '8 college avenue east', 'clarke quay somewhere', NOW()::timestamp, 4),
+	(16.0, 'fine foods', 'food clique', NOW()::timestamp, 4);
 
+    INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
+    (100, 'toyota', 'prius', '2016', 124923.1, 4),
+    (101, 'honda', 'crv', '2018', 98752.4, 6);
                                                
 	INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES
 	(2, 2, 1, 18.0),
 	(1, 2, 4, 19.0),
-	(2, 1, 5, 11.0),
+-- 	(2, 1, 5, 11.0),
 	(1, 3, 3, 19.0);
 
-	INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
-	(100, 'toyota', 'prius', '2016', 124923.1, 4),
-	(101, 'honda', 'crv', '2018', 98752.4, 6);
 
-	INSERT INTO Accepted (aid, puid, duid, price) VALUES
-	(2, 1, 4, 19.0),
-	(1, 2, 3, 11.0);
 
-	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
-	(4, 2, 1, 9.0);
+-- 	INSERT INTO Accepted (aid, puid, duid, price) VALUES
+-- 	(2, 1, 4, 19.0),
+-- 	(1, 2, 3, 11.0);
+
+-- 	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
+-- 	(4, 2, 1, 9.0);
 	`;
   return knex.raw(createQuery);
 };
