@@ -70,25 +70,7 @@ exports.up = function(knex, Promise) {
     EXECUTE PROCEDURE check_not_too_many_passengers();
     
     
-    CREATE OR REPLACE FUNCTION add_bid_to_history()
-    RETURNS TRIGGER AS
-    $$
-    BEGIN
-        INSERT INTO
-            Histories(uid, aid)
-            VALUES(NEW.puid,NEW.aid);
-        INSERT INTO
-            Histories(uid, aid)
-            VALUES(NEW.duid,NEW.aid);
-        RETURN NEW;
-    END;
-    $$
-    LANGUAGE plpgsql;
-    CREATE TRIGGER add_bid_to_history
-    AFTER INSERT
-    ON Accepted
-    FOR EACH ROW
-    EXECUTE PROCEDURE add_bid_to_history();
+    
     
     CREATE OR REPLACE FUNCTION update_rating_driver()
     RETURNS TRIGGER AS
