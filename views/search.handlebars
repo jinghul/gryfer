@@ -1,8 +1,9 @@
+<script src="js/barrating.min.js"></script>
 <div class="row mx-auto base-width" style="height:calc(100% - 57px)">
     <div class="w-100" id="search-box" >
         <form id="form-search" class="auth-form mx-auto needs-validation" novalidate>
             <div class="form-row pt-3" style="justify-content: center">
-                <div class="form-group col-md-2 col-md-offset-1 outline-shadow">
+                <div class="form-group col-md-2 outline-shadow">
                     <div class="input-group">
                         <span class="input-group-prepend">
                             <span class="fas no-border fa-map-marker-alt input-group-text"></span>
@@ -36,6 +37,15 @@
                             <span class="input-group-text no-border fas fa-dollar-sign"></span>
                         </span>
                         <input type="number" name="maxPrice" class="form-control no-border" placeholder="Max Price" id="price-fr">
+                    </div>
+                    <span class="search-clear far fa-times-circle"></span>
+                </div>
+                <div class="form-group col-md-2 outline-shadow">
+                    <div class='input-group'>
+                        <span class="input-group-prepend">
+                            <span class="input-group-text no-border fas fa-user-plus"></span>
+                        </span>
+                        <input type="number" name="numPassengers" class="form-control no-border" placeholder="Passengers" id="passengers-fr">
                     </div>
                     <span class="search-clear far fa-times-circle"></span>
                 </div>

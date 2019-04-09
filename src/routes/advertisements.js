@@ -40,7 +40,7 @@ router.get('/search', (request, response, next) => {
     paramCounter++
   }
   if (numPassengers) {
-    whereStrings.push('maxPassengers >= $' + paramCounter.toString())
+    whereStrings.push('(SELECT maxPassengers FROM CarProfiles WHERE cid=(SELECT cid FROM drivers WHERE uid=uid)) >= $' + paramCounter.toString())
     results.push(numPassengers)
     paramCounter++
   }
@@ -63,8 +63,10 @@ router.get('/search', (request, response, next) => {
   // queryString = queryString.concat(' NATURAL LEFT JOIN (SELECT aid, bidPrice FROM Bids where uid = $' + paramCounter.toString() + ') AS userbids')
   queryString = queryString.concat(' NATURAL LEFT JOIN (SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) AS currprices')
   
+  queryString = queryString.concat(' WHERE aid NOT IN (SELECT aid FROM accepted)')
+
   if (maxPrice) {
-    queryString = queryString.concat(" WHERE coalesce(currPrice, minBidPrice) <= $" + paramCounter.toString())
+    queryString = queryString.concat(" AND coalesce(currPrice, minBidPrice) <= $" + paramCounter.toString())
     results.push(maxPrice)
   }
 

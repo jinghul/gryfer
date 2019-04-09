@@ -41,7 +41,7 @@ router.get('/:aid', (request, response) => {
     }
 
     let title = results.fromAddress + " to " + results.toAddress
-    response.render('ad_bid', {title: title, username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+    response.render('bid_ad', {title: title, username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
   })
 })
 

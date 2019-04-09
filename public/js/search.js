@@ -1,14 +1,26 @@
-var markers, map, from_marker, to_marker, bounds, autocomplete_from, autocomplete_to;
+var markers,
+    map,
+    from_marker,
+    to_marker,
+    bounds,
+    autocomplete_from,
+    autocomplete_to,
+    path;
 
 function initMapAndAutocomplete() {
     map = new google.maps.Map(document.getElementById('search-map'), {
         zoom: 13,
-        mapTypeControlOptions: { mapTypeIds: [] }
+        mapTypeControlOptions: { mapTypeIds: [] },
     });
 
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            map.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+            map.setCenter(
+                new google.maps.LatLng(
+                    position.coords.latitude,
+                    position.coords.longitude
+                )
+            );
         });
     } else {
         map.setCenter(new google.maps.LatLng(1.2994266, 103.7784662));
@@ -17,11 +29,11 @@ function initMapAndAutocomplete() {
     // Create the autocomplete object, restricting the search predictions to
     // geographical location types.
     autocomplete_from = new google.maps.places.Autocomplete(
-        document.getElementById('from-fr'),
+        document.getElementById('from-fr')
     );
 
     autocomplete_to = new google.maps.places.Autocomplete(
-        document.getElementById('to-fr'),
+        document.getElementById('to-fr')
     );
 
     // Bind the map's bounds (viewport) property to the autocomplete object,
@@ -31,20 +43,30 @@ function initMapAndAutocomplete() {
     autocomplete_to.bindTo('bounds', map);
 
     // Set the data fields to return when the user selects a place.
-    autocomplete_from.setFields(['address_components', 'geometry', 'icon', 'name']);
-    autocomplete_to.setFields(['address_components', 'geometry', 'icon', 'name']);
+    autocomplete_from.setFields([
+        'address_components',
+        'geometry',
+        'icon',
+        'name',
+    ]);
+    autocomplete_to.setFields([
+        'address_components',
+        'geometry',
+        'icon',
+        'name',
+    ]);
 
     from_marker = new google.maps.Marker({
         map: map,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
     });
 
     to_marker = new google.maps.Marker({
         map: map,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
     });
-    markers = []
-    
+    markers = [];
+
     if (window.location.search.length != 0) {
         let query = window.location.search.substring(1);
         let state = JSON.parse(
@@ -59,6 +81,11 @@ function initMapAndAutocomplete() {
     }
 }
 
+function scrollToAd(ad) {
+    var position = ad.position();
+    $('#search-results').stop().animate({scrollTop: position.top}, 300);
+}
+
 function display(results) {
     console.log(results);
     $('.ad-result').remove();
@@ -70,9 +97,11 @@ function display(results) {
     if (!bounds) {
         bounds = new google.maps.LatLngBounds();
     }
- 
+
     var template = Handlebars.templates['ad'];
-    results.forEach(function(res) {
+    for (var i = 0; i < results.length; i++) {
+        var res = results[i]
+
         // Some date parsing
         var date = new Date(res.departuretime);
         var dateString = date
@@ -86,47 +115,54 @@ function display(results) {
             .slice(0, 2);
         var timeOfDay = 'AM';
         var hour = parseInt(timeParts[0]);
-        
+
         if (hour >= 12) {
             timeOfDay = 'PM';
             if (hour > 12) {
                 hour = hour - 12;
             }
         } else if (hour == 0) {
-            hour = 12
+            hour = 12;
         }
 
-        var timeString = hour.toString() + ":" + timeParts[1] + " " + timeOfDay;
+        var timeString = hour.toString() + ':' + timeParts[1] + ' ' + timeOfDay;
 
         var context = {
+            index: i,
             from: res.fromaddress,
             to: res.toaddress,
             price: '$' + res.minbidprice,
             date: dateString,
             time: timeString,
         };
+
         var item = $(template(context));
+        item.on('click', function() {
+            scrollToAd($(this))
+        });
+
         $('#search-results').append(item);
+
         item.fadeIn(300);
 
-        // var res_to_marker = new google.maps.Marker({
-        //     map: map,
-        //     label: Math.floor(markers.length / 2) + 1,
-        //     icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-        // });
-        // var res_from_marker = new google.maps.Marker({
-        //     map: map,
-        //     label: Math.floor(markers.length / 2) + 1,
-        //     icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-        // });
-        // res_to_marker.setPosition({lat: res.tolat, lng: res.tolng})
-        // res_from_marker.setPosition({lat: res.fromlat, lng: res.fromlng})
+        var res_to_marker = new google.maps.Marker({
+            map: map,
+            label: Math.floor(markers.length / 2) + 1,
+            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+        });
+        var res_from_marker = new google.maps.Marker({
+            map: map,
+            label: Math.floor(markers.length / 2) + 1,
+            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        });
+        res_to_marker.setPosition({ lat: res.toLat, lng: res.toLng });
+        res_from_marker.setPosition({ lat: res.fromLat, lng: res.fromLng });
 
-        // markers.push(res_to_marker, res_from_marker);
+        markers.push(res_to_marker, res_from_marker);
 
-        // bounds.extend({lat: res.tolat, lng: res.tolng});
-        // bounds.extend({lat: res.fromlat, lng: res.fromlng});
-    });
+        bounds.extend({ lat: res.toLat, lng: res.toLng });
+        bounds.extend({ lat: res.fromLat, lng: res.fromLng });
+    }
 
     if (markers.length != 0) {
         map.fitBounds(bounds);
@@ -148,18 +184,42 @@ function search(params, state) {
             .serialize();
 
         if (params !== '') {
-            params = '?' + params;
-            window.history.pushState(
-                {
-                    sp: params,
-                    fromAddress: $('#from-fr').val(),
-                    toAddress: $('#to-fr').val(),
-                    departureTime: $('#date-fr').val(),
-                    maxPrice: $('#price-fr').val(),
-                },
-                'Search',
-                params
-            );
+            let new_state = {
+                fromAddress: $('#from-fr').val(),
+                toAddress: $('#to-fr').val(),
+                departureTime: $('#date-fr').val(),
+                maxPrice: $('#price-fr').val(),
+            };
+
+            if ($('#to-fr').val() != '') {
+                let location = autocomplete_to.getPlace();
+                if (location) {
+                    params =
+                        '&toLat=' +
+                        location.geometry.location.lat() +
+                        '&toLng=' +
+                        location.geometry.location.lng() + params;
+                    new_state.toLat = location.latitude;
+                    new_state.toLng = location.longitude;
+                }
+            }
+
+            if ($('#from-fr').val() != '') {
+                let location = autocomplete_from.getPlace();
+                if (location) {
+                    params =
+                        '&fromLat=' +
+                        location.geometry.location.lat() +
+                        '&fromLng=' +
+                        location.geometry.location.lng() + params;
+                    new_state.fromLat = location.latitude;
+                    new_state.fromLng = location.longitude;
+                }
+            }
+
+            params = "?" + params;
+            new_state.params = params;
+            window.history.pushState(new_state, 'Search', params);
         } else {
             window.history.pushState({}, 'Search', '/search');
         }
@@ -189,24 +249,42 @@ function search(params, state) {
 
     markers = [];
 
-    bounds = null
-    if (autocomplete_from.getPlace()) {
+    bounds = null;
+
+    let from_place = autocomplete_from.getPlace()
+    if (from_place) {
         from_marker.setMap(map);
-        from_marker.setPosition(autocomplete_from.getPlace().geometry.location);
+        from_marker.setPosition(from_place.geometry.location);
+        from_marker.setVisible(true);
+        bounds = new google.maps.LatLngBounds();
+        bounds.extend(from_marker.getPosition());
+    } else if (state.fromLat && state.fromLng) {
+        from_marker.setMap(map);
+        from_marker.setPosition(new google.maps.LatLng(fromLat, fromLng));
         from_marker.setVisible(true);
         bounds = new google.maps.LatLngBounds();
         bounds.extend(from_marker.getPosition());
     }
-    if (autocomplete_to.getPlace()) {
+
+    let to_place = autocomplete_to.getPlace();
+    if (to_place) {
         to_marker.setMap(map);
-        to_marker.setPosition(autocomplete_to.getPlace().geometry.location);
+        to_marker.setPosition(to_place.geometry.location);
+        to_marker.setVisible(true);
+        if (!bounds) {
+            bounds = new google.maps.LatLngBounds();
+        }
+        bounds.extend(to_marker.getPosition());
+    } else if (state.toLat && state.toLng) {
+        to_marker.setMap(map);
+        to_marker.setPosition(new google.maps.LatLng(state.toLat, state.toLng));
         to_marker.setVisible(true);
         if (!bounds) {
             bounds = new google.maps.LatLngBounds();
         }
         bounds.extend(to_marker.getPosition());
     }
-    
+
     if (bounds) {
         map.fitBounds(bounds);
     }
@@ -229,19 +307,31 @@ $('document').ready(function() {
         minDate: 'today',
     });
 
-    $('.search-clear').hover(function() {
-        $(this).css('display', 'inline-block')
-    }, function() {
-        $(this).hide();
-    })
-
-    $('input').hover(function() {
-        if ($(this).val().length != 0) {
-            $(this).parent().siblings('.search-clear').show();
+    $('.search-clear').hover(
+        function() {
+            $(this).css('display', 'inline-block');
+        },
+        function() {
+            $(this).hide();
         }
-    }, function() {
-        $(this).parent().siblings('.search-clear').hide();
-    })
+    );
+
+    $('input').hover(
+        function() {
+            if ($(this).val().length != 0) {
+                $(this)
+                    .parent()
+                    .siblings('.search-clear')
+                    .show();
+            }
+        },
+        function() {
+            $(this)
+                .parent()
+                .siblings('.search-clear')
+                .hide();
+        }
+    );
 
     $('.search-clear').click(function() {
         $(this)
@@ -252,7 +342,7 @@ $('document').ready(function() {
         $(this).hide();
     });
 
-    $("input").on('keyup', function (e) {
+    $('input').on('keyup', function(e) {
         if (e.keyCode == 13) {
             event.preventDefault();
             event.stopPropagation();
@@ -260,7 +350,6 @@ $('document').ready(function() {
             return false;
         }
     });
-    
 
     window.onpopstate = function(e) {
         console.log('pop: ' + JSON.stringify(e.state));
@@ -272,11 +361,9 @@ $('document').ready(function() {
         }
     };
 
-    $('#form-search').submit(
-        function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            search();
-        }
-    );
+    $('#form-search').submit(function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        search();
+    });
 });

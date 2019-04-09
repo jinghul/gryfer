@@ -173,6 +173,10 @@
    min-width: 60%;
 }
 
+#bid-display {
+    position: absolute;
+}
+
 #no-results {
     display: flex;
     justify-content: center;

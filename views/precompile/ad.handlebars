@@ -2,10 +2,14 @@
     <div class="card-body row">
         <div class="col-6">
             <ul class="list-group">
-                <li class="list-group-item"><span class="to-place fas fa-map-marker-alt input-group-text"></span>{{ from }}</li>
-                <li class="list-group-item"><span class="from-place fas fa-map-marker-alt input-group-text"></span>{{ to }}</li>
+                <li class="list-group-item"><span
+                        class="to-place fas fa-map-marker-alt input-group-text"></span>{{ from }}</li>
+                <li class="list-group-item"><span
+                        class="from-place fas fa-map-marker-alt input-group-text"></span>{{ to }}</li>
             </ul>
         </div>
-        <div class="col-6"><span class="price-display display-5">{{price}}</span><span class="date-display lead">{{time}}</br>{{date}} </span></div>
+        <div class="col-6"><span class="price-display display-5">{{price}}</span>
+            <span class="date-display lead">{{time}} on {{date}}</span>
+        </div>
     </div>
 </div>

@@ -38,9 +38,9 @@ exports.up = function(knex, Promise) {
 	('tembu', '28 college avenue east', 4),
 	('fatboys', 'clarke quay somewhere', 4);
 
-	INSERT INTO Advertisements (minBidPrice, fromAddress, fromCoords, fromLat, fromLng, toAddress, toLat, toLng, departureTime, uid) VALUES
+	INSERT INTO Advertisements (minBidPrice, fromAddress, fromLat, fromLng, toAddress, toLat, toLng, departureTime, uid) VALUES
 	(10.0, '28 College Avenue East', 1.3060616, 103.7719055, 'Marina Bay Sands', 1.2833808, 103.8585377, NOW()::timestamp, 3),
-	(15.0, '8 College Avenue East', 1.3078482, 103.7709924, Clarke Quay', 1.2906078, 103.8442855, NOW()::timestamp, 4);
+	(15.0, '8 College Avenue East', 1.3078482, 103.7709924, 'Clarke Quay', 1.2906078, 103.8442855, NOW()::timestamp, 4),
 	(16.0, 'fine foods', 1.318482, 103.7889924, 'food clique',1.3080616, 103.7719955, NOW()::timestamp, 4);
 
     INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
