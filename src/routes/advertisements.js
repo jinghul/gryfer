@@ -22,7 +22,7 @@ router.use((request, response, next) => {
 })
 
 // Search by toaddress, fromaddress, time,  and/or maxPrice
-router.get('/search', (request, response) => {
+router.get('/search', (request, response, next) => {
   console.log(request.query);
   const { toAddress, fromAddress, departureTime, maxPrice } = request.query
   let whereStrings = []
@@ -39,17 +39,11 @@ router.get('/search', (request, response) => {
     paramCounter++
   }
   if (departureTime) {
-    whereStrings.push('(departureTime > now() AND (departureTime BETWEEN $' + paramCounter.toString() + " - interval '30 minute' AND $" + paramCounter.toString() +" + interval '30 minute'))")
+    whereStrings.push('(departureTime > now()::timestamp AND (departureTime BETWEEN $' + paramCounter.toString() + "::timestamp - interval '30 minute' AND $" + paramCounter.toString() +"::timestamp + interval '30 minute'))")
     results.push(departureTime)
     paramCounter++
   } else {
-    whereStrings.push('departureTime > now()')
-  }
-  if (maxPrice) {
-    whereStrings.push('minBidPrice <= $' + paramCounter.toString())
-    console.log('minBidPrice <= $' + paramCounter.toString())
-    results.push(maxPrice)
-    paramCounter++
+    whereStrings.push('departureTime > now()::timestamp')
   }
 
   results.push(request.session.uid)
@@ -58,10 +52,19 @@ router.get('/search', (request, response) => {
   for (let i = 0; i < whereStrings.length; i++) {
     queryString += whereStrings[i] + ' AND '
   }
-  queryString = queryString.slice(0, -5) + ') AS allads NATURAL LEFT JOIN (SELECT aid, bidPrice FROM Bids where uid = $' + paramCounter.toString() + ') AS userbids'
-  queryString = queryString.concat(' ORDER BY CASE WHEN bidPrice IS NULL THEN 1 ELSE 0 END, minBidPrice') // minBidPrice should be top-bid << to reflect current
+  queryString = queryString.slice(0, -5) + ') AS allads'
+  queryString = queryString.concat(' NATURAL LEFT JOIN (SELECT aid, bidPrice FROM Bids where uid = $' + paramCounter.toString() + ') AS userbids')
+  queryString = queryString.concat(' NATURAL LEFT JOIN (SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) AS currprices')
+  
+  if (maxPrice) {
+    paramCounter++
+    queryString = queryString.concat(" WHERE coalesce(currPrice, minBidPrice) <= $" + paramCounter.toString())
+    results.push(maxPrice)
+  }
+
+  queryString = queryString.concat(' ORDER BY CASE WHEN bidPrice IS NULL THEN 1 ELSE 0 END, coalesce(currPrice, minBidPrice)')
+  
   console.log(queryString)
-  console.log(results)
 
   pool.query(queryString, results, (error, results) => {
     if (error) {
@@ -72,7 +75,7 @@ router.get('/search', (request, response) => {
 })
 
 const getBestBidPrice = (aid)=>{
-    pool.query('SELECT max(bidPrice) FROM Bids WHERE aid=$1',[aid], (error, results) => {
+    pool.query('',[aid], (error, results) => {
         if (error) {
             throw error
         }
@@ -124,7 +127,7 @@ router.post('/', (request, response) => {
 
   const { toAddress, fromAddress, time, minBidPrice } = request.body
   const uid = request.session.uid
-  pool.query('INSERT INTO Advertisements (fromAddress, toAddress, time, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [fromAddress, toAddress, time, minBidPrice, uid], (error, results) => {
+  pool.query('INSERT INTO Advertisements (fromAddress, toAddress, departureTime, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5) RETURNING *', [fromAddress, toAddress, time, minBidPrice, uid], (error, results) => {
     if (error) {
       throw error
     }

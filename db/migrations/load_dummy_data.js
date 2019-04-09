@@ -68,6 +68,9 @@ exports.up = function(knex, Promise) {
 // (1, 1, 9.0);
 // INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
 // (4, 3, 1, 5.0);
+// ---After the accepted bids---
+// INSERT INTO Bids (uid, aid, bidPrice) VALUES
+// (2, 2, 18.0);
 
 exports.down = function(knex, Promise) {
   let dropQuery = ``;

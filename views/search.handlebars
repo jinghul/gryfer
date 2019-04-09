@@ -1,53 +1,59 @@
-<div class="row" style="height:90%">
-    <div class="col h-100" id="search-col">
-        <div id="search-box" class="w-100 mx-auto">
-            <form id="form-search" class="auth-form w-75 mx-auto needs-validation" novalidate>
-                <div class="form-group form-row">
-                    <label for="from-fr">From Destination</label>
+<div class="row mx-auto base-width" style="height:calc(100% - 57px)">
+    <div class="w-100" id="search-box" >
+        <form id="form-search" class="auth-form mx-auto needs-validation" novalidate>
+            <div class="form-row pt-3" style="justify-content: center">
+                <div class="form-group col-md-2 col-md-offset-1 outline-shadow">
                     <div class="input-group">
                         <span class="input-group-prepend">
-                            <span class="fas fa-map-marker-alt input-group-text"></span>
+                            <span class="fas no-border fa-map-marker-alt input-group-text"></span>
                         </span>
-                        <input type="text" class="form-control" id="from-fr" name="fromAddress" required />
+                        <input type="text" class="form-control no-border" id="from-fr" placeholder="From" name="fromAddress" required />
                     </div>
+                    <span class="search-clear far fa-times-circle"></span>
                 </div>
-                <div class="form-group form-row">
-                    <label for="to-fr">To Destination</label>
+                <div class="form-group col-md-2 outline-shadow">
                     <div class="input-group">
                         <span class="input-group-prepend">
-                            <span class="input-group-text fas fa-flag-checkered"></span>
+                            <span class="input-group-text no-border fas fa-flag-checkered"></span>
                         </span>
-                        <input type="text" class="form-control" id="to-fr" name="toAddress"
+                        <input type="text" class="form-control no-border" id="to-fr" placeholder="Destination" name="toAddress"
                             required />
                     </div>
+                    <span class="search-clear far fa-times-circle"></span>
                 </div>
-                <div class="form-row form-group">
-                    <label for="date-fr">Date of Departure</label>
+                <div class="form-group col-md-2 outline-shadow">
                     <div class='input-group'>
                         <span class="input-group-prepend">
-                            <span class="input-group-text far fa-calendar-alt"></span>
+                            <span class="input-group-text no-border far fa-calendar-alt"></span>
                         </span>
-                        <input type='text' id='date-fr' name="departureTime" class="form-control"/>
+                        <input type='text' id='date-fr' class="no-border form-control" name="departureTime" placeholder="Time"/>
                     </div>
+                    <span class="search-clear far fa-times-circle"></span>
                 </div>
-                <div class="form-row form-group">
-                    <label for="price-fr">Max Price</label>
+                <div class="form-group col-md-2 outline-shadow">
                     <div class='input-group'>
                         <span class="input-group-prepend">
-                            <span class="input-group-text fas fa-dollar-sign"></span>
+                            <span class="input-group-text no-border fas fa-dollar-sign"></span>
                         </span>
-                        <input type="number" name="maxPrice" class="form-control" id="price-fr">
+                        <input type="number" name="maxPrice" class="form-control no-border" placeholder="Max Price" id="price-fr">
                     </div>
+                    <span class="search-clear far fa-times-circle"></span>
                 </div>
-                <div role="group" class="form-row">
+                <div role="group" class="col-md-2 mb-3">
                     <button id="submit-fr" type="submit" class="btn btn-block btn-primary">
                         Search
                     </button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>  
     </div>
+    <div class="col vertical-col" id="search-results">
+        <div class="h-100 w-100 none display-5" id="no-results">No results.</div>
+    </div>
+    <div id="map-col" class="col vertical-col"><div id="search-map" class="h-100 w-100"></div></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
 <script src="js/ad.template.js"></script>
 <script src="js/search.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=APIKEY&libraries=places&callback=initMapAndAutocomplete"
+        async defer></script>
