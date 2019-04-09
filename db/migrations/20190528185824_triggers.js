@@ -1,29 +1,6 @@
 exports.up = function(knex, Promise) {
   
   let createQuery = `
-    CREATE OR REPLACE FUNCTION add_bid_to_history()
-    RETURNS TRIGGER AS
-    $$
-    BEGIN
-        INSERT INTO
-            Histories(uid, aid)
-            VALUES(NEW.puid,NEW.aid);
-        INSERT INTO
-            Histories(uid, aid)
-            VALUES(NEW.duid,NEW.aid);
-        RETURN NEW;
-    END;
-    $$
-    LANGUAGE plpgsql;
-
-    CREATE TRIGGER add_bid_to_history
-    AFTER INSERT
-    ON Accepted
-    FOR EACH ROW
-    EXECUTE PROCEDURE add_bid_to_history();
-
-
-
     CREATE OR REPLACE FUNCTION check_min_bid()
     RETURNS TRIGGER AS
     $$
@@ -152,7 +129,6 @@ exports.up = function(knex, Promise) {
     ON Accepted
     FOR EACH ROW
     EXECUTE PROCEDURE update_num_trips();
-    
     `;
 
 
@@ -237,5 +213,12 @@ exports.up = function(knex, Promise) {
 //     EXECUTE PROCEDURE check_review_passenger();
     
 exports.down = function(knex, Promise) {
-  
+  let dropQuery = `
+  DROP TRIGGER IF EXISTS add_bid_to_history ON Accepted;
+  DROP TRIGGER IF EXISTS check_min_bid ON Bids;
+  DROP TRIGGER IF EXISTS update_rating_driver ON DriverRatings;
+  DROP TRIGGER IF EXISTS update_rating_passenger ON PassengerRatings;
+  DROP TRIGGER IF EXISTS update_num_trips ON Accepted;
+  `;
+  return knex.raw(dropQuery);
 };

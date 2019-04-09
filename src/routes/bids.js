@@ -52,14 +52,36 @@ router.post('/create', (request, response) => {
 // Trigger will add the advertisement to history of driver and passenger
 router.post('/accept', (request, response) => {
   const { puid, duid, aid, price } = request.body
-  pool.query(
-    'INSERT INTO accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *',
-    [aid, puid, duid, price],
-    (error, results) => {
-      if (error) throw error
-      console.log(results.rows[0])
-      return response.status(200).send('Bid for advertisement ' + aid + ' accepted.')
-    })
+
+  const acceptBid = async (puid, duid, aid, price) => {
+    const client = await pool.connect()
+
+    try {
+      await client.query('BEGIN')
+      
+      await client.query('INSERT INTO Accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *', [aid, puid, duid, price])
+      await client.query('INSERT INTO Histories(uid, aid) VALUES($1, $2)', [puid, aid])
+      await client.query('INSERT INTO Histories (uid, aid) VALUES ($1, $2)', [duid, aid])
+      
+      await client.query('COMMIT')
+    } catch (e) {
+      await client.query('ROLLBACK')
+      throw e
+    } finally {
+      client.release()
+      response.status(200).send('Bid accepted for advertisement: ' + [puid, duid, aid, price])
+    }
+  }
+
+  acceptBid(puid, duid, aid, price)
+  // pool.query(
+  //   'INSERT INTO accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *',
+  //   [aid, puid, duid, price],
+  //   (error, results) => {
+  //     if (error) throw error
+  //     console.log(results.rows[0])
+  //     return response.status(200).send('Bid for advertisement ' + aid + ' accepted.')
+  // })
 })
 
 module.exports = router
