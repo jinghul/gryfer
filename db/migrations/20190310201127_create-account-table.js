@@ -1,9 +1,9 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Accounts;
   CREATE TABLE Accounts (
-	uid				INTEGER NOT NULL,
+	uid				  INTEGER NOT NULL,
   password		VARCHAR(100) NOT NULL,
-  mode BOOLEAN NOT NULL,
+  mode        BOOLEAN NOT NULL,
   userToken		VARCHAR(64),
 	PRIMARY KEY (uid),
 	FOREIGN KEY (uid) REFERENCES Users

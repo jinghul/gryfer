@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
 	toAddress 		VARCHAR(60),
 	departureTime	TIMESTAMP,
 	uid				INTEGER NOT NULL,
+	maxPassengers	INTEGER NOT NULL,
 	UNIQUE (aid, uid),
 	PRIMARY KEY (aid),
 	FOREIGN KEY (uid) REFERENCES Drivers

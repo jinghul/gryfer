@@ -35,10 +35,10 @@ router.get('/accepted', (request, response) => {
 // body requires uid (of a passenger), aid of an advertisement, and bidPrice
 // trigger should check to make sure constraints are satisfied
 router.post('/create', (request, response) => {
-  const { uid, aid, bidPrice } = request.body
+  const { uid, aid, numPassengers, bidPrice } = request.body
   pool.query(
-    'INSERT INTO Bids (uid, aid, bidPrice) VALUES ($1, $2, $3) RETURNING *',
-    [uid, aid, bidPrice],
+    'INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES ($1, $2, $3, $4) RETURNING *',
+    [uid, aid, numPassengers, bidPrice],
     (error, results) => {
       if (error) {
         throw error
