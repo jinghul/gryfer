@@ -69,6 +69,7 @@ function initMapAndAutocomplete() {
 
     if (window.location.search.length != 0) {
         let query = window.location.search.substring(1);
+        console.log('{"' + query.replace(/&/g, '","').replace(/=/g, '":"') + '"}')
         let state = JSON.parse(
             '{"' + query.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
             function(key, value) {
@@ -145,28 +146,42 @@ function display(results) {
 
         item.fadeIn(300);
 
+        let from_pos = new google.maps.LatLng(parseFloat(res.fromlat), parseFloat(res.fromlng))
+        let to_pos = new google.maps.LatLng(parseFloat(res.tolat), parseFloat(res.tolng))
         var res_to_marker = new google.maps.Marker({
             map: map,
-            label: Math.floor(markers.length / 2) + 1,
+            position: to_pos,
+            label: (Math.floor(markers.length / 2) + 1).toString(),
             icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
         });
         var res_from_marker = new google.maps.Marker({
             map: map,
-            label: Math.floor(markers.length / 2) + 1,
+            position: from_pos,
+            label: (Math.floor(markers.length / 2) + 1).toString(),
             icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
         });
-        res_to_marker.setPosition({ lat: res.toLat, lng: res.toLng });
-        res_from_marker.setPosition({ lat: res.fromLat, lng: res.fromLng });
+
+        let id = "#search-result-" + i.toString()
+        res_to_marker.setPosition(to_pos);
+        res_from_marker.setPosition(from_pos);
+        res_to_marker.addListener('click', function() {
+            
+            scrollToAd($(id));
+        })
+        res_from_marker.addListener('click', function() {
+            scrollToAd($(id));
+        })
 
         markers.push(res_to_marker, res_from_marker);
 
-        bounds.extend({ lat: res.toLat, lng: res.toLng });
-        bounds.extend({ lat: res.fromLat, lng: res.fromLng });
+        bounds.extend(to_pos);
+        bounds.extend(from_pos);
     }
 
     if (markers.length != 0) {
         map.fitBounds(bounds);
     }
+
     markers.push(to_marker, from_marker);
 }
 
@@ -189,16 +204,17 @@ function search(params, state) {
                 toAddress: $('#to-fr').val(),
                 departureTime: $('#date-fr').val(),
                 maxPrice: $('#price-fr').val(),
+                maxPassengers: $('#passengers-fr').val()
             };
 
             if ($('#to-fr').val() != '') {
                 let location = autocomplete_to.getPlace();
                 if (location) {
                     params =
-                        '&toLat=' +
+                        'toLat=' +
                         location.geometry.location.lat() +
                         '&toLng=' +
-                        location.geometry.location.lng() + params;
+                        location.geometry.location.lng() + "&" + params;
                     new_state.toLat = location.latitude;
                     new_state.toLng = location.longitude;
                 }
@@ -208,10 +224,10 @@ function search(params, state) {
                 let location = autocomplete_from.getPlace();
                 if (location) {
                     params =
-                        '&fromLat=' +
+                        'fromLat=' +
                         location.geometry.location.lat() +
                         '&fromLng=' +
-                        location.geometry.location.lng() + params;
+                        location.geometry.location.lng() + "&" + params;
                     new_state.fromLat = location.latitude;
                     new_state.fromLng = location.longitude;
                 }
@@ -238,6 +254,7 @@ function search(params, state) {
                 .setDate(new Date(state.departureTime));
         }
         $('#price-fr').val(state.maxPrice);
+        $('#passengers-fr').val(state.maxPassengers)
     }
 
     qurl += params;
@@ -258,9 +275,9 @@ function search(params, state) {
         from_marker.setVisible(true);
         bounds = new google.maps.LatLngBounds();
         bounds.extend(from_marker.getPosition());
-    } else if (state.fromLat && state.fromLng) {
+    } else if (state && state.fromLat && state.fromLng) {
         from_marker.setMap(map);
-        from_marker.setPosition(new google.maps.LatLng(fromLat, fromLng));
+        from_marker.setPosition(new google.maps.LatLng(state.fromLat, state.fromLng));
         from_marker.setVisible(true);
         bounds = new google.maps.LatLngBounds();
         bounds.extend(from_marker.getPosition());
@@ -275,7 +292,7 @@ function search(params, state) {
             bounds = new google.maps.LatLngBounds();
         }
         bounds.extend(to_marker.getPosition());
-    } else if (state.toLat && state.toLng) {
+    } else if (state && state.toLat && state.toLng) {
         to_marker.setMap(map);
         to_marker.setPosition(new google.maps.LatLng(state.toLat, state.toLng));
         to_marker.setVisible(true);

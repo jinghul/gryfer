@@ -40,7 +40,7 @@ router.get('/search', (request, response, next) => {
     paramCounter++
   }
   if (numPassengers) {
-    whereStrings.push('(SELECT maxPassengers FROM CarProfiles WHERE cid=(SELECT cid FROM drivers WHERE uid=uid)) >= $' + paramCounter.toString())
+    whereStrings.push('(SELECT maxPassengers FROM CarProfiles WHERE cid=(SELECT cid FROM drivers WHERE drivers.uid=Advertisements.uid)) >= $' + paramCounter.toString())
     results.push(numPassengers)
     paramCounter++
   }
