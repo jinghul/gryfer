@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
 	tripsDriven			INTEGER NOT NULL,
 	rating				NUMERIC,
 	cid					INTEGER,
-	license				VARCHAR(10),
+	license				VARCHAR(10) NOT NULL,
 	PRIMARY KEY (uid),
 	FOREIGN KEY (cid) REFERENCES Cars
 )`;
