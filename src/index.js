@@ -63,7 +63,17 @@ app.get('/search', (req, res) => {
     if (!req.session.uid) {
         res.redirect('../auth/signin')
     } else {
-        res.render('search', {layout: 'ads', title : 'Find Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+        res.render('search', {
+            layout: 'ads',
+            title : 'Find Rides',
+            username: req.session.username,
+            email: req.session.email,
+            fname: req.session.fname,
+            lname: req.session.lname,
+            driver: req.session.mode,
+            switchable: req.session.switchable,
+            google_key: config.google_key
+        })
     }
 })
 app.get('/make', (req, res) => {

@@ -141,7 +141,7 @@ function display(results) {
             index: i,
             from: res.fromaddress,
             to: res.toaddress,
-            price: '$' + res.minbidprice,
+            price: '$' + parseFloat(res.currprice).toFixed(2),
             date: dateString,
             time: timeString,
         };

@@ -143,6 +143,7 @@ router.get('/id/:aid', (request, response) => {
     lname: request.session.lname, 
     driver: request.session.mode, 
     switchable: request.session.switchable,
+    google_key: config.google_key
   })
 })
 
