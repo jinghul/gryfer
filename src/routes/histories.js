@@ -51,7 +51,7 @@ router.get('/driver/:id', (request, response) => {
 })
 
 // Get the detailed driving stats
-router.get('/stats/:id', (request, response) => {
+router.get('/driver/stats/:id', (request, response) => {
     const uid = parseInt(request.params.id)
     pool.query('SELECT max(price) as mostExpensiveRide, count(*) as numrides FROM Histories NATURAL JOIN Accepted where duid = $1',[uid], (error, results) => {
         if (error) {
@@ -59,12 +59,34 @@ router.get('/stats/:id', (request, response) => {
         }
         response.status(200).json(results.rows)
     })
-
 })
 
-router.get('/months/:id', (request, response) => {
+// Get the detailed Riding stats
+router.get('/passenger/stats/:id', (request, response) => {
+    const uid = parseInt(request.params.id)
+    pool.query('SELECT max(price) as mostExpensiveRide, count(*) as numrides FROM Histories NATURAL JOIN Accepted where puid = $1',[uid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+})
+
+// Get the number of rides given per month
+router.get('/driver/months/:id', (request, response) => {
     const uid = parseInt(request.params.id)
     pool.query("SELECT DATE_PART('month', timeCompleted) as month, count(aid) as numRides  FROM Histories NATURAL JOIN Accepted where duid = $1 Group BY DATE_PART('month', timeCompleted)",[uid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+})
+
+// Get the number of rides taken per month
+router.get('/passenger/months/:id', (request, response) => {
+    const uid = parseInt(request.params.id)
+    pool.query("SELECT DATE_PART('month', timeCompleted) as month, count(aid) as numRides  FROM Histories NATURAL JOIN Accepted where puid = $1 Group BY DATE_PART('month', timeCompleted)",[uid], (error, results) => {
         if (error) {
             throw error
         }
