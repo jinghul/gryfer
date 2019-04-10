@@ -86,24 +86,17 @@ router.post('/accept', (request, response) => {
       await client.query('INSERT INTO Histories (uid, aid) VALUES ($1, $2)', [duid, aid])
       
       await client.query('COMMIT')
+
+      await client.release()
+      await response.status(200).send('Bid accepted for advertisement: ' + [puid, duid, aid, price])
     } catch (e) {
       await client.query('ROLLBACK')
+      response.status(500).send('Bid acceptance transaction failed.')
       throw e
-    } finally {
-      client.release()
-      response.status(200).send('Bid accepted for advertisement: ' + [puid, duid, aid, price])
     }
   }
 
   acceptBid(puid, duid, aid, price)
-  // pool.query(
-  //   'INSERT INTO accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *',
-  //   [aid, puid, duid, price],
-  //   (error, results) => {
-  //     if (error) throw error
-  //     console.log(results.rows[0])
-  //     return response.status(200).send('Bid for advertisement ' + aid + ' accepted.')
-  // })
 })
 
 module.exports = router
