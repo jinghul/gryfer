@@ -110,6 +110,34 @@ exports.up = function(knex, Promise) {
     ON Advertisements
     FOR EACH ROW
     EXECUTE PROCEDURE ad_not_accepted();
+    
+    
+    
+    
+    CREATE OR REPLACE FUNCTION bid_on_own_ad()
+    RETURNS TRIGGER AS
+    $$
+    DECLARE ad_creator_id INTEGER;
+    BEGIN
+        SELECT uid INTO ad_creator_id
+        FROM Advertisements
+        WHERE NEW.aid = Advertisements.aid;
+        
+        IF (ad_creator_id = NEW.uid) THEN
+            RAISE EXCEPTION 'Cannot bid on your own ad';
+            RETURN NULL;
+        END IF;
+        
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+    
+    CREATE TRIGGER bid_on_own_ad
+    BEFORE INSERT OR UPDATE
+    ON Bids
+    FOR EACH ROW
+    EXECUTE PROCEDURE bid_on_own_ad();
     `;
 
 

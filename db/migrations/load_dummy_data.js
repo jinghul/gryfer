@@ -17,10 +17,12 @@ exports.up = function(knex, Promise) {
 
 	INSERT INTO Cars (cid) VALUES
 	(100),
-	(101);
+	(101),
+    (102);
 
 	INSERT INTO Drivers (uid, tripsDriven, rating, cid, license) VALUES
 	(3, 3, 2.0, 100, 'S918841412'),
+    (1, 3, 2.0, 102, 'S918841413'),
 	(4, 2, 4.5, 101, 'S847189374');
 
 	INSERT INTO Accounts (uid, passwordHash, mode, userToken) VALUES
@@ -41,16 +43,19 @@ exports.up = function(knex, Promise) {
 	INSERT INTO Advertisements (minBidPrice, fromAddress, fromLat, fromLng, toAddress, toLat, toLng, departureTime, uid) VALUES
 	(10.0, '28 College Avenue East', 1.3060616, 103.7719055, 'Marina Bay Sands', 1.2833808, 103.8585377, '2019-04-26 09:30', 3),
 	(15.0, '8 College Avenue East', 1.3078482, 103.7709924, 'Clarke Quay', 1.2906078, 103.8442855, '2019-04-30 14:30', 4),
-	(16.0, 'Fine Foods', 1.3064821, 103.7889924, 'food clique',1.3080616, 103.7719955, '2019-05-03 19:30', 4);
+	(16.0, 'Fine Foods', 1.3064821, 103.7889924, 'food clique',1.3080616, 103.7719955, '2019-05-03 19:30', 4),
+    (16.0, 'Fine Foods', 1.3064821, 103.7889924, 'food clique',1.3080616, 103.7719955, '2019-05-03 19:30', 1);
 
     INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
     (100, 'toyota', 'prius', '2016', 124923.1, 4),
-    (101, 'honda', 'crv', '2018', 98752.4, 6);
+    (101, 'honda', 'crv', '2018', 98752.4, 6),
+    (102, 'toyota', 'camry', '2000', 98752.4, 4);
                                                
 	INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES
 	(2, 2, 1, 18.0),
 	(1, 2, 4, 19.0),
 	(2, 1, 4, 11.0),
+--     (1, 4, 3, 19.0),
 	(1, 3, 3, 19.0);
 
 
