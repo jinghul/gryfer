@@ -21,9 +21,10 @@ router.use((request, response, next) => {
   }
 })
 
-// GET all bids
-router.get('/', (request, response) => {
-  pool.query('SELECT * FROM Bids ORDER BY uid ASC', (error, results) => {
+router.get('/:aid', (request, response) => {
+  const aid = parseInt(request.params.aid)
+
+  pool.query('SELECT * FROM bids WHERE aid = $1', [aid], (error, results) => {
     if (error) {
       throw error
     }
@@ -31,17 +32,13 @@ router.get('/', (request, response) => {
   })
 })
 
-router.get('/:aid', (request, response) => {
-  const aid = parseInt(request.params.aid)
-  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN (SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) AS currprices NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as status FROM accepted)) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+// GET all bids
+router.get('/', (request, response) => {
+  pool.query('SELECT * FROM Bids ORDER BY uid ASC', (error, results) => {
     if (error) {
-      console.log(error);
-      response.status(400).end();
-      return
+      throw error
     }
-
-    let title = results.fromAddress + " to " + results.toAddress
-    response.render('bid_ad', {title: title, username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+    response.status(200).json(results.rows)
   })
 })
 
@@ -57,7 +54,15 @@ router.get('/accepted', (request, response) => {
 // body requires uid (of a passenger), aid of an advertisement, and bidPrice
 // trigger should check to make sure constraints are satisfied
 router.post('/create', (request, response) => {
-  const { uid, aid, numPassengers, bidPrice } = request.body
+  const { aid, numPassengers, bidPrice } = request.body
+  console.log(request.body)
+
+  if (!bidPrice || !numPassengers || !aid) {
+    response.status(400).send('Fields cannot be empty.')
+    return
+  }
+  const uid = request.session.uid
+
   pool.query(
     'INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES ($1, $2, $3, $4) RETURNING *',
     [uid, aid, numPassengers, bidPrice],
@@ -66,7 +71,7 @@ router.post('/create', (request, response) => {
         throw error
       }
       console.log(results.rows[0])
-      response.status(200).send('New bid created: ' + results.rows[0])
+      response.status(200).json(results.rows[0])
     })
 })
 

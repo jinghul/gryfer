@@ -128,10 +128,25 @@ $('document').ready(function() {
 
     $('#go-back-reg').bind('click', toPartOne);
 
+    $('input').on('keyup', function(e) {
+        if (e.keyCode == 13) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (checkEmptyFields()) {
+                if ($('#exist-account').attr('loggedin') == 'true') {
+                    register();
+                } else {
+                    check_then_register();
+                }
+            }
+            return false;
+        }
+    });
+
     const typeHandler = function(e) {
         if ($(this).hasClass('is-invalid')) {
             $(this).removeClass('is-invalid');
-            $('#incorrect-creds').hide(150);
+            $('.invalid-feedback').hide(150);
         }
     };
 

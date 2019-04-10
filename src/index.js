@@ -60,10 +60,20 @@ app.get('/home', (req, res) => {
     res.render('home', {title: 'Gryfer', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
 })
 app.get('/search', (req, res) => {
-    res.render('search', {layout: 'ads', title : 'Find Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+    if (!req.session.uid) {
+        res.redirect('../auth/signin')
+    } else {
+        res.render('search', {layout: 'ads', title : 'Find Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+    }
 })
 app.get('/make', (req, res) => {
-    res.render('make', {layout: 'ads', title:'Make Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+    if (!req.session.uid) {
+        res.redirect('../auth/signin')
+    } else if (!req.session.mode) {
+        res.redirect('../search')
+    } else {
+        res.render('make', {layout: 'ads', title:'Make Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+    }
 })
 
 // API

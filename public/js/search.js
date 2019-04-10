@@ -10,6 +10,9 @@ var markers,
 function initMapAndAutocomplete() {
     map = new google.maps.Map(document.getElementById('search-map'), {
         zoom: 13,
+        zoomControl: false,
+        scaleControl: false,
+        streetViewControl: false,
         mapTypeControlOptions: { mapTypeIds: [] },
     });
 
@@ -80,11 +83,17 @@ function initMapAndAutocomplete() {
     } else {
         search();
     }
+
+    $('#loading').hide();
 }
 
 function scrollToAd(ad) {
     var position = ad.position();
     $('#search-results').stop().animate({scrollTop: position.top}, 300);
+    ad.addClass('outline-shadow');
+    setTimeout(function() {
+        ad.removeClass('outline-shadow');
+    }, 500);
 }
 
 function display(results) {
@@ -138,10 +147,6 @@ function display(results) {
         };
 
         var item = $(template(context));
-        item.on('click', function() {
-            scrollToAd($(this))
-        });
-
         $('#search-results').append(item);
 
         item.fadeIn(300);
@@ -151,21 +156,22 @@ function display(results) {
         var res_to_marker = new google.maps.Marker({
             map: map,
             position: to_pos,
-            label: (Math.floor(markers.length / 2) + 1).toString(),
             icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
         });
         var res_from_marker = new google.maps.Marker({
             map: map,
             position: from_pos,
-            label: (Math.floor(markers.length / 2) + 1).toString(),
             icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
         });
 
         let id = "#search-result-" + i.toString()
+        $(id).on('click', function() {
+            window.open('http://localhost:3000/ads/id/' + res.aid, '_blank');
+        })
+
         res_to_marker.setPosition(to_pos);
         res_from_marker.setPosition(from_pos);
         res_to_marker.addListener('click', function() {
-            
             scrollToAd($(id));
         })
         res_from_marker.addListener('click', function() {
@@ -316,6 +322,10 @@ function search(params, state) {
 }
 
 $('document').ready(function() {
+    setTimeout(function() {
+        $('#loading').hide();
+    }, 20 * 1000);
+    
     $('#date-fr').flatpickr({
         enableTime: true,
         dateFormat: 'Y-m-d H:i',
