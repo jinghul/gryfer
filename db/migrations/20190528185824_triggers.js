@@ -142,36 +142,6 @@ exports.up = function(knex, Promise) {
     ON PassengerRatings
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating_passenger();
-
-
-
-    CREATE OR REPLACE FUNCTION update_num_trips()
-    RETURNS TRIGGER AS
-    $$
-    DECLARE num_trips INTEGER;
-    BEGIN
-        SELECT tripsTaken INTO num_trips
-        FROM Passengers
-        WHERE NEW.puid = Passengers.uid;
-        UPDATE Passengers
-        SET tripsTaken = num_trips + 1
-        WHERE NEW.puid = Passengers.uid;
-        SELECT tripsDriven INTO num_trips
-        FROM Drivers
-        WHERE NEW.duid = Drivers.uid;
-        UPDATE Drivers
-        SET tripsDriven = num_trips + 1
-        WHERE NEW.duid = Drivers.uid;
-        RETURN NEW; 
-    END;
-    $$
-    LANGUAGE plpgsql ;
-    CREATE TRIGGER update_num_trips
-    BEFORE INSERT OR UPDATE
-    ON Accepted
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_num_trips();
-    
     `;
 
 

@@ -6,8 +6,8 @@ exports.up = function(knex, Promise) {
 	byUid			INTEGER NOT NULL,
 	rating 			NUMERIC NOT NULL,
 	PRIMARY KEY (forUid, aid),
-	FOREIGN KEY (forUid) REFERENCES Passengers,
-	FOREIGN KEY (byUid)  REFERENCES Drivers,
+	FOREIGN KEY (forUid) REFERENCES Passengers (uid),
+	FOREIGN KEY (byUid)  REFERENCES Drivers (uid),
 	FOREIGN KEY (aid) REFERENCES Accepted (aid)
 )`;
   return knex.raw(createQuery);
