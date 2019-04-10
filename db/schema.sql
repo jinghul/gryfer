@@ -69,14 +69,6 @@ CREATE TABLE Advertisements (
 	FOREIGN KEY (uid) REFERENCES Drivers
 );
 
-CREATE TABLE Histories (
-  	puid			INTEGER NOT NULL,
-	duid 			INTEGER NOT NULL,
-	aid				INTEGER NOT NULL,
-	PRIMARY KEY (aid),
-	FOREIGN KEY (aid) REFERENCES Accepted
-);
-
 CREATE FUNCTION getMaxPrice(INTEGER, INTEGER) RETURNS NUMERIC AS
   	$$
   	DECLARE maxPrice NUMERIC;
