@@ -64,7 +64,8 @@ exports.up = function(knex, Promise) {
     (1, '2019-04-26 09:30'),
     (3, '2019-05-26 09:30');
     
-
+--     DELETE FROM Advertisements where aid=1;
+                
 	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
 	(4, 2, 1, 9.0);
 	`;
