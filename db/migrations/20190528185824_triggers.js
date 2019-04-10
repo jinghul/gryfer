@@ -13,10 +13,11 @@ exports.up = function(knex, Promise) {
             RAISE EXCEPTION 'Bid price too low';
             RETURN NULL;
         END IF;
-        RETURN NEW;
+        RETURN NEW; 
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER check_min_bid
     BEFORE INSERT OR UPDATE
     ON Bids
@@ -39,6 +40,7 @@ exports.up = function(knex, Promise) {
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER check_new_bid_not_accepted
     BEFORE INSERT OR UPDATE
     ON Bids
@@ -78,6 +80,7 @@ exports.up = function(knex, Promise) {
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER check_not_too_many_passengers
     BEFORE INSERT OR UPDATE
     ON Bids
@@ -85,93 +88,56 @@ exports.up = function(knex, Promise) {
     EXECUTE PROCEDURE check_not_too_many_passengers();
     
     
-    
-    
-    
-    
-    
-    CREATE OR REPLACE FUNCTION update_rating_driver()
+    CREATE OR REPLACE FUNCTION ad_not_accepted()
     RETURNS TRIGGER AS
     $$
-    DECLARE num_reviews INTEGER;
-            prev_rating NUMERIC;
     BEGIN
-        SELECT rating INTO prev_rating
-        FROM Drivers
-        WHERE NEW.forUid = Drivers.uid;
-        SELECT count(*) INTO num_reviews
-        FROM DriverRatings
-        WHERE DriverRatings.forUid = NEW.forUid;
-        prev_rating = COALESCE(prev_rating, 0);
-        UPDATE Drivers
-        SET rating = (num_reviews * prev_rating + NEW.rating)/(num_reviews + 1)
-        WHERE NEW.forUid = Drivers.uid;
+        IF EXISTS (
+        SELECT 1
+        FROM Accepted
+        WHERE OLD.aid = Accepted.aid) THEN
+            RAISE EXCEPTION 'Advertisement already accepted';
+            RETURN NULL;
+        END IF;
+        
+        RETURN NULL;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+    
+    CREATE TRIGGER ad_not_accepted
+    BEFORE DELETE
+    ON Advertisements
+    FOR EACH ROW
+    EXECUTE PROCEDURE ad_not_accepted();
+    
+    
+    
+    
+    CREATE OR REPLACE FUNCTION bid_on_own_ad()
+    RETURNS TRIGGER AS
+    $$
+    DECLARE ad_creator_id INTEGER;
+    BEGIN
+        SELECT uid INTO ad_creator_id
+        FROM Advertisements
+        WHERE NEW.aid = Advertisements.aid;
+        
+        IF (ad_creator_id = NEW.uid) THEN
+            RAISE EXCEPTION 'Cannot bid on your own ad';
+            RETURN NULL;
+        END IF;
+        
         RETURN NEW;
     END;
     $$
     LANGUAGE plpgsql ;
-    CREATE TRIGGER update_rating_driver
-    BEFORE INSERT OR UPDATE
-    ON DriverRatings
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_rating_driver();
-
-
     
-    CREATE OR REPLACE FUNCTION update_rating_passenger()
-    RETURNS TRIGGER AS
-    $$
-    DECLARE num_reviews INTEGER;
-            prev_rating NUMERIC;
-    BEGIN
-        SELECT rating INTO prev_rating
-        FROM Passengers
-        WHERE NEW.forUid = Passengers.uid;
-        SELECT count(*) INTO num_reviews
-        FROM PassengerRatings
-        WHERE PassengerRatings.forUid = NEW.forUid;
-        prev_rating = COALESCE(prev_rating, 0);
-        UPDATE Passengers
-        SET rating = (num_reviews * prev_rating + NEW.rating)/(num_reviews + 1)
-        WHERE NEW.forUid = Passengers.uid;
-    END;
-    $$
-    LANGUAGE plpgsql ;
-    CREATE TRIGGER update_rating_passenger
+    CREATE TRIGGER bid_on_own_ad
     BEFORE INSERT OR UPDATE
-    ON PassengerRatings
+    ON Bids
     FOR EACH ROW
-    EXECUTE PROCEDURE update_rating_passenger();
-
-
-
-    CREATE OR REPLACE FUNCTION update_num_trips()
-    RETURNS TRIGGER AS
-    $$
-    DECLARE num_trips INTEGER;
-    BEGIN
-        SELECT tripsTaken INTO num_trips
-        FROM Passengers
-        WHERE NEW.puid = Passengers.uid;
-        UPDATE Passengers
-        SET tripsTaken = num_trips + 1
-        WHERE NEW.puid = Passengers.uid;
-        SELECT tripsDriven INTO num_trips
-        FROM Drivers
-        WHERE NEW.duid = Drivers.uid;
-        UPDATE Drivers
-        SET tripsDriven = num_trips + 1
-        WHERE NEW.duid = Drivers.uid;
-        RETURN NEW; 
-    END;
-    $$
-    LANGUAGE plpgsql ;
-    CREATE TRIGGER update_num_trips
-    BEFORE INSERT OR UPDATE
-    ON Accepted
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_num_trips();
-    
+    EXECUTE PROCEDURE bid_on_own_ad();
     `;
 
 
@@ -179,81 +145,6 @@ exports.up = function(knex, Promise) {
 
 
 };
-// REMOVED TRIGGER
-// CREATE OR REPLACE FUNCTION check_review_driver()
-//     RETURNS TRIGGER AS
-//     $$
-//     DECLARE ad_puid INTEGER;
-//             ad_duid INTEGER;
-//             count INTEGER;
-//     BEGIN
-    
-//         SELECT count(*) into count
-//         FROM Accepted
-//         WHERE NEW.aid = Accepted.aid;
-        
-//         IF count = 0 THEN
-//           RAISE EXCEPTION 'Ad not accepted';
-//           RETURN NULL;
-//         END IF;
-        
-//         SELECT puid, duid INTO ad_puid, ad_duid
-//         FROM Accepted
-//         WHERE NEW.aid = Accepted.aid;
-
-//         IF NEW.byUid <> ad_puid THEN
-//             RAISE EXCEPTION 'Incorrect Passenger';
-//             RETURN NULL;
-//         ELSIF NEW.forUid <> ad_duid THEN
-//             RAISE EXCEPTION 'Incorrect Driver';
-//             RETURN NULL;
-//         END IF;
-
-//         RETURN NEW;
-//     END;
-//     $$
-//     LANGUAGE plpgsql;
-
-//     CREATE TRIGGER check_review_driver
-//     BEFORE INSERT OR UPDATE
-//     ON DriverRatings
-//     FOR EACH ROW
-//     EXECUTE PROCEDURE check_review_driver();
-    
-    
-    
-//     CREATE OR REPLACE FUNCTION check_review_passenger()
-//     RETURNS TRIGGER AS
-//     $$
-//     DECLARE ad_puid INTEGER;
-//             ad_duid INTEGER;
-//             count INTEGER;
-//     BEGIN
-    
-        
-        
-//         SELECT puid, duid INTO ad_puid, ad_duid
-//         FROM Accepted
-//         WHERE NEW.aid = Accepted.aid;
-
-//         IF NEW.forUid <> ad_puid THEN
-//             RAISE EXCEPTION 'Incorrect Passenger';
-//             RETURN NULL;
-//         ELSIF NEW.byUid <> ad_duid THEN
-//             RAISE EXCEPTION 'Incorrect Driver';
-//             RETURN NULL;
-//         END IF;
-
-//         RETURN NEW;
-//     END;
-//     $$
-//     LANGUAGE plpgsql;
-    
-//     CREATE TRIGGER check_review_passenger
-//     BEFORE INSERT OR UPDATE
-//     ON PassengerRatings
-//     FOR EACH ROW
-//     EXECUTE PROCEDURE check_review_passenger();
     
 exports.down = function(knex, Promise) {
   

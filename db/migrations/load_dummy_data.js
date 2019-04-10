@@ -84,7 +84,8 @@ exports.up = function(knex, Promise) {
     INSERT INTO Histories(puid, duid, aid, timeCompleted) VALUES 
     (1, 4, 2, '2019-04-30 15:35');
     
-
+--     DELETE FROM Advertisements where aid=1;
+                
 	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
 	(4, 2, 1, 4.5);
 
