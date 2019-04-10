@@ -59,10 +59,10 @@ exports.up = function(knex, Promise) {
 	(1, 2, 3, 11.0),
     (3, 1, 4, 19.0);
 
-    INSERT INTO Histories(aid, timeCompleted) VALUES 
-    (2, '2019-04-26 09:30'),
-    (1, '2019-04-26 09:30'),
-    (3, '2019-05-26 09:30');
+    INSERT INTO Histories(puid, duid, aid, timeCompleted) VALUES 
+    (1, 4, 2, '2019-04-26 09:30'),
+    (2, 3, 1, '2019-04-26 09:30'),
+    (1, 4, 3, '2019-05-26 09:30');
     
 --     DELETE FROM Advertisements where aid=1;
                 
