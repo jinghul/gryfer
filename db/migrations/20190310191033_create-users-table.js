@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Users;
   CREATE TABLE Users (
-  uid               SERIAL,
+  uid               SERIAL ON DELETE CASCADE,
   fname             VARCHAR(60),
   lname             VARCHAR(60),
   email             VARCHAR(60) UNIQUE,
