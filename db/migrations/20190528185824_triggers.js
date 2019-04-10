@@ -140,33 +140,6 @@ exports.up = function(knex, Promise) {
     ON DriverRatings
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating_driver();
-
-
-    
-    CREATE OR REPLACE FUNCTION update_rating_passenger()
-    RETURNS TRIGGER AS
-    $$
-    DECLARE num_reviews INTEGER;
-            prev_rating NUMERIC;
-    BEGIN
-        SELECT rating INTO prev_rating
-        FROM Passengers
-        WHERE NEW.forUid = Passengers.uid;
-        SELECT count(*) INTO num_reviews
-        FROM PassengerRatings
-        WHERE PassengerRatings.forUid = NEW.forUid;
-        prev_rating = COALESCE(prev_rating, 0);
-        UPDATE Passengers
-        SET rating = (num_reviews * prev_rating + NEW.rating)/(num_reviews + 1)
-        WHERE NEW.forUid = Passengers.uid;
-    END;
-    $$
-    LANGUAGE plpgsql ;
-    CREATE TRIGGER update_rating_passenger
-    BEFORE INSERT OR UPDATE
-    ON PassengerRatings
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_rating_passenger();
     `;
 
 

@@ -58,35 +58,53 @@ router.get('/passengers/:id', (request, response) => {
 // Create new rating for a passenger
 router.post('/passengers', (request, response) => {
     const {byUid, forUid, aid, rating} = request.body
-    pool.query(
-        'INSERT INTO PassengerRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *',
-        [byUid, forUid, aid, rating],
-        (error, results) => {
-            if (error) {
-                response.status(400).send('Database rejection')
-                throw error
-            }
-            console.log(results.rows[0])
-            response.status(200).send('Rating saved: ' + results.rows[0])
-        })
+
+    const createPassengerRating = async (byUid, forUid, aid, rating) => {
+        const client = await pool.connect()
+
+        try {
+          await client.query('BEGIN')
+          
+          await client.query('INSERT INTO PassengerRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *', [byUid, forUid, aid, rating])
+          await client.query('SELECT * FROM update_rating_passenger($1, $2)', [forUid, rating])
+          
+          await client.query('COMMIT')
+
+          await client.release()
+          await response.status(200).send('PassengerRating inserted for: ' + [byUid, forUid, aid, rating])
+        } catch (e) {
+          await client.query('ROLLBACK')
+          response.status(400).send('Insert passenger rating transaction failed.')
+          throw e
+        }
+  }
+
+  createPassengerRating(byUid, forUid, aid, rating)
 })
 
 // Create new rating for a driver
 router.post('/drivers', (request, response) => {
     const {byUid, forUid, aid, rating} = request.body
-    console.log(byUid, forUid)
-    pool.query(
-        'INSERT INTO DriverRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *',
-        [byUid, forUid, aid, rating],
-        (error, results) => {
-            if (error) {
-                response.status(400).send('Database rejection')
-                console.log( error)
-                return
-            }
-            console.log(results.rows[0])
-            response.status(200).send('Rating saved: ' + results.rows[0])
-        })
+    const createDriverRating = async (byUid, forUid, aid, rating) => {
+        const client = await pool.connect()
+
+        try {
+          await client.query('BEGIN')
+          
+          await client.query('INSERT INTO DriverRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *', [byUid, forUid, aid, rating])
+          await client.query('SELECT * FROM update_rating_driver($1, $2)', [forUid, rating])
+          
+          await client.query('COMMIT')
+          await client.release()
+          await response.status(200).send('Driver rating inserted for: ' + [byUid, forUid, aid, rating])
+        } catch (e) {
+          await client.query('ROLLBACK')
+          response.status(400).send('Insert driver rating transaction failed.')
+          throw e
+        }
+    }
+
+    createDriverRating(byUid, forUid, aid, rating)
 })
 
 module.exports = router
