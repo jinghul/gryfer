@@ -13,10 +13,11 @@ exports.up = function(knex, Promise) {
             RAISE EXCEPTION 'Bid price too low';
             RETURN NULL;
         END IF;
-        RETURN NEW;
+        RETURN NEW; 
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER check_min_bid
     BEFORE INSERT OR UPDATE
     ON Bids
@@ -39,6 +40,7 @@ exports.up = function(knex, Promise) {
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER check_new_bid_not_accepted
     BEFORE INSERT OR UPDATE
     ON Bids
@@ -78,6 +80,7 @@ exports.up = function(knex, Promise) {
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER check_not_too_many_passengers
     BEFORE INSERT OR UPDATE
     ON Bids
@@ -101,6 +104,7 @@ exports.up = function(knex, Promise) {
     END;
     $$
     LANGUAGE plpgsql ;
+    
     CREATE TRIGGER ad_not_accepted
     BEFORE DELETE
     ON Advertisements
