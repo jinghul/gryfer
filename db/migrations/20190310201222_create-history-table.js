@@ -1,12 +1,12 @@
 exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Histories;
   CREATE TABLE Histories (
-	uid 			INTEGER NOT NULL,
-	aid				INTEGER NOT NULL,
-	numPassengers	INTEGER,
-	PRIMARY KEY (uid, aid),
-	FOREIGN KEY (uid) REFERENCES UserProfiles,
-	FOREIGN KEY (aid) REFERENCES Advertisements
+    puid			     INTEGER NOT NULL,
+	  duid 			     INTEGER NOT NULL,
+	  aid				     INTEGER NOT NULL,
+    timeCompleted  TIMESTAMP
+	  PRIMARY KEY (aid),
+	  FOREIGN KEY (aid) REFERENCES Accepted
 )`;
   return knex.raw(createQuery);
 };
