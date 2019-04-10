@@ -32,6 +32,7 @@
     "express": "^4.16.4",
     "express-handlebars": "^3.0.2",
     "express-session": "^1.15.6",
+    "geolib": "^2.0.24",
     "handlebars": "^4.1.0",
     "helmet": "^3.15.1",
     "knex": "^0.16.3",

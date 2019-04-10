@@ -1,4 +1,4 @@
-<div class="row mt-4" style="height: calc(100% - 57px)">
+<div class="row mt-4" style="height: calc(100% - 100px);padding: 0px 15px">
     <div class="col w-100" id="reg-col" style="min-width: 500px">
         <h1 class="display-5 text-center mt-4">
             Register to {{page}}
@@ -86,7 +86,17 @@
                         Continue
                     </button>
                 </div>
-                <div class="form-row driver-reg-2 mt-4" id="car-desc-reg">
+                <div class="form-row driver-reg-2">
+                    <div class="form-group col-md-12">
+                        <label for="license-reg">Driver's License ID</label>
+                        <input type="text" class="form-control" id="license-reg" name="license" placeholder="S123456789"
+                            required />
+                        <div id="user-text" class="invalid-feedback">
+                            Please enter your driver's license.
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row driver-reg-2 mt-4 flex" id="car-desc-reg">
                     <div class="form-group col-md-4">
                         <label for="year-reg">Year</label>
                         <select class="form-control" name="year" id="year-reg">
@@ -177,13 +187,21 @@
                             required />
                     </div>
                 </div>
-                <div class="form-row driver-reg-2">
-                    <div class="form-group col-md-12">
-                        <label for="user-reg">License Plate</label>
-                        <input type="text" class="form-control" id="license-reg" name="carlicense" placeholder="abc123"
+                <div class="form-row driver-reg-2 flex">
+                    <div class="form-group col-md-6">
+                        <label for="carlicense-reg">License Plate</label>
+                        <input type="text" class="form-control" id="carlicense-reg" name="carlicense" placeholder="abc123"
                             required />
                         <div id="user-text" class="invalid-feedback">
                             Please enter your license plate.
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="maxseats-reg">Seats Available</label>
+                        <input type="number" class="form-control" id="maxseats-reg" name="maxPassengers" min="1" value="4"
+                            required />
+                        <div id="user-text" class="invalid-feedback">
+                            Please enter the maximum amount of passengers.
                         </div>
                     </div>
                 </div>

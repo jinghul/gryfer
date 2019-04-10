@@ -167,10 +167,18 @@
     height: calc(100% - 87px);
 }
 
+.pac-container {
+    min-width: 250px;
+}
+
 #search-results {
    padding: 15px;
    overflow-y: auto;
    min-width: 60%;
+}
+
+#bid-display {
+    position: absolute;
 }
 
 #no-results {

@@ -12,6 +12,14 @@ const pool = new pg.Pool({
 })
 
 const router = express.Router()
+router.use((request, response, next) => {
+  if (!request.session.uid) {
+    response.status(401).end()
+    return
+  } else {
+    next()
+  }
+})
 
 // GET all bids
 router.get('/', (request, response) => {
@@ -20,6 +28,20 @@ router.get('/', (request, response) => {
       throw error
     }
     response.status(200).json(results.rows)
+  })
+})
+
+router.get('/:aid', (request, response) => {
+  const aid = parseInt(request.params.aid)
+  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN (SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) AS currprices NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as status FROM accepted)) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+    if (error) {
+      console.log(error);
+      response.status(400).end();
+      return
+    }
+
+    let title = results.fromAddress + " to " + results.toAddress
+    response.render('bid_ad', {title: title, username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
   })
 })
 

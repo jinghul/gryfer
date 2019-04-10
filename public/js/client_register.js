@@ -107,7 +107,7 @@ $('document').ready(function() {
             .each(function() {
                 var input = $(this);
                 if (input.hasClass('driver-reg-2')) {
-                    if (input.is('#car-desc-reg')) {
+                    if (input.is('.flex')) {
                         input.css('display', 'flex');
                         input.hide();
                     }

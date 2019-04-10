@@ -23,7 +23,7 @@ exports.up = function(knex, Promise) {
 	(3, 3, 2.0, 100, 'S918841412'),
 	(4, 2, 4.5, 101, 'S847189374');
 
-	INSERT INTO Accounts (uid, password, mode, userToken) VALUES
+	INSERT INTO Accounts (uid, passwordHash, mode, userToken) VALUES
 	(1, 'what', false, 'usertoken1'),
 	(2, 'a', false, 'usertoken2'),
 	(3, 'great', true, 'usertoken3'),
@@ -38,10 +38,10 @@ exports.up = function(knex, Promise) {
 	('tembu', '28 college avenue east', 4),
 	('fatboys', 'clarke quay somewhere', 4);
 
-	INSERT INTO Advertisements (minBidPrice, fromAddress, toAddress, departureTime, uid) VALUES
-	(10.0, '28 college avenue east', 'marina bay sands', NOW()::timestamp, 3),
-	(15.0, '8 college avenue east', 'clarke quay somewhere', NOW()::timestamp, 4),
-	(16.0, 'fine foods', 'food clique', NOW()::timestamp, 4);
+	INSERT INTO Advertisements (minBidPrice, fromAddress, fromLat, fromLng, toAddress, toLat, toLng, departureTime, uid) VALUES
+	(10.0, '28 College Avenue East', 1.3060616, 103.7719055, 'Marina Bay Sands', 1.2833808, 103.8585377, '2019-04-26 09:30', 3),
+	(15.0, '8 College Avenue East', 1.3078482, 103.7709924, 'Clarke Quay', 1.2906078, 103.8442855, '2019-04-30 14:30', 4),
+	(16.0, 'Fine Foods', 1.3064821, 103.7889924, 'food clique',1.3080616, 103.7719955, '2019-05-03 19:30', 4);
 
     INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
     (100, 'toyota', 'prius', '2016', 124923.1, 4),
