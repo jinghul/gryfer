@@ -23,7 +23,7 @@ exports.up = function(knex, Promise) {
 	(3, 3, 2.0, 100, 'S918841412'),
 	(4, 2, 4.5, 101, 'S847189374');
 
-	INSERT INTO Accounts (uid, password, mode, userToken) VALUES
+	INSERT INTO Accounts (uid, passwordHash, mode, userToken) VALUES
 	(1, 'what', false, 'usertoken1'),
 	(2, 'a', false, 'usertoken2'),
 	(3, 'great', true, 'usertoken3'),

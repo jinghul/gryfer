@@ -111,6 +111,9 @@ exports.up = function(knex, Promise) {
     ON DriverRatings
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating_driver();
+
+
+    
     CREATE OR REPLACE FUNCTION update_rating_passenger()
     RETURNS TRIGGER AS
     $$
@@ -135,6 +138,9 @@ exports.up = function(knex, Promise) {
     ON PassengerRatings
     FOR EACH ROW
     EXECUTE PROCEDURE update_rating_passenger();
+
+
+
     CREATE OR REPLACE FUNCTION update_num_trips()
     RETURNS TRIGGER AS
     $$

@@ -201,7 +201,7 @@ const createUser = async (user) => {
         user1.uid = result.rows[0].uid
 
         await client.query("INSERT INTO UserProfiles (username, uid, dateJoined) VALUES ($1, currval('users_uid_seq'), $2)", [user1.username, new Date()])
-        await client.query("INSERT INTO Accounts (uid, password, userToken, mode) VALUES (currval('users_uid_seq'), $1, $2, $3)", [user1.password_digest, user1.token, user1.driver])
+        await client.query("INSERT INTO Accounts (uid, passwordHash, userToken, mode) VALUES (currval('users_uid_seq'), $1, $2, $3)", [user1.password_digest, user1.token, user1.driver])
         
         console.log(user1.driver)
         if (user1.driver) {
