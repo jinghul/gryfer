@@ -76,13 +76,38 @@ app.get('/search', (req, res) => {
         })
     }
 })
+app.get('/active', (req, res) => {
+    if (!req.session.uid) {
+        res.redirect('../auth/signin')
+    } else {
+        res.render('active_rides', {
+            title : 'Active Rides',
+            username: req.session.username,
+            email: req.session.email,
+            fname: req.session.fname,
+            lname: req.session.lname,
+            driver: req.session.mode,
+            switchable: req.session.switchable,
+            google_key: config.google_key
+        })
+    }
+})
 app.get('/make', (req, res) => {
     if (!req.session.uid) {
         res.redirect('../auth/signin')
     } else if (!req.session.mode) {
         res.redirect('../search')
     } else {
-        res.render('make', {layout: 'ads', title:'Make Rides', username: req.session.username, email: req.session.email, fname: req.session.fname, lname: req.session.lname, driver: req.session.mode, switchable: req.session.switchable})
+        res.render('make', {layout: 'ads',
+            title:'Make Rides',
+            username: req.session.username,
+            email: req.session.email,
+            fname: req.session.fname,
+            lname: req.session.lname,
+            driver: req.session.mode,
+            switchable: req.session.switchable,
+            google_key: config.google_key
+        })
     }
 })
 

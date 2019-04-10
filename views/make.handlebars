@@ -1,9 +1,10 @@
-<div class="row" style="height:calc(100% - 90px)">
-    <div id="make-box" class="mx-auto w-75">
+<div class="row" style="height:calc(100% - 57px)">
+    <div class="mx-auto col-6 vertical-col">
+        <button id="view-creates" type="button" class="btn btn-link">View Rides</button>    
         <h1 class="display-5 text-center" style="margin: 5% 0">Make a Ride</h1>
-        <form id="form-make" class="auth-form needs-validation" novalidate>
-            <div class="form-row mb-3">
-                <div class="form-group col-md-6">
+        <form id="form-make" class="w-75 auth-form mx-auto needs-validation" novalidate>
+            <div class="form-row">
+                <div class="form-group col-md-12">
                     <label for="from-mr">From</label>
                     <div class="input-group">
                         <span class="input-group-prepend">
@@ -15,7 +16,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group col-md-6">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
                     <label for="to-mr">Destination</label>
                     <div class="input-group">
                         <span class="input-group-prepend">
@@ -29,7 +32,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-12">
                     <label for="date-mr">Time of Departure</label>
                     <div class='input-group'>
                         <span class="input-group-prepend">
@@ -49,7 +52,8 @@
                         });
                     </script>
                 </div>
-                <div class="form-group col-md-6">
+            </div>
+            <div class="form-row"><div class="form-group col-md-12">
                     <label for="price-mr">Starting Price</label>
                     <div class='input-group'>
                         <span class="input-group-prepend">
@@ -57,18 +61,17 @@
                         </span>
                         <input type="number" class="form-control" name="minBidPrice" id="price-mr">
                     </div>
-                </div>
-            </div>
+                </div></div>
             <div class="w-100 vc-align">
                 <button id="submit-mr" type="submit" class="half-but w-50 mx-auto btn mt-4 btn-primary">
                     Create
                 </button>
-                <button id="cancel-mr" type="button" class="half-but mt-2 btn btn-outline-secondary w-50 mx-auto">
-                    Cancel
-                </button>
             </div>
         </form>
-        <button id="view-creates" type="button" class="btn btn-link">View Rides</button>
+    </div>
+    <div class="col-6 vertical-col">
+        <div id="make-map" class="h-100 w-100"></div>
     </div>
 </div>
 <script src="js/make.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=places&callback=initMapAndAutocomplete" async defer></script>

@@ -141,7 +141,7 @@ function display(results) {
             index: i,
             from: res.fromaddress,
             to: res.toaddress,
-            price: '$' + parseFloat(res.currprice).toFixed(2),
+            price: '$' + parseFloat(res.listprice).toFixed(2),
             date: dateString,
             time: timeString,
         };
@@ -156,12 +156,20 @@ function display(results) {
         var res_to_marker = new google.maps.Marker({
             map: map,
             position: to_pos,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/red.png',
+                labelOrigin: new google.maps.Point(16, 10)
+            },
+            label: (i+1).toString()
         });
         var res_from_marker = new google.maps.Marker({
             map: map,
             position: from_pos,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/green.png',
+                labelOrigin: new google.maps.Point(16, 10)
+            },
+            label: (i+1).toString()
         });
 
         let id = "#search-result-" + i.toString()
@@ -221,8 +229,8 @@ function search(params, state) {
                         location.geometry.location.lat() +
                         '&toLng=' +
                         location.geometry.location.lng() + "&" + params;
-                    new_state.toLat = location.latitude;
-                    new_state.toLng = location.longitude;
+                    new_state.toLat = location.geometry.location.lat();
+                    new_state.toLng = location.geometry.location.lng();
                 }
             }
 
@@ -234,8 +242,8 @@ function search(params, state) {
                         location.geometry.location.lat() +
                         '&fromLng=' +
                         location.geometry.location.lng() + "&" + params;
-                    new_state.fromLat = location.latitude;
-                    new_state.fromLng = location.longitude;
+                    new_state.fromLat = location.geometry.location.lat();
+                    new_state.fromLng = location.geometry.location.lng();
                 }
             }
 

@@ -9,7 +9,7 @@ templates['ad'] = template({"compiler":[7,">= 4.0.0"],"main":function(container,
     + alias4(((helper = (helper = helpers.from || (depth0 != null ? depth0.from : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"from","hash":{},"data":data}) : helper)))
     + "</div></li>\r\n                <li class=\"list-group-item flex\"><div>\r\n                    <span\r\n                        class=\"from-place fas fa-map-marker-alt input-group-text\"></span>\r\n                </div><div>\r\n                    "
     + alias4(((helper = (helper = helpers.to || (depth0 != null ? depth0.to : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"to","hash":{},"data":data}) : helper)))
-    + "\r\n                </div></li>\r\n            </ul>\r\n        </div>\r\n        <div class=\"col-6\"><span class=\"price-display display-5\">"
+    + "\r\n                </div></li>\r\n            </ul>\r\n        </div>\r\n        <div class=\"col-6 pt-3\"><span class=\"price-display display-5\">"
     + alias4(((helper = (helper = helpers.price || (depth0 != null ? depth0.price : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"price","hash":{},"data":data}) : helper)))
     + "</span>\r\n            <span class=\"date-display lead\">"
     + alias4(((helper = (helper = helpers.time || (depth0 != null ? depth0.time : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"time","hash":{},"data":data}) : helper)))

@@ -89,14 +89,14 @@
                 <div class="form-row driver-reg-2">
                     <div class="form-group col-md-12">
                         <label for="license-reg">Driver's License ID</label>
-                        <input type="text" class="form-control" id="license-reg" name="license" placeholder="S123456789"
+                        <input type="text" class="form-control" id="license-reg" name="license" maxlength="10" placeholder="S123456789"
                             required />
                         <div id="user-text" class="invalid-feedback">
                             Please enter your driver's license.
                         </div>
                     </div>
                 </div>
-                <div class="form-row driver-reg-2 mt-4 flex" id="car-desc-reg">
+                <div class="form-row driver-reg-2 mt-4 only-flex" id="car-desc-reg">
                     <div class="form-group col-md-4">
                         <label for="year-reg">Year</label>
                         <select class="form-control" name="year" id="year-reg">
@@ -187,7 +187,7 @@
                             required />
                     </div>
                 </div>
-                <div class="form-row driver-reg-2 flex">
+                <div class="form-row driver-reg-2 only-flex">
                     <div class="form-group col-md-6">
                         <label for="carlicense-reg">License Plate</label>
                         <input type="text" class="form-control" id="carlicense-reg" name="carlicense" placeholder="abc123"

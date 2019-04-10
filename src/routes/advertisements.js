@@ -55,7 +55,7 @@ router.get('/search', (request, response, next) => {
 
   // results.push(request.session.uid)
 
-  let queryString = 'SELECT * FROM (SELECT * FROM Advertisements WHERE '
+  let queryString = 'SELECT *, coalesce(currPrice, minBidPrice) as listPrice FROM (SELECT * FROM Advertisements WHERE '
   for (let i = 0; i < whereStrings.length; i++) {
     queryString += whereStrings[i] + ' AND '
   }
@@ -146,15 +146,6 @@ router.get('/id/:aid', (request, response) => {
     google_key: config.google_key
   })
 })
-
-// status: result.status,
-//       driver_name: d_name,
-//       driver_rating: rating,
-//       num_rides: num_rides,
-//       tolat: result.tolat,
-//       tolng: result.tolng,
-//       fromlat: result.fromlat,
-//       fromlng: result.fromlng
 
 // Get all ads for a user
 router.get('/user/:uid', (request, response) => {
