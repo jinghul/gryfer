@@ -51,6 +51,7 @@ const auth = require('./routes/auth')
 const bids = require('./routes/bids')
 const destinations = require('./routes/destinations')
 const ratings = require('./routes/ratings')
+const histories = require('./routes/histories')
 
 app.get('/', (req, res) => {
     res.redirect('/home')
@@ -72,6 +73,7 @@ app.use('/auth', auth)
 app.use('/bids', bids)
 app.use('/destinations', destinations)
 app.use('/ratings', ratings)
+app.use('/history',histories)
 
 app.use(express.static(path.join(__dirname, '../public/')))
 

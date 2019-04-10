@@ -13,8 +13,12 @@ const pool = new pg.Pool({
 
 const router = express.Router()
 
+
+// router.get('/completeAd')
+
+
 // GET all histories
-router.get('/history', (request, response) => {
+router.get('/', (request, response) => {
     pool.query('SELECT * FROM Histories', (error, results) => {
         if (error) {
             throw error
@@ -24,10 +28,10 @@ router.get('/history', (request, response) => {
 })
 
 
-// GET the driving history for specific user
-router.get('/history/:id', (request, response) => {
+// GET the riding history for specific user
+router.get('/passenger/:id', (request, response) => {
     const uid = parseInt(request.params.id)
-    pool.query('SELECT * FROM Histories NATURAL JOIN Awhere uid = $1',[uid], (error, results) => {
+    pool.query("SELECT * FROM Histories NATURAL JOIN Accepted where puid = $1 ORDER BY timeCompleted",[uid], (error, results) => {
         if (error) {
             throw error
         }
@@ -35,38 +39,37 @@ router.get('/history/:id', (request, response) => {
     })
 })
 
-// Create new rating for a passenger
-router.post('/passengers', (request, response) => {
-    const {byUid, forUid, aid, rating} = request.body
-    pool.query(
-        'INSERT INTO PassengerRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *',
-        [byUid, forUid, aid, rating],
-        (error, results) => {
-            if (error) {
-                response.status(400).send('Database rejection')
-                throw error
-            }
-            console.log(results.rows[0])
-            response.status(200).send('Rating saved: ' + results.rows[0])
-        })
+// GET the driving history for specific user
+router.get('/driver/:id', (request, response) => {
+    const uid = parseInt(request.params.id)
+    pool.query('SELECT * FROM Histories NATURAL JOIN Accepted where duid = $1 ORDER BY timeCompleted',[uid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
 })
 
-// Create new rating for a driver
-router.post('/drivers', (request, response) => {
-    const {byUid, forUid, aid, rating} = request.body
-    console.log(byUid, forUid)
-    pool.query(
-        'INSERT INTO DriverRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *',
-        [byUid, forUid, aid, rating],
-        (error, results) => {
-            if (error) {
-                response.status(400).send('Database rejection')
-                console.log( error)
-                return
-            }
-            console.log(results.rows[0])
-            response.status(200).send('Rating saved: ' + results.rows[0])
-        })
+// Get the detailed driving stats
+router.get('/stats/:id', (request, response) => {
+    const uid = parseInt(request.params.id)
+    pool.query('SELECT max(price) as mostExpensiveRide, count(*) as numrides FROM Histories NATURAL JOIN Accepted where duid = $1',[uid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
+
+})
+
+router.get('/months/:id', (request, response) => {
+    const uid = parseInt(request.params.id)
+    pool.query("SELECT DATE_PART('month', timeCompleted) as month, count(aid) as numRides  FROM Histories NATURAL JOIN Accepted where duid = $1 Group BY DATE_PART('month', timeCompleted)",[uid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        response.status(200).json(results.rows)
+    })
 })
 
 module.exports = router

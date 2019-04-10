@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
   uid             INTEGER NOT NULL,
   dateJoined      TIMESTAMP,
   PRIMARY KEY (uid),
-  FOREIGN KEY (uid) REFERENCES Users
+  FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE
 )`;
   return knex.raw(createQuery);
 };

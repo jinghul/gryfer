@@ -50,17 +50,23 @@ exports.up = function(knex, Promise) {
 	INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES
 	(2, 2, 1, 18.0),
 	(1, 2, 4, 19.0),
--- 	(2, 1, 5, 11.0),
+	(2, 1, 4, 11.0),
 	(1, 3, 3, 19.0);
 
 
+	INSERT INTO Accepted (aid, puid, duid, price) VALUES
+	(2, 1, 4, 19.0),
+	(1, 2, 3, 11.0),
+    (3, 1, 4, 19.0);
 
--- 	INSERT INTO Accepted (aid, puid, duid, price) VALUES
--- 	(2, 1, 4, 19.0),
--- 	(1, 2, 3, 11.0);
+    INSERT INTO Histories(aid, timeCompleted) VALUES 
+    (2, '2019-04-26 09:30'),
+    (1, '2019-04-26 09:30'),
+    (3, '2019-05-26 09:30');
+    
 
--- 	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
--- 	(4, 2, 1, 9.0);
+	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
+	(4, 2, 1, 9.0);
 	`;
   return knex.raw(createQuery);
 };
