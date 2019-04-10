@@ -85,6 +85,31 @@ exports.up = function(knex, Promise) {
     EXECUTE PROCEDURE check_not_too_many_passengers();
     
     
+    CREATE OR REPLACE FUNCTION ad_not_accepted()
+    RETURNS TRIGGER AS
+    $$
+    BEGIN
+        IF EXISTS (
+        SELECT 1
+        FROM Accepted
+        WHERE OLD.aid = Accepted.aid) THEN
+            RAISE EXCEPTION 'Advertisement already accepted';
+            RETURN NULL;
+        END IF;
+        
+        RETURN NULL;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+    CREATE TRIGGER ad_not_accepted
+    BEFORE DELETE
+    ON Advertisements
+    FOR EACH ROW
+    EXECUTE PROCEDURE ad_not_accepted();
+    
+    
+    
+    
     
     
     
