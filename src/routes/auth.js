@@ -196,7 +196,7 @@ const createUser = async (user) => {
     try {
         await client.query('BEGIN')
         var result = await client.query('INSERT INTO Users (fname, lname, email) VALUES($1, $2, $3) RETURNING uid', [user1.fname, user1.lname, user1.email])
-        
+        console.log('user: ' + JSON.stringify(user))
         // save user.uid to return
         user1.uid = result.rows[0].uid
 
