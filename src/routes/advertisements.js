@@ -129,7 +129,7 @@ router.get('/ongoing', (request, response) => {
     oid = 'puid'
     qtable = 'passengers'
   }
-  pool.query('SELECT * FROM advertisements natural join (accepted join ' + qtable + ' on ' + oid + '=' + qtable+ '.uid) WHERE (' + qid + '= $1 AND departureTime <= now()::timestamp AND aid NOT IN histories)', [uid], (error, results) => {
+  pool.query('SELECT * FROM advertisements natural join (accepted join ' + qtable + ' on ' + oid + '=' + qtable+ '.uid) WHERE (' + qid + '= $1 AND departureTime <= now()::timestamp AND aid NOT IN (SELECT aid from histories))', [uid], (error, results) => {
     if (error) {
       throw error
     }
