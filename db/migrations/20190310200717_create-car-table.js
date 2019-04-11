@@ -2,10 +2,10 @@ exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Cars;
   CREATE TABLE Cars (
 	cid 			SERIAL,
-	make			VARCHAR(60),
-	model			VARCHAR(60),
-	modelYear		INTEGER,
-	maxPassengers	INTEGER,
+	make			VARCHAR(60) NOT NULL,
+	model			VARCHAR(60) NOT NULL,
+	modelYear		INTEGER NOT NULL,
+	maxPassengers	INTEGER NOT NULL,
 	UNIQUE (make, model, modelYear),
 	PRIMARY KEY (cid)
 )`;

@@ -78,8 +78,8 @@ exports.up = function(knex, Promise) {
 	(6, 5, 6, 47.4);
 
 
-	INSERT INTO Accepted (aid, puid, duid, price) VALUES
-	(2, 1, 4, 50.15);
+	INSERT INTO Accepted (aid, puid, duid, completed, price) VALUES
+	(2, 1, 4, true, 50.15);
 
     INSERT INTO Histories(puid, duid, aid, timeCompleted) VALUES 
     (1, 4, 2, '2019-04-30 15:35');

@@ -1,9 +1,9 @@
 exports.up = function(knex, Promise) {
   let createQuery = ` DROP TABLE IF EXISTS UserProfiles;
   CREATE TABLE UserProfiles (
-  username        VARCHAR(20) UNIQUE,
+  username        VARCHAR(20) UNIQUE NOT NULL,
   uid             INTEGER NOT NULL,
-  dateJoined      TIMESTAMP,
+  dateJoined      TIMESTAMP NOT NULL,
   PRIMARY KEY (uid),
   FOREIGN KEY (uid) REFERENCES Users ON DELETE CASCADE
 )`;

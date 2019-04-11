@@ -14,9 +14,9 @@ exports.up = function(knex, Promise) {
   	LANGUAGE plpgsql;
   
   CREATE TABLE Bids (
-	uid 			INTEGER,
-	aid				INTEGER,
-	numPassengers   INTEGER,
+	uid 			INTEGER NOT NULL,
+	aid				INTEGER NOT NULL,
+	numPassengers   INTEGER NOT NULL,
 	bidPrice		NUMERIC NOT NULL,
 	PRIMARY KEY (uid, aid, bidPrice),
 	FOREIGN KEY (uid) REFERENCES Passengers,

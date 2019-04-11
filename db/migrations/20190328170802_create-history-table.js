@@ -4,7 +4,7 @@ exports.up = function(knex, Promise) {
     puid			        INTEGER NOT NULL,
 	  duid 			        INTEGER NOT NULL,
 	  aid				        INTEGER NOT NULL,
-    timeCompleted 		TIMESTAMP,
+    timeCompleted 		TIMESTAMP NOT NULL,
 	PRIMARY KEY (aid),
 	FOREIGN KEY (aid) REFERENCES Accepted
 )`;
