@@ -190,7 +190,7 @@
                 <div class="form-row driver-reg-2 only-flex">
                     <div class="form-group col-md-6">
                         <label for="carlicense-reg">License Plate</label>
-                        <input type="text" class="form-control" id="carlicense-reg" name="carlicense" placeholder="abc123"
+                        <input type="text" class="form-control" id="carlicense-reg" name="carlicense" maxlength="10" placeholder="ABCDE12345"
                             required />
                         <div id="user-text" class="invalid-feedback">
                             Please enter your license plate.
@@ -228,28 +228,28 @@
             <div class="form-row">
                 <div class="form-group col-md-4 mb-3">
                     <label for="fn-reg">First Name</label>
-                    <input type="text" class="form-control" name="fname" placeholder="{{fname}}" readonly/>
+                    <input type="text" class="form-control" name="fname" placeholder="{{fname}}" disabled/>
                 </div>
                 <div class="form-group col-md-4 mb-3">
                     <label for="ln-reg">Last Name</label>
-                    <input type="text" class="form-control" name="lname" placeholder="{{lname}}" readonly />
+                    <input type="text" class="form-control" name="lname" placeholder="{{lname}}" disabled/>
                 </div>
                 <div class="form-group col-md-4 mb-3">
                     <label for="email-reg">Email</label>
                     <input type="email" class="form-control" id="email-reg" name="email" placeholder="{{email}}"
-                        readonly />
+                        disabled />
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6 mb-3">
                     <label for="user-reg">Username</label>
                     <input type="text" class="form-control" id="user-reg" name="username" placeholder="{{username}}"
-                        readonly />
+                        disabled />
                 </div>
                 <div class="form-group col-md-6 mb-3">
                     <label for="password-reg">Password</label>
                     <input type="password" class="form-control" minlength="4" name="password" id="password-reg"
-                        placeholder="********" readonly />
+                        placeholder="********" disabled />
                 </div>
             </div>
             {{else}}
