@@ -83,17 +83,22 @@ router.get('/search', (request, response, next) => {
     if (toLat && toLng) {
       let new_res = []
       for (var i = 0; i < res.length; i++) {
-        if (geolib.getDistance({latitude: res[i].toLat, longitude: res[i].toLng}, {latitude: toLat, longitude: toLng}) <= 1000) {
-          new_res += res[i]
+        if (res[i].tolat && res[i].tolng) {
+          if (geolib.getDistance({latitude: res[i].tolat, longitude: res[i].tolng}, {latitude: toLat, longitude: toLng}) <= 1000) {
+            new_res.push(res[i])
+          }
         }
       }
       res = new_res
     }
+
     if (fromLat && fromLng) {
       let new_res = []
       for (var i = 0; i < res.length; i++) {
-        if (geolib.getDistance({latitude: res[i].fromLat, longitude: res[i].fromLng}, {latitude: fromLat, longitude: fromLng}) <= 1000) {
-          new_res += res[i]
+        if (res[i].fromlat && res[i].fromlng) {
+          if (geolib.getDistance({latitude: res[i].fromlat, longitude: res[i].fromlng}, {latitude: fromLat, longitude: fromLng}) <= 1000) {
+            new_res.push(res[i])
+          }
         }
       }
       res = new_res
@@ -113,12 +118,31 @@ router.get('/', (request, response) => {
   })
 })
 
+// Get all ads
+router.get('/ongoing', (request, response) => {
+  const uid = request.session.uid
+  let qid = 'puid';
+  let oid = 'duid'
+  let qtable = 'drivers'
+  if (request.session.mode) {
+    qid = 'duid'
+    oid = 'puid'
+    qtable = 'passengers'
+  }
+  pool.query('SELECT * FROM advertisements natural join (accepted join ' + qtable + ' on ' + oid + '=' + qtable+ '.uid) WHERE (' + qid + '= $1 AND departureTime <= now()::timestamp AND aid NOT IN histories)', [uid], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows[0])
+  })
+})
+
 // Get ad by id - for front end
 // Driver info + current bids + # of bids + ad info
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
-  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers JOIN CarProfiles on drivers.uid = CarProfiles.uid NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT duid as uid, count(aid) as tripsdriven FROM histories GROUP by duid) as numTrips NATURAL LEFT JOIN CarProfiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
     if (error) {
       console.log(error);
       response.status(400).end();
@@ -128,7 +152,10 @@ router.get('/:aid', (request, response) => {
     result = results.rows[0]
     if (result.closed !== undefined && result.currLead == request.session.uid) {
       result.winner = true
-    } 
+    }
+    if (result.uid == request.session.uid) {
+      result.owner = true
+    }
 
     response.status(200).json(result);
   })
@@ -204,6 +231,22 @@ router.delete('/:aid', (request, response) => {
     }
     response.status(200).send(`Advertisements deleted with AID: ${aid}`)
   })
+})
+
+// Complete an ad (only drivers can accept a bid)
+// Trigger will check the advertisement is accepted
+router.post('/complete/:aid', (request, response) => {
+
+    const aid = parseInt(request.params.aid)
+
+    pool.query('INSERT INTO History (aid, timeCompleted) VALUES ($1, $2) RETURNING *', [aid, new Date()], (error, results) => {
+        if (error) {
+            throw error
+        }
+        console.log(results.rows)
+        response.status(201).send(`Advertisements completed with ID: ${results.rows[0].aid}`)
+    })
+
 })
 
 module.exports = router

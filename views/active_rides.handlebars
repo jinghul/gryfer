@@ -1,3 +1,80 @@
-<div class="row base-width">
-    
+<div class="row base-width" style="height:calc(100% - 57px)">
+    <div class="col-2 h-100" style="padding-top:10%">
+        <ul class="nav flex-column" style="border-bottom: none;min-width: 80px;">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">Ongoing</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Accepted</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Bidding</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-10 vertical-col h-100">
+        <div class="jumbotron h-100 bg-white" style="margin:0px;padding-top:2rem">
+            <div class="display-4">
+                Ongoing
+            </div>
+            <div class="h-100" id="ongoing-display">
+                <div class="display-5 mt-4" id="no-rides-display">No ongoing rides.</div>
+                <div id="ongoing-card" class="card w-100 h-100 none">
+                    <div class="card-img-top none"
+                        src="https://maps.googleapis.com/maps/api/staticmap?zoom=13&size=600x40&maptype=roadmap&markers=color:red%7Clabel:To%7C/to_coords/&markers=color:green%7Clabel:From%7C/from_coords/&key={{google_key}}"
+                        alt="Your Trip Path">
+                        <div class="card-body">
+                            <div class="row flex h-100">
+                                <div class="col h-100" id="ad-desc">
+                                </div>
+                                <div class="col">
+                                    <ul class="list-group mb-4 mt-2 w-75 mx-auto">
+                                        <li class="list-group-item flex">
+                                            <div>
+                                                <span
+                                                    class="bg-white list-icon fas fa-user-tie input-group-text"></span>
+                                            </div>
+                                            <div style="line-height:1.25em">
+                                                <span id="ad-driver-name" class="display-8"></span> <span
+                                                    id="ad-driver-rating" class="display-8"></span> <span
+                                                    class="fas fa-star bg-white" style="border:none;"></span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item flex" id="car-item">
+                                            <div>
+                                                <span class="fas fa-car bg-white list-icon input-group-text"></span>
+                                            </div>
+                                            <div>
+                                                <span class="display-8" style="line-height:1.25em" id="ad-car"></span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    {{#if driver}}
+                                    <button role="button" class="mt-4 button btn-primary btn-block" id="complete-btn">Complete Ride</button>
+                                    {{/if}}
+                                    <div id="rate-box" class="mt-4 none">
+                                        <div>How was the ride?</div>
+                                        <select id="rate-ad">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                        <button role="button" class="button btn-primary btn-outline" id="rate-btn">Rate</button>
+                                    </div>
+                                    <div class="display-7 mt-4" class="none" id="finish-rating">Ride complete.</div>
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="http://localhost:3000/js/barrating.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
+<script src="http://localhost:3000/js/ad_details.template.js"></script>
+<script src="http://localhost:3000/js/active_rides.js"></script>

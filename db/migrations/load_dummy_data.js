@@ -81,8 +81,8 @@ exports.up = function(knex, Promise) {
 	INSERT INTO Accepted (aid, puid, duid, completed, price) VALUES
 	(2, 1, 4, true, 50.15);
 
-    INSERT INTO Histories(puid, duid, aid, timeCompleted) VALUES 
-    (1, 4, 2, '2019-04-30 15:35');
+    INSERT INTO Histories(aid, timeCompleted) VALUES 
+    (2, '2019-04-30 15:35');
     
 --     DELETE FROM Advertisements where aid=1;
                 

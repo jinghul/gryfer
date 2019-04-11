@@ -23,7 +23,7 @@ router.get('/', (request, response) => {
   })
 })
 
-// Get a user's saved destniations
+// Get a user's saved destinations
 router.get('/:id', (request, response) => {
   const uid = parseInt(request.params.id)
   pool.query('SELECT * FROM SavedDestinations WHERE uid = $1 ORDER BY nickname ASC', [uid], (error, results) => {
@@ -37,10 +37,10 @@ router.get('/:id', (request, response) => {
 // CREATE saved destination 
 // body requires uid, nickname of a destination, and address
 router.post('/create', (request, response) => {
-  const { uid, nickname, address } = request.body
+  const { uid, nickname, address, lat, lng } = request.body
   pool.query(
-    'INSERT INTO SavedDestinations (uid, nickname, address) VALUES ($1, $2, $3) RETURNING *',
-    [uid, nickname, address],
+    'INSERT INTO SavedDestinations (uid, nickname, address, lat, lng) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+    [uid, nickname, address, lat, lng],
     (error, results) => {
       if (error) {
         response.status(400).send('Database rejection')

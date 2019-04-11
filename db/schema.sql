@@ -17,25 +17,28 @@ CREATE TABLE UserProfiles (
 );
 
 CREATE TABLE Passengers (
-	uid 			INTEGER NOT NULL REFERENCES Users(uid),
-	tripsTaken		INTEGER NOT NULL,
+	uid 			INTEGER NOT NULL,
 	rating			NUMERIC,
-	PRIMARY KEY (uid)	
+	PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES Users
 );
 
 CREATE TABLE Cars (
-	cid 			SERIAL,
-	PRIMARY KEY (cid)
+	cid             SERIAL,
+    make            VARCHAR(60),
+    model           VARCHAR(60),
+    modelYear       INTEGER,
+    maxPassengers   INTEGER,
+    UNIQUE (make, model, modelYear),
+    PRIMARY KEY (cid)
 );
 
 CREATE TABLE Drivers (
-	uid 				INTEGER NOT NULL REFERENCES Users(uid),
-	tripsDriven			INTEGER NOT NULL,
-	rating				NUMERIC,
-	cid					INTEGER,
-	license				VARCHAR(10) NOT NULL,
-	PRIMARY KEY (uid),
-	FOREIGN KEY (cid) REFERENCES Cars
+    uid                 INTEGER NOT NULL,
+    rating              NUMERIC,
+    license             VARCHAR(10) NOT NULL,
+    PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES Users
 );
 
 CREATE TABLE Accounts (
@@ -91,21 +94,18 @@ CREATE TABLE Bids (
 	bidPrice		NUMERIC NOT NULL,
 	PRIMARY KEY (uid, aid, bidPrice),
 	FOREIGN KEY (uid) REFERENCES Passengers,
-	FOREIGN KEY (aid) REFERENCES Advertisements,
+	FOREIGN KEY (aid) REFERENCES Advertisements ON DELETE CASCADE,
 	CONSTRAINT checkMaxBid
 		CHECK (bidPrice > getMaxPrice(uid, aid))
 );
 
 CREATE TABLE CarProfiles (
-	cid				INTEGER,
-	license         VARCHAR(10),
-	make			VARCHAR(60),
-	model			VARCHAR(60),
-	modelYear		VARCHAR(60),
-	milesDriven		NUMERIC,
-	maxPassengers	INTEGER NOT NULL,
-	PRIMARY KEY (cid),
-	FOREIGN KEY (cid) REFERENCES Cars
+    uid             INTEGER,
+    cid             INTEGER NOT NULL,
+    licensePlate    VARCHAR(10),
+    PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES Drivers,
+    FOREIGN KEY (cid) REFERENCES Cars
 );
 
 CREATE TABLE "session" (
@@ -127,33 +127,31 @@ CREATE TABLE Accepted (
 );
 
 CREATE TABLE Histories (
-    puid			    INTEGER NOT NULL,
-	duid 			    INTEGER NOT NULL,
-	aid				    INTEGER NOT NULL,
-    timeCompleted  		TIMESTAMP,
-	PRIMARY KEY (aid),
-	FOREIGN KEY (aid) REFERENCES Accepted
+    aid                 INTEGER NOT NULL,
+    timeCompleted       TIMESTAMP,
+    PRIMARY KEY (aid),
+    FOREIGN KEY (aid) REFERENCES Accepted
 )
 
 CREATE TABLE PassengerRatings (
-	forUid			INTEGER NOT NULL,
-	aid				INTEGER NOT NULL,
-	byUid			INTEGER NOT NULL,
-	rating 			NUMERIC NOT NULL,
-	PRIMARY KEY (forUid, aid),
-	FOREIGN KEY (forUid) REFERENCES Passengers,
-	FOREIGN KEY (byUid)  REFERENCES Drivers,
-	FOREIGN KEY (aid) REFERENCES Accepted (aid)
+	forUid          INTEGER NOT NULL,
+    aid             INTEGER NOT NULL,
+    byUid           INTEGER NOT NULL,
+    rating          NUMERIC NOT NULL,
+    PRIMARY KEY (aid),
+    FOREIGN KEY (forUid) REFERENCES Passengers (uid),
+    FOREIGN KEY (byUid)  REFERENCES Drivers (uid),
+    FOREIGN KEY (aid) REFERENCES Accepted (aid)
 );
 
 CREATE TABLE DriverRatings (
-	forUid 			INTEGER NOT NULL,
-	aid				INTEGER NOT NULL,
-	byUid			INTEGER NOT NULL,
-	rating 			NUMERIC NOT NULL,
-	PRIMARY KEY (forUid, aid),
-	FOREIGN KEY (forUid) REFERENCES Drivers,
-	FOREIGN KEY (byUid)  REFERENCES Passengers,
+	forUid          INTEGER NOT NULL,
+    aid             INTEGER NOT NULL,
+    byUid           INTEGER NOT NULL,
+    rating          NUMERIC NOT NULL,
+    PRIMARY KEY (aid),
+    FOREIGN KEY (forUid) REFERENCES Drivers (uid),
+    FOREIGN KEY (byUid)  REFERENCES Passengers (uid),
     FOREIGN KEY (aid) REFERENCES Accepted (aid)
 );
 

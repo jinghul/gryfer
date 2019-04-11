@@ -113,7 +113,6 @@ exports.up = function(knex, Promise) {
     
     
     
-    
     CREATE OR REPLACE FUNCTION bid_on_own_ad()
     RETURNS TRIGGER AS
     $$
@@ -138,8 +137,9 @@ exports.up = function(knex, Promise) {
     ON Bids
     FOR EACH ROW
     EXECUTE PROCEDURE bid_on_own_ad();
+    
+    
     `;
-
 
   return knex.raw(createQuery);
 

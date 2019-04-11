@@ -2,7 +2,6 @@ exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS Drivers;
   CREATE TABLE Drivers (
 	uid 				INTEGER NOT NULL REFERENCES Users(uid),
-	tripsDriven			INTEGER NOT NULL,
 	rating				NUMERIC,
 	license				VARCHAR(10) NOT NULL,
 	PRIMARY KEY (uid)

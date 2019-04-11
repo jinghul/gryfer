@@ -26,7 +26,7 @@
             {{/if}}
             {{#if username}}
             <li class="nav-item">
-                <a class="nav-link" href="http://localhost:3000/">Active Rides</a>
+                <a class="nav-link" href="http://localhost:3000/active">Active Rides</a>
             </li>
             {{/if}}
             {{#if username}}
@@ -35,7 +35,7 @@
                     aria-expanded="false"><b>{{fname}}</b></a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="http://localhost:3000/profile">Profile</a>
-                    <a class="dropdown-item" href="http://localhost:3000/profile/history">Ride History</a>
+                    <a class="dropdown-item" href="http://localhost:3000/profile?page=history">Ride History</a>
                     {{#if driver}}
                     {{#if switchable}}
                     <a class="dropdown-item" id="d-to-r">Switch to Rider Mode</a>
