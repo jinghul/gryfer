@@ -40,7 +40,7 @@ router.get('/search', (request, response, next) => {
     paramCounter++
   }
   if (numPassengers) {
-    whereStrings.push('(SELECT maxPassengers FROM CarProfiles WHERE cid=(SELECT cid FROM drivers WHERE drivers.uid=Advertisements.uid)) >= $' + paramCounter.toString())
+    whereStrings.push('(SELECT maxPassengers FROM Cars WHERE cid=(SELECT cid FROM CarProfiles WHERE CarProfiles.uid=Advertisements.uid)) >= $' + paramCounter.toString())
     results.push(numPassengers)
     paramCounter++
   }
@@ -118,7 +118,7 @@ router.get('/', (request, response) => {
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
-  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers JOIN carprofiles on drivers.cid = carprofiles.cid NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers JOIN CarProfiles on drivers.uid = CarProfiles.uid NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
     if (error) {
       console.log(error);
       response.status(400).end();

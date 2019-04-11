@@ -23,17 +23,17 @@ exports.up = function(knex, Promise) {
 	(5, 0, 3.7),
 	(6, 10, 5.0);
 
-	INSERT INTO Cars (cid) VALUES
-	(100),
-	(101),
-	(102),
-	(103);
+	INSERT INTO Cars (make, model, modelYear, maxPassengers) VALUES
+	('toyota', 'prius', 2009, 4),
+	('honda', 'crv', 2012, 6),
+	('BMW', 'M8', 2018, 4),
+	('toyota', 'sienna', 2004, 6);
 
-	INSERT INTO Drivers (uid, tripsDriven, rating, cid, license) VALUES
-	(3, 3, 2.0, 100, 'S918841412'),
-	(4, 2, 4.5, 101, 'S847189374'),
-	(6, 100, 5.0, 102, 'S847876374'),
-	(7, 89, 3.8, 103, 'S973654014');
+	INSERT INTO Drivers (uid, tripsDriven, rating, license) VALUES
+	(3, 3, 2.0, 'S918841412'),
+	(4, 2, 4.5, 'S847189374'),
+	(6, 100, 5.0, 'S847876374'),
+	(7, 89, 3.8, 'S973654014');
 
 	INSERT INTO Accounts (uid, passwordHash, mode, userToken) VALUES
 	(1, 'what', false, 'usertoken1'),
@@ -60,11 +60,11 @@ exports.up = function(knex, Promise) {
 	(18.0, 'TreeTop Walk', 1.3607341, 103.8103328, 'Nanyang Technological University', 1.3483153, 103.680946, '2019-04-18 12:30', 6),
 	(13.0, 'McDonalds', 1.3226099, 103.8115106, 'ION Orchard Mall', 1.3039991,103.8297814, '2019-05-31 14:25', 7);
 
-    INSERT INTO CarProfiles (cid, make, model, modelYear, milesDriven, maxPassengers) VALUES
-    (100, 'Toyota', 'Prius', '2016', 124923.1, 4),
-		(101, 'Honda', 'Crv', '2018', 98752.4, 6),
-		(102, 'BMW', 'M8', '2019', 1350.0, 4),
-		(103, 'Toyota', 'Sienna', '2004', 12323.1, 6);
+    INSERT INTO CarProfiles (uid, cid, licensePlate) VALUES
+    (3, 1, 'plate1'),
+		(4, 2, 'plate2'),
+		(6, 3, 'plate3'),
+		(7, 4, 'plate4');
                                                
 	INSERT INTO Bids (uid, aid, numPassengers, bidPrice) VALUES
 	(2, 2, 1, 18.0),

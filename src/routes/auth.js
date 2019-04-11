@@ -172,10 +172,10 @@ const insertRole = async (user, uid) => {
     try {
         await client.query('BEGIN')
         if (user.driver) {
-            var result = await client.query('INSERT INTO Cars (cid) VALUES (DEFAULT) RETURNING cid')
+            var result = await client.query('INSERT INTO Cars (make, model, modelYear, maxPassengers) VALUES ($1, $2, $3, $4) RETURNING cid', [user.make, user.model, user.year, user.maxPassengers])
             cid = result.rows[0].cid
-            await client.query('INSERT INTO CarProfiles (cid, licensePlate, make, model, modelYear, milesDriven, maxPassengers) VALUES ($1, $2, $3, $4, $5, $6, $7)', [cid, user.carlicense, user.make, user.model, user.year, 0, user.maxPassengers])
-            await client.query("INSERT INTO drivers (uid, license, tripsDriven, cid) VALUES ($1, $2, $3, $4)", [uid, user.license, 0, cid])
+            await client.query('INSERT INTO CarProfiles (uid, cid, licensePlate) VALUES ($1, $2, $3)', [uid, cid, user.carlicense])
+            await client.query("INSERT INTO drivers (uid, tripsDriven, license) VALUES ($1, $2, $3, $4)", [uid, 0, user.license])
         } else {
             await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (#1, $2)", [uid, 0])
         }
@@ -205,10 +205,10 @@ const createUser = async (user) => {
         
         console.log(user1.driver)
         if (user1.driver) {
-            result  = await client.query('INSERT INTO Cars (cid) VALUES (DEFAULT) RETURNING cid')
+            result  = await client.query('INSERT INTO Cars (make, model, modelYear, maxPassengers) VALUES ($1, $2, $3, $4) RETURNING cid', [user.make, user.model, user.year, user.maxPassengers])
             cid = result.rows[0].cid
-            await client.query('INSERT INTO CarProfiles (cid, licensePlate, make, model, modelYear, milesDriven) VALUES ($1, $2, $3, $4, $5, $6)', [cid, user1.carlicense, user1.make, user1.model, user1.year, 0])
-            await client.query("INSERT INTO drivers (uid, tripsDriven, cid) VALUES (currval('users_uid_seq'), $1, $2)", [0, cid])
+            await client.query('INSERT INTO CarProfiles (uid, cid, licensePlate) VALUES ($1, $2, $3)', [uid, cid, user.carlicense])
+            await client.query("INSERT INTO drivers (uid, tripsDriven, license) VALUES (currval('users_uid_seq'), $1, $2)", [0, user.license])
         } else {
             await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (currval('users_uid_seq'), $1)", [0])
         }
