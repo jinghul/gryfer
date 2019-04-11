@@ -2,16 +2,16 @@
 
 CREATE TABLE Users (
   uid               SERIAL,
-  fname             VARCHAR(60),
-  lname             VARCHAR(60),
-  email             VARCHAR(60) UNIQUE,
+  fname             VARCHAR(60) NOT NULL,
+  lname             VARCHAR(60) NOT NULL,
+  email             VARCHAR(60) UNIQUE NOT NULL,
   PRIMARY KEY (uid)
 );
 
 CREATE TABLE UserProfiles (
-  username        VARCHAR(20),
+  username        VARCHAR(20) NOT NULL,
   uid             INTEGER NOT NULL,
-  dateJoined      TIMESTAMP,
+  dateJoined      TIMESTAMP NOT NULL,
   PRIMARY KEY (uid),
   FOREIGN KEY (uid) REFERENCES Users
 );
@@ -25,10 +25,10 @@ CREATE TABLE Passengers (
 
 CREATE TABLE Cars (
 	cid             SERIAL,
-    make            VARCHAR(60),
-    model           VARCHAR(60),
-    modelYear       INTEGER,
-    maxPassengers   INTEGER,
+    make            VARCHAR(60) NOT NULL,
+    model           VARCHAR(60) NOT NULL,
+    modelYear       INTEGER NOT NULL,
+    maxPassengers   INTEGER NOT NULL,
     UNIQUE (make, model, modelYear),
     PRIMARY KEY (cid)
 );
@@ -51,23 +51,25 @@ CREATE TABLE Accounts (
 );
 
 CREATE TABLE SavedDestinations (
-	nickname		VARCHAR(20),
-	address			VARCHAR(60),
+	nickname		VARCHAR(20) NOT NULL,
+	address			VARCHAR(60) NOT NULL,
 	uid				INTEGER NOT NULL,
+    lat             NUMERIC NOT NULL,
+    lng             NUMERIC NOT NULL,
 	PRIMARY KEY (nickname, uid),
 	FOREIGN KEY (uid) REFERENCES Accounts
 );
 
 CREATE TABLE Advertisements (
 	aid					SERIAL,
-	minBidPrice			NUMERIC,
-	fromAddress			VARCHAR(60),
-	fromLat				NUMERIC,
-	fromLng				NUMERIC,
-	toAddress 			VARCHAR(60),
-	toLat				NUMERIC,
-	toLng				NUMERIC,
-	departureTime		TIMESTAMP,
+	minBidPrice			NUMERIC NOT NULL,
+	fromAddress			VARCHAR(60) NOT NULL,
+	fromLat				NUMERIC NOT NULL,
+	fromLng				NUMERIC NOT NULL,
+	toAddress 			VARCHAR(60) NOT NULL,
+	toLat				NUMERIC NOT NULL,
+	toLng				NUMERIC NOT NULL,
+	departureTime		TIMESTAMP NOT NuLL,
 	uid					INTEGER NOT NULL,
 	UNIQUE (aid, uid),
 	PRIMARY KEY (aid),
@@ -88,9 +90,9 @@ CREATE FUNCTION getMaxPrice(INTEGER, INTEGER) RETURNS NUMERIC AS
   	LANGUAGE plpgsql;
   
 CREATE TABLE Bids (
-	uid 			INTEGER,
-	aid				INTEGER,
-	numPassengers   INTEGER,
+	uid 			INTEGER NOT NULL,
+	aid				INTEGER NOT NULL,
+	numPassengers   INTEGER NOT NULL,
 	bidPrice		NUMERIC NOT NULL,
 	PRIMARY KEY (uid, aid, bidPrice),
 	FOREIGN KEY (uid) REFERENCES Passengers,
@@ -100,9 +102,9 @@ CREATE TABLE Bids (
 );
 
 CREATE TABLE CarProfiles (
-    uid             INTEGER,
+    uid             INTEGER NOT NULL,
     cid             INTEGER NOT NULL,
-    licensePlate    VARCHAR(10),
+    licensePlate    VARCHAR(10) NOT NULL,
     PRIMARY KEY (uid),
     FOREIGN KEY (uid) REFERENCES Drivers,
     FOREIGN KEY (cid) REFERENCES Cars
@@ -117,9 +119,9 @@ CREATE TABLE "session" (
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE TABLE Accepted (
-	aid				INTEGER,
-	puid			INTEGER,
-	duid			INTEGER,
+	aid				INTEGER NOT NULL,
+	puid			INTEGER NOT NULL,
+	duid			INTEGER NOT NULL,
 	price			NUMERIC NOT NULL,
 	PRIMARY KEY (aid),
 	FOREIGN KEY (aid, duid) REFERENCES Advertisements (aid, uid),
@@ -128,7 +130,7 @@ CREATE TABLE Accepted (
 
 CREATE TABLE Histories (
     aid                 INTEGER NOT NULL,
-    timeCompleted       TIMESTAMP,
+    timeCompleted       TIMESTAMP NOT NULL,
     PRIMARY KEY (aid),
     FOREIGN KEY (aid) REFERENCES Accepted
 )
