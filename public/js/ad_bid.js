@@ -4,19 +4,24 @@ function display(res) {
     currPrice = res.currprice
     $('#curr-price').html("$"+parseFloat(res.currprice).toFixed(2));
     if (res.winner) {
-        $('#ad-status').html('You won the ride!');
+        $('#ad-status').html('You won the ride.');
         $('#ad-bid-price').val('');
         $('#ad-bid-price').prop('disabled', true);
         $('#ad-num-pass').prop('disabled', true);
         $('#ad-num-pass').val('');
         $('#submit-bid').prop('disabled', true);
     } else if (res.closed) {
-        $('#ad-status').html('Bidding closed | ' + res.numbids);
+        if (res.owner) {
+            $('#ad-status').html('Bidding closed | Accepted');
+        } else {
+            $('#ad-status').html('Bidding closed | ' + res.numbids);
+        }
         $('#ad-bid-price').val('');
         $('#ad-bid-price').prop('disabled', true);
         $('#ad-num-pass').prop('disabled', true);
         $('#ad-num-pass').val('');
         $('#submit-bid').prop('disabled', true);
+        $('#accept-btn').prop('disabled', true)
     } else {
         $('#ad-status').html('Accepting Bids | ' + res.numbids + ' bids');
     }
@@ -28,51 +33,25 @@ function refresh() {
     });
 }
 
-function initMapAndAutocomplete() {
-    var map = new google.maps.Map(document.getElementById('ad-map'), {
-        zoom: 13,
-        zoomControl: false,
-        scaleControl: false,
-        streetViewControl: false,
-        mapTypeControlOptions: { mapTypeIds: [] },
-    });
-
-    console.log('called')
-
+function initMap() {
     $.get(
         'http://localhost:3000/ads/' + aid,
         function(results) {
             let res = results
             console.log(results)
-            var bounds = new google.maps.LatLngBounds();
-            let from_pos = new google.maps.LatLng(
-                parseFloat(res.fromlat),
-                parseFloat(results.fromlng)
-            );
-            let to_pos = new google.maps.LatLng(
-                parseFloat(res.tolat),
-                parseFloat(res.tolng)
-            );
-            bounds.extend(from_pos);
-            bounds.extend(to_pos);
 
-            var from_marker = new google.maps.Marker({
-                map: map,
-                icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            });
+            var map = $('#ad-map');
+            var orig_src = map.attr('src');
+            orig_src = orig_src.replace('/from_coords/', res.fromlat + ',' + res.fromlng);
+            orig_src = orig_src.replace('/to_coords/', res.tolat+","+res.tolng);
+            console.log(orig_src)
+            map.attr('src', orig_src)
+            map.show(300);
 
-            var to_marker = new google.maps.Marker({
-                map: map,
-                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-            });
-
-            from_marker.setPosition(from_pos);
-            to_marker.setPosition(to_pos);
-            map.fitBounds(bounds);
-
-            $('#ad-from').html(res.fromaddress);
-            $('#ad-to').html(res.toaddress);
-
+            if (res.owner) {
+                $('#accept-btn').show();
+            }
+            
             // Some date parsing
             var date = new Date(res.departuretime);
             var dateString = date
@@ -99,7 +78,16 @@ function initMapAndAutocomplete() {
             var timeString =
                 hour.toString() + ':' + timeParts[1] + ' ' + timeOfDay;
 
-            $('#ad-date').html(timeString + ' on ' + dateString);
+            var context = {
+                first_style: 'style="border-top:none;"',
+                from_loc: res.fromaddress,
+                to_loc: res.toaddress,
+                date: timeString + ' on ' + dateString
+            }
+            
+            var template = Handlebars.templates['ad_details'];
+            $('#ad-desc').append($(template(context)))
+
             $('#ad-driver-name').html(res.fname);
             $('#ad-driver-rating').html(res.rating);
             $('#ad-driver-rides').html("&nbsp; | &nbsp; " + res.tripsdriven + " rides");
@@ -108,6 +96,12 @@ function initMapAndAutocomplete() {
         },
         'json'
     );
+}
+
+function accept() {
+    $.post('http://localhost:3000/bids/accept/', function() {
+        refresh()
+    });
 }
 
 function bid() {
@@ -127,7 +121,7 @@ function bid() {
     data.aid = aid;
     console.log(data)
 
-    $.post('http://localhost:3000/bids/create/', data, function(results) {
+    $.post('http://localhost:3000/bids/create/', data, function() {
         refresh()
     });
 }
@@ -157,6 +151,12 @@ $('document').ready(function() {
     } else {
         aid = comps[comps.length - 1].slice(0,1);
     }
+
+    initMap();
+
+    $('#accept-btn').on('click', function() {
+        accept();
+    });
     
     $('input').on('keyup', function(e) {
         if (e.keyCode == 13) {

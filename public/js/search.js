@@ -72,7 +72,6 @@ function initMapAndAutocomplete() {
 
     if (window.location.search.length != 0) {
         let query = window.location.search.substring(1);
-        console.log('{"' + query.replace(/&/g, '","').replace(/=/g, '":"') + '"}')
         let state = JSON.parse(
             '{"' + query.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
             function(key, value) {
@@ -186,7 +185,8 @@ function display(results) {
             scrollToAd($(id));
         })
 
-        markers.push(res_to_marker, res_from_marker);
+        markers.push(res_to_marker)
+        markers.push(res_from_marker);
 
         bounds.extend(to_pos);
         bounds.extend(from_pos);
@@ -196,7 +196,8 @@ function display(results) {
         map.fitBounds(bounds);
     }
 
-    markers.push(to_marker, from_marker);
+    markers.push(to_marker)
+    markers.push(from_marker);
 }
 
 function search(params, state) {
@@ -275,7 +276,7 @@ function search(params, state) {
     console.log(qurl);
 
     for (var i = 0; i < markers.length; i++) {
-        markers[i].setMap[null];
+        markers[i].setMap(null);
     }
 
     markers = [];
@@ -283,7 +284,7 @@ function search(params, state) {
     bounds = null;
 
     let from_place = autocomplete_from.getPlace()
-    if (from_place) {
+    if (from_place && $('from-fr').val().length > 0) {
         from_marker.setMap(map);
         from_marker.setPosition(from_place.geometry.location);
         from_marker.setVisible(true);
@@ -298,7 +299,7 @@ function search(params, state) {
     }
 
     let to_place = autocomplete_to.getPlace();
-    if (to_place) {
+    if (to_place && $('to-fr').val().length > 0) {
         to_marker.setMap(map);
         to_marker.setPosition(to_place.geometry.location);
         to_marker.setVisible(true);

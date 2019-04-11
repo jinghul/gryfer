@@ -57,7 +57,8 @@ router.get('/passengers/:id', (request, response) => {
 
 // Create new rating for a passenger
 router.post('/passengers', (request, response) => {
-    const {byUid, forUid, aid, rating} = request.body
+    const byUid = request.session.uid
+    const {forUid, aid, rating} = request.body
 
     const createPassengerRating = async (byUid, forUid, aid, rating) => {
         const client = await pool.connect()
@@ -84,7 +85,8 @@ router.post('/passengers', (request, response) => {
 
 // Create new rating for a driver
 router.post('/drivers', (request, response) => {
-    const {byUid, forUid, aid, rating} = request.body
+    const byUid = request.session.uid
+    const {forUid, aid, rating} = request.body
     const createDriverRating = async (byUid, forUid, aid, rating) => {
         const client = await pool.connect()
 
