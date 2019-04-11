@@ -78,7 +78,7 @@ router.post('/create', (request, response) => {
 })
 
 // ACCEPT a bid (only drivers can accept a bid)
-router.post('/accept', (request, response) => {
+router.post('/accept', async (request, response) => {
 
   const { aid } = request.body
 

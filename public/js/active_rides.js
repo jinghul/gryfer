@@ -1,4 +1,5 @@
 var ongoing_aid = null;
+var ongoing_tb_rated = null;
 
 function toOngoing() {
     $.get('http://localhost:3000/ads/ongoing', function(results) {
@@ -15,6 +16,7 @@ function toOngoing() {
             return;
         } else {
             ongoing_aid = res.aid;
+            ongoing_tb_rated = res.uid;
         }
 
         var map = $('#ad-map');
@@ -81,35 +83,63 @@ function toOngoing() {
 
         $('#ongoing-card').show(300);
 
-        if (res.completed) {
+        if (res.completed && !res.rated) {
             $('#rate-box').show();
         }
     });
 }
 
 function complete_ride() {
-    
+    if (!ongoing_aid) {
+        $('#complete-btn').prop('disabled', true);
+        return;
+    }
+    $.post('http://localhost:3000/complete/' + ongoing_aid, function() {
+        $('#complete-btn').hide(200);
+        $('#rate-box').show(200);
+    });
 }
 
 function rate_ride() {
+    if (!ongoing_tb_rated || !ongoing_aid) {
+        $('#rate-btn').prop('disabled', true)
+        return
+    }
 
+    data = {
+        forUid: ongoing_tb_rated,
+        rating: $('#rate-ad').val()
+    }
+
+    if ($('#complete-btn') !== undefined) {
+        $.post('http://localhost:3000/ratings/drivers/', data, function() {
+            $('#rate-box').hide(200);
+            $('#finish-rating').show(200);
+        });
+    } else {
+        $.post('http://localhost:3000/ratings/passengers/', data, function() {
+            $('#rate-box').hide(200);
+            $('#finish-rating').show(200);
+        });
+    }
 }
 
-
 $('document').ready(function() {
-
     $('#rate-ad').barrating({
         theme: 'css-stars',
     });
     $('#rate-btn').on('click', function() {
         rate_ride();
-    })
+        $(this).prop('disabled', true);
+        $('#rate-ad').barrating({
+            theme: 'css-stars',
+            readonly: true,
+        });
+    });
 
     $('#complete-btn').on('click', function() {
         complete_ride();
-        $(this).hide(200)
-        $("#rate-box").show(200);
-    })
+    });
 
     if (window.location.search.length != 0) {
         let query = window.location.search.substring(1);
@@ -120,7 +150,7 @@ $('document').ready(function() {
             }
         );
 
-        let page = state.page
+        let page = state.page;
         if (page == 'accepted') {
             toAccepted();
         } else if (page == 'Bidding') {
