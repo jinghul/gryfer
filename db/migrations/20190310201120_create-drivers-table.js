@@ -4,10 +4,8 @@ exports.up = function(knex, Promise) {
 	uid 				INTEGER NOT NULL REFERENCES Users(uid),
 	tripsDriven			INTEGER NOT NULL,
 	rating				NUMERIC,
-	cid					INTEGER,
 	license				VARCHAR(10) NOT NULL,
-	PRIMARY KEY (uid),
-	FOREIGN KEY (cid) REFERENCES Cars
+	PRIMARY KEY (uid)
 )`;
   return knex.raw(createQuery);
 };

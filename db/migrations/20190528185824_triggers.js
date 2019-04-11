@@ -57,9 +57,9 @@ exports.up = function(knex, Promise) {
         
         IF NOT EXISTS(
           SELECT 1
-          FROM (Drivers 
-          INNER JOIN  CarProfiles ON CarProfiles.cid=Drivers.cid
-          INNER JOIN Advertisements ON Drivers.uid=Advertisements.uid) AS CarAd
+          FROM (CarProfiles 
+          INNER JOIN Cars ON Cars.cid=CarProfiles.cid
+          INNER JOIN Advertisements ON CarProfiles.uid=Advertisements.uid) AS CarAd
           WHERE NEW.aid = CarAd.aid
         ) THEN
             RAISE EXCEPTION 'No valid car for ads';
@@ -67,9 +67,9 @@ exports.up = function(knex, Promise) {
         END IF;
            
         SELECT CarAd.maxPassengers into max_pass
-        FROM (Drivers 
-        INNER JOIN  CarProfiles ON CarProfiles.cid=Drivers.cid 
-        INNER JOIN Advertisements ON Drivers.uid=Advertisements.uid) AS CarAd
+        FROM (CarProfiles 
+        INNER JOIN Cars ON Cars.cid=CarProfiles.cid
+        INNER JOIN Advertisements ON CarProfiles.uid=Advertisements.uid) AS CarAd
         WHERE NEW.aid = CarAd.aid;
     
         IF NEW.numPassengers > max_pass THEN
