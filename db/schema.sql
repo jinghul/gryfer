@@ -17,14 +17,14 @@ CREATE TABLE UserProfiles (
 );
 
 CREATE TABLE Passengers (
-	uid 			INTEGER NOT NULL,
-	rating			NUMERIC,
-	PRIMARY KEY (uid),
+    uid             INTEGER NOT NULL,
+    rating          NUMERIC,
+    PRIMARY KEY (uid),
     FOREIGN KEY (uid) REFERENCES Users
 );
 
 CREATE TABLE Cars (
-	cid             SERIAL,
+    cid             SERIAL,
     make            VARCHAR(60) NOT NULL,
     model           VARCHAR(60) NOT NULL,
     modelYear       INTEGER NOT NULL,
@@ -42,63 +42,63 @@ CREATE TABLE Drivers (
 );
 
 CREATE TABLE Accounts (
-	uid				    INTEGER NOT NULL,
-  	passwordHash		VARCHAR(100) NOT NULL,
-  	mode            	BOOLEAN NOT NULL,
-  	userToken		    VARCHAR(64),
-	PRIMARY KEY (uid),
-	FOREIGN KEY (uid) REFERENCES Users
+    uid                 INTEGER NOT NULL,
+    passwordHash        VARCHAR(100) NOT NULL,
+    mode                BOOLEAN NOT NULL,
+    userToken           VARCHAR(64),
+    PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES Users
 );
 
 CREATE TABLE SavedDestinations (
-	nickname		VARCHAR(20) NOT NULL,
-	address			VARCHAR(60) NOT NULL,
-	uid				INTEGER NOT NULL,
+    nickname        VARCHAR(20) NOT NULL,
+    address         VARCHAR(60) NOT NULL,
+    uid             INTEGER NOT NULL,
     lat             NUMERIC NOT NULL,
     lng             NUMERIC NOT NULL,
-	PRIMARY KEY (nickname, uid),
-	FOREIGN KEY (uid) REFERENCES Accounts
+    PRIMARY KEY (nickname, uid),
+    FOREIGN KEY (uid) REFERENCES Accounts
 );
 
 CREATE TABLE Advertisements (
-	aid					SERIAL,
-	minBidPrice			NUMERIC NOT NULL,
-	fromAddress			VARCHAR(60) NOT NULL,
-	fromLat				NUMERIC NOT NULL,
-	fromLng				NUMERIC NOT NULL,
-	toAddress 			VARCHAR(60) NOT NULL,
-	toLat				NUMERIC NOT NULL,
-	toLng				NUMERIC NOT NULL,
-	departureTime		TIMESTAMP NOT NuLL,
-	uid					INTEGER NOT NULL,
-	UNIQUE (aid, uid),
-	PRIMARY KEY (aid),
-	FOREIGN KEY (uid) REFERENCES Drivers
+    aid                 SERIAL,
+    minBidPrice         NUMERIC NOT NULL,
+    fromAddress         VARCHAR(60) NOT NULL,
+    fromLat             NUMERIC NOT NULL,
+    fromLng             NUMERIC NOT NULL,
+    toAddress           VARCHAR(60) NOT NULL,
+    toLat               NUMERIC NOT NULL,
+    toLng               NUMERIC NOT NULL,
+    departureTime       TIMESTAMP NOT NuLL,
+    uid                 INTEGER NOT NULL,
+    UNIQUE (aid, uid),
+    PRIMARY KEY (aid),
+    FOREIGN KEY (uid) REFERENCES Drivers
 );
 
 CREATE FUNCTION getMaxPrice(INTEGER, INTEGER) RETURNS NUMERIC AS
-  	$$
-  	DECLARE maxPrice NUMERIC;
-  	BEGIN
-	  	SELECT MAX(bidPrice) into maxPrice
-	  	FROM Bids
-	  	WHERE uid = $1 AND aid = $2;
+    $$
+    DECLARE maxPrice NUMERIC;
+    BEGIN
+        SELECT MAX(bidPrice) into maxPrice
+        FROM Bids
+        WHERE uid = $1 AND aid = $2;
 
-	  	RETURN maxPrice;
-	END;
-  	$$
-  	LANGUAGE plpgsql;
+        RETURN maxPrice;
+    END;
+    $$
+    LANGUAGE plpgsql;
   
 CREATE TABLE Bids (
-	uid 			INTEGER NOT NULL,
-	aid				INTEGER NOT NULL,
-	numPassengers   INTEGER NOT NULL,
-	bidPrice		NUMERIC NOT NULL,
-	PRIMARY KEY (uid, aid, bidPrice),
-	FOREIGN KEY (uid) REFERENCES Passengers,
-	FOREIGN KEY (aid) REFERENCES Advertisements ON DELETE CASCADE,
-	CONSTRAINT checkMaxBid
-		CHECK (bidPrice > getMaxPrice(uid, aid))
+    uid             INTEGER NOT NULL,
+    aid             INTEGER NOT NULL,
+    numPassengers   INTEGER NOT NULL,
+    bidPrice        NUMERIC NOT NULL,
+    PRIMARY KEY (uid, aid, bidPrice),
+    FOREIGN KEY (uid) REFERENCES Passengers,
+    FOREIGN KEY (aid) REFERENCES Advertisements ON DELETE CASCADE,
+    CONSTRAINT checkMaxBid
+        CHECK (bidPrice > getMaxPrice(uid, aid))
 );
 
 CREATE TABLE CarProfiles (
@@ -112,20 +112,20 @@ CREATE TABLE CarProfiles (
 
 CREATE TABLE "session" (
     "sid" varchar NOT NULL COLLATE "default",
-      "sess" json NOT NULL,
-      "expire" timestamp(6) NOT NULL
+    "sess" json NOT NULL,
+    "expire" timestamp(6) NOT NULL
   )
   WITH (OIDS=FALSE);
 ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
 
 CREATE TABLE Accepted (
-	aid				INTEGER NOT NULL,
-	puid			INTEGER NOT NULL,
-	duid			INTEGER NOT NULL,
-	price			NUMERIC NOT NULL,
-	PRIMARY KEY (aid),
-	FOREIGN KEY (aid, duid) REFERENCES Advertisements (aid, uid),
-	FOREIGN KEY (puid, aid, price) REFERENCES Bids (uid, aid, bidPrice)
+    aid             INTEGER NOT NULL,
+    puid            INTEGER NOT NULL,
+    duid            INTEGER NOT NULL,
+    price           NUMERIC NOT NULL,
+    PRIMARY KEY (aid),
+    FOREIGN KEY (aid, duid) REFERENCES Advertisements (aid, uid),
+    FOREIGN KEY (puid, aid, price) REFERENCES Bids (uid, aid, bidPrice)
 );
 
 CREATE TABLE Histories (
@@ -136,7 +136,7 @@ CREATE TABLE Histories (
 )
 
 CREATE TABLE PassengerRatings (
-	forUid          INTEGER NOT NULL,
+    forUid          INTEGER NOT NULL,
     aid             INTEGER NOT NULL,
     byUid           INTEGER NOT NULL,
     rating          NUMERIC NOT NULL,
@@ -147,7 +147,7 @@ CREATE TABLE PassengerRatings (
 );
 
 CREATE TABLE DriverRatings (
-	forUid          INTEGER NOT NULL,
+    forUid          INTEGER NOT NULL,
     aid             INTEGER NOT NULL,
     byUid           INTEGER NOT NULL,
     rating          NUMERIC NOT NULL,
@@ -293,20 +293,20 @@ CREATE OR REPLACE FUNCTION update_rating_passenger(INTEGER, NUMERIC) RETURNS VOI
 
 
 CREATE OR REPLACE FUNCTION update_rating_driver(INTEGER, NUMERIC) RETURNS VOID AS
-	$$
-	DECLARE num_reviews INTEGER;
-	        prev_rating NUMERIC;
-	BEGIN
-	    SELECT rating INTO prev_rating
-	    FROM Drivers
-	    WHERE $1 = Drivers.uid;
-	    SELECT count(*) INTO num_reviews
-	    FROM DriverRatings
-	    WHERE DriverRatings.forUid = $1;
-	    prev_rating = COALESCE(prev_rating, 0);
-	    UPDATE Drivers
-	    SET rating = (num_reviews * prev_rating + $2)/(num_reviews + 1)
-	    WHERE $1 = Drivers.uid;
-	END;
-	$$
-	LANGUAGE plpgsql ;
+    $$
+    DECLARE num_reviews INTEGER;
+            prev_rating NUMERIC;
+    BEGIN
+        SELECT rating INTO prev_rating
+        FROM Drivers
+        WHERE $1 = Drivers.uid;
+        SELECT count(*) INTO num_reviews
+        FROM DriverRatings
+        WHERE DriverRatings.forUid = $1;
+        prev_rating = COALESCE(prev_rating, 0);
+        UPDATE Drivers
+        SET rating = (num_reviews * prev_rating + $2)/(num_reviews + 1)
+        WHERE $1 = Drivers.uid;
+    END;
+    $$
+    LANGUAGE plpgsql ;
