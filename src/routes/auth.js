@@ -207,8 +207,8 @@ const createUser = async (user) => {
         if (user1.driver) {
             result  = await client.query('INSERT INTO Cars (make, model, modelYear, maxPassengers) VALUES ($1, $2, $3, $4) RETURNING cid', [user.make, user.model, user.year, user.maxPassengers])
             cid = result.rows[0].cid
-            await client.query('INSERT INTO CarProfiles (uid, cid, licensePlate) VALUES ($1, $2, $3)', [uid, cid, user.carlicense])
-            await client.query("INSERT INTO drivers (uid, tripsDriven, license) VALUES (currval('users_uid_seq'), $1, $2)", [0, user.license])
+            await client.query("INSERT INTO drivers (uid, tripsDriven, license) VALUES (currval('users_uid_seq'), $1, $2)", [user1.uid, 0, user.license])
+            await client.query('INSERT INTO CarProfiles (uid, cid, licensePlate) VALUES ($1, $2, $3)', [user1.uid, cid, user.carlicense])
         } else {
             await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (currval('users_uid_seq'), $1)", [0])
         }
