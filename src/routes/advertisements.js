@@ -233,4 +233,19 @@ router.delete('/:aid', (request, response) => {
   })
 })
 
+// Complete an ad (only drivers can accept a bid)
+// Trigger will check the advertisement is accepted
+router.post('/complete/:aid', (request, response) => {
+    const aid = parseInt(request.params.aid)
+
+    pool.query('INSERT INTO History (aid, timeCompleted) VALUES ($1, $2) RETURNING *', [aid, new Date()], (error, results) => {
+        if (error) {
+            throw error
+        }
+        console.log(results.rows)
+        response.status(201).send(`Advertisements completed with ID: ${results.rows[0].aid}`)
+    })
+
+})
+
 module.exports = router
