@@ -211,12 +211,12 @@ router.delete('/:aid', (request, response) => {
 router.post('/complete/:aid', (request, response) => {
     const aid = parseInt(request.params.aid)
 
-    pool.query('INSERT INTO History (aid, ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [fromAddress, fromLat, fromLng, toAddress, toLat, toLng, time, minBidPrice, uid], (error, results) => {
+    pool.query('INSERT INTO History (aid, timeCompleted) VALUES ($1, $2) RETURNING *', [aid, new Date()], (error, results) => {
         if (error) {
             throw error
         }
         console.log(results.rows)
-        response.status(201).send(`Advertisements added with ID: ${results.rows[0].aid}`)
+        response.status(201).send(`Advertisements completed with ID: ${results.rows[0].aid}`)
     })
 
 })

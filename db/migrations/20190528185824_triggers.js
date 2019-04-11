@@ -113,7 +113,6 @@ exports.up = function(knex, Promise) {
     
     
     
-    
     CREATE OR REPLACE FUNCTION bid_on_own_ad()
     RETURNS TRIGGER AS
     $$
@@ -138,6 +137,31 @@ exports.up = function(knex, Promise) {
     ON Bids
     FOR EACH ROW
     EXECUTE PROCEDURE bid_on_own_ad();
+    
+    
+    CREATE OR REPLACE FUNCTION accepted_completed_ad()
+    RETURNS TRIGGER AS
+    $$
+    BEGIN
+        IF NOT EXISTS (
+        SELECT 1
+        FROM Accepted
+        WHERE NEW.aid = Accepted.aid) THEN
+            RAISE EXCEPTION 'Advertisement not accepted';
+            RETURN NULL;
+        END IF;
+        
+        RETURN NEW;
+    END;
+    $$
+    LANGUAGE plpgsql ;
+    
+    CREATE TRIGGER accepted_completed_ad
+    BEFORE INSERT OR UPDATE
+    ON Histories
+    FOR EACH ROW
+    EXECUTE PROCEDURE accepted_completed_ad();
+    
     `;
 
 
