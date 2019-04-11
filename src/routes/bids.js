@@ -76,7 +76,6 @@ router.post('/create', (request, response) => {
 })
 
 // ACCEPT a bid (only drivers can accept a bid)
-// Trigger will add the advertisement to history of driver and passenger
 router.post('/accept', (request, response) => {
   const { puid, duid, aid, price } = request.body
 

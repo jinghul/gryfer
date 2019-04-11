@@ -23,7 +23,7 @@ router.get('/', (request, response) => {
   })
 })
 
-// Get a user's saved destniations
+// Get a user's saved destinations
 router.get('/:id', (request, response) => {
   const uid = parseInt(request.params.id)
   pool.query('SELECT * FROM SavedDestinations WHERE uid = $1 ORDER BY nickname ASC', [uid], (error, results) => {

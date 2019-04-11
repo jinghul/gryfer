@@ -206,4 +206,19 @@ router.delete('/:aid', (request, response) => {
   })
 })
 
+// Complete an ad (only drivers can accept a bid)
+// Trigger will add the advertisement to history of driver and passenger
+router.post('/complete/:aid', (request, response) => {
+    const aid = parseInt(request.params.aid)
+
+    pool.query('INSERT INTO History (aid, ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [fromAddress, fromLat, fromLng, toAddress, toLat, toLng, time, minBidPrice, uid], (error, results) => {
+        if (error) {
+            throw error
+        }
+        console.log(results.rows)
+        response.status(201).send(`Advertisements added with ID: ${results.rows[0].aid}`)
+    })
+
+})
+
 module.exports = router
