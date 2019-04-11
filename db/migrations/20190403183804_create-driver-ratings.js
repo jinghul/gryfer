@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
 	aid				INTEGER NOT NULL,
 	byUid				INTEGER NOT NULL,
 	rating 			NUMERIC NOT NULL,
-	PRIMARY KEY (forUid, aid),
+	PRIMARY KEY (aid),
 	FOREIGN KEY (forUid) REFERENCES Drivers (uid),
 	FOREIGN KEY (byUid)  REFERENCES Passengers (uid),
     FOREIGN KEY (aid) REFERENCES Accepted (aid)

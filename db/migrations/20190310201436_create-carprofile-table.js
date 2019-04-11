@@ -2,7 +2,7 @@ exports.up = function(knex, Promise) {
   let createQuery = `DROP TABLE IF EXISTS CarProfiles;
   CREATE TABLE CarProfiles (
 	cid				INTEGER,
-	license         VARCHAR(10),
+	licensePlate    VARCHAR(10),
 	make			VARCHAR(60),
 	model			VARCHAR(60),
 	modelYear		VARCHAR(60),
