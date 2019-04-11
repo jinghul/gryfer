@@ -22,7 +22,7 @@ exports.up = function(knex, Promise) {
 	FOREIGN KEY (uid) REFERENCES Passengers,
 	FOREIGN KEY (aid) REFERENCES Advertisements ON DELETE CASCADE,
 	CONSTRAINT checkMaxBid
-		CHECK (bidPrice > getMaxPrice(aid))
+		CHECK (bidPrice > getMaxPrice(aid) + 0.01)
 )`;
   return knex.raw(createQuery);
 };

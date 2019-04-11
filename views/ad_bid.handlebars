@@ -32,6 +32,10 @@
                 </div>
             </li>
         </ul>
+
+        {{#if driver}}
+            <button id="accept-btn" type="button" class="w-75 mt-4 mx-auto btn btn-block btn-primary none">Accept Bid</button>
+        {{else}}
         <form id="bid-form" class="mt-4 w-75 mx-auto" novalidate>
             <div class="form-row">
                 <div class="form-group col-md-6">
@@ -53,6 +57,7 @@
                 <button id="submit-bid" type="submit" class="btn btn-block btn-primary">Submit Bid</button>
             </div>
         </form>
+        {{/if}}
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>

@@ -57,7 +57,9 @@ router.post('/create', (request, response) => {
   const { aid, numPassengers, bidPrice } = request.body
   console.log(request.body)
 
-  if (!bidPrice || !numPassengers || !aid) {
+  if (request.session.mode) {
+    response.status(400).send('Drivers cannot bid on rides.')
+  } else if (!bidPrice || !numPassengers || !aid) {
     response.status(400).send('Fields cannot be empty.')
     return
   }
@@ -78,30 +80,40 @@ router.post('/create', (request, response) => {
 // ACCEPT a bid (only drivers can accept a bid)
 // Trigger will add the advertisement to history of driver and passenger
 router.post('/accept', (request, response) => {
-  const { puid, duid, aid, price } = request.body
 
-  const acceptBid = async (puid, duid, aid, price) => {
-    const client = await pool.connect()
+  const { aid } = request.body
 
-    try {
-      await client.query('BEGIN')
-      
-      await client.query('INSERT INTO Accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *', [aid, puid, duid, price])
-      await client.query('INSERT INTO Histories(uid, aid) VALUES($1, $2)', [puid, aid])
-      await client.query('INSERT INTO Histories (uid, aid) VALUES ($1, $2)', [duid, aid])
-      
-      await client.query('COMMIT')
+  await pool.query('SELECT * FROM (SELECT aid, uid as duid FROM advertisements) as ads natural join (SELECT aid, uid as puid, bidPrice FROM bids) as b1 JOIN (SELECT aid, max(bidPrice) as price FROM bids) as b2 on b1.aid = b2.aid AND b1.bidPrice = b2.price', (error, results) => {
+    const { puid, price, duid } = results.rows[0]
 
-      await client.release()
-      await response.status(200).send('Bid accepted for advertisement: ' + [puid, duid, aid, price])
-    } catch (e) {
-      await client.query('ROLLBACK')
-      response.status(500).send('Bid acceptance transaction failed.')
-      throw e
+    if (duid != request.session.uid) {
+      response.status(401).end();
+      return
     }
-  }
 
-  acceptBid(puid, duid, aid, price)
-})
+    const acceptBid = async (puid, duid, aid, price) => {
+        const client = await pool.connect()
+
+        try {
+          await client.query('BEGIN')
+          
+          await client.query('INSERT INTO Accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *', [aid, puid, duid, price])
+          await client.query('INSERT INTO Histories(uid, aid) VALUES($1, $2)', [puid, aid])
+          await client.query('INSERT INTO Histories (uid, aid) VALUES ($1, $2)', [duid, aid])
+          
+          await client.query('COMMIT')
+
+          await client.release()
+          await response.status(200).send('Bid accepted for advertisement: ' + [puid, duid, aid, price])
+        } catch (e) {
+          await client.query('ROLLBACK')
+          response.status(500).send('Bid acceptance transaction failed.')
+          throw e
+        }
+      }
+
+      acceptBid(puid, duid, aid, price)
+    })
+  })
 
 module.exports = router

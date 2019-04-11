@@ -62,14 +62,6 @@ function toOngoing() {
         $('#ad-driver-name').html(res.fname);
         $('#ad-driver-rating').html(res.rating);
 
-        if (!res.tripsdriven) {
-            res.tripsdriven = res.tripstaken
-        }
-
-        $('#ad-driver-rides').html(
-            '&nbsp; | &nbsp; ' + res.tripsdriven + ' rides'
-        );
-
         if (!res.make) {
             $('#car-item').hide();
         } else {
@@ -96,7 +88,7 @@ function toOngoing() {
 }
 
 function complete_ride() {
-
+    
 }
 
 function rate_ride() {

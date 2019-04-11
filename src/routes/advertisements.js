@@ -142,7 +142,7 @@ router.get('/ongoing', (request, response) => {
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
-  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers JOIN CarProfiles on drivers.uid = CarProfiles.uid NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT duid as uid, count(aid) as tripsdriven FROM histories where histories.duid = drivers.uid) as  JOIN CarProfiles on drivers.uid = CarProfiles.uid NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
     if (error) {
       console.log(error);
       response.status(400).end();
@@ -152,7 +152,10 @@ router.get('/:aid', (request, response) => {
     result = results.rows[0]
     if (result.closed !== undefined && result.currLead == request.session.uid) {
       result.winner = true
-    } 
+    }
+    if (result.uid == request.session.uid) {
+      result.owner = true
+    }
 
     response.status(200).json(result);
   })

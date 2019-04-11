@@ -4,19 +4,24 @@ function display(res) {
     currPrice = res.currprice
     $('#curr-price').html("$"+parseFloat(res.currprice).toFixed(2));
     if (res.winner) {
-        $('#ad-status').html('You won the ride!');
+        $('#ad-status').html('You won the ride.');
         $('#ad-bid-price').val('');
         $('#ad-bid-price').prop('disabled', true);
         $('#ad-num-pass').prop('disabled', true);
         $('#ad-num-pass').val('');
         $('#submit-bid').prop('disabled', true);
     } else if (res.closed) {
-        $('#ad-status').html('Bidding closed | ' + res.numbids);
+        if (res.owner) {
+            $('#ad-status').html('Bidding closed | Accepted');
+        } else {
+            $('#ad-status').html('Bidding closed | ' + res.numbids);
+        }
         $('#ad-bid-price').val('');
         $('#ad-bid-price').prop('disabled', true);
         $('#ad-num-pass').prop('disabled', true);
         $('#ad-num-pass').val('');
         $('#submit-bid').prop('disabled', true);
+        $('#accept-btn').prop('disabled', true)
     } else {
         $('#ad-status').html('Accepting Bids | ' + res.numbids + ' bids');
     }
@@ -42,6 +47,10 @@ function initMap() {
             console.log(orig_src)
             map.attr('src', orig_src)
             map.show(300);
+
+            if (res.owner) {
+                $('#accept-btn').show();
+            }
             
             // Some date parsing
             var date = new Date(res.departuretime);
@@ -89,6 +98,12 @@ function initMap() {
     );
 }
 
+function accept() {
+    $.post('http://localhost:3000/bids/accept/', function() {
+        refresh()
+    });
+}
+
 function bid() {
     if (parseFloat($('#ad-bid-price').val()) <= parseFloat(currPrice)) {
         $('#ad-bid-price').addClass('is-invalid');
@@ -106,7 +121,7 @@ function bid() {
     data.aid = aid;
     console.log(data)
 
-    $.post('http://localhost:3000/bids/create/', data, function(results) {
+    $.post('http://localhost:3000/bids/create/', data, function() {
         refresh()
     });
 }
@@ -138,6 +153,10 @@ $('document').ready(function() {
     }
 
     initMap();
+
+    $('#accept-btn').on('click', function() {
+        accept();
+    });
     
     $('input').on('keyup', function(e) {
         if (e.keyCode == 13) {
