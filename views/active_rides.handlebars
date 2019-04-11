@@ -50,9 +50,9 @@
                                         </li>
                                     </ul>
                                     {{#if driver}}
-                                    <button role="button" class="button btn-primary btn-block" id="complete-btn">Complete Ride</button>
+                                    <button role="button" class="mt-4 button btn-primary btn-block" id="complete-btn">Complete Ride</button>
                                     {{/if}}
-                                    <div id="rate-box" class="none">
+                                    <div id="rate-box" class="mt-4 none">
                                         <div>How was the ride?</div>
                                         <select id="rate-ad">
                                             <option value="1">1</option>
@@ -63,6 +63,7 @@
                                         </select>
                                         <button role="button" class="button btn-primary btn-outline" id="rate-btn">Rate</button>
                                     </div>
+                                    <div class="display-7 mt-4" class="none" id="finish-rating">Ride complete.</div>
                                 </div>
                             </div>
                             <a href="#" class="btn btn-primary">Go somewhere</a>
@@ -73,6 +74,7 @@
         </div>
     </div>
 </div>
+<script src="http://localhost:3000/js/barrating.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
 <script src="http://localhost:3000/js/ad_details.template.js"></script>
 <script src="http://localhost:3000/js/active_rides.js"></script>

@@ -121,9 +121,9 @@ router.get('/', (request, response) => {
 // Get all ads
 router.get('/ongoing', (request, response) => {
   const uid = request.session.uid
-  const qid = 'puid';
-  const oid = 'duid'
-  const qtable = 'drivers'
+  let qid = 'puid';
+  let oid = 'duid'
+  let qtable = 'drivers'
   if (request.session.mode) {
     qid = 'duid'
     oid = 'puid'
@@ -142,7 +142,7 @@ router.get('/ongoing', (request, response) => {
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
 
-  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT duid as uid, count(aid) as tripsdriven FROM histories where histories.duid = drivers.uid) as  JOIN CarProfiles on drivers.uid = CarProfiles.uid NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT duid as uid, count(aid) as tripsdriven FROM histories GROUP by duid) as numTrips NATURAL LEFT JOIN CarProfiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
     if (error) {
       console.log(error);
       response.status(400).end();
@@ -236,6 +236,7 @@ router.delete('/:aid', (request, response) => {
 // Complete an ad (only drivers can accept a bid)
 // Trigger will check the advertisement is accepted
 router.post('/complete/:aid', (request, response) => {
+
     const aid = parseInt(request.params.aid)
 
     pool.query('INSERT INTO History (aid, timeCompleted) VALUES ($1, $2) RETURNING *', [aid, new Date()], (error, results) => {
