@@ -207,7 +207,7 @@ router.delete('/:aid', (request, response) => {
 })
 
 // Complete an ad (only drivers can accept a bid)
-// Trigger will add the advertisement to history of driver and passenger
+// Trigger will check the advertisement is accepted
 router.post('/complete/:aid', (request, response) => {
     const aid = parseInt(request.params.aid)
 

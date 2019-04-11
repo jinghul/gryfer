@@ -86,8 +86,6 @@ router.post('/accept', (request, response) => {
       await client.query('BEGIN')
       
       await client.query('INSERT INTO Accepted (aid, puid, duid, price) VALUES ($1, $2, $3, $4) RETURNING *', [aid, puid, duid, price])
-      await client.query('INSERT INTO Histories(uid, aid) VALUES($1, $2)', [puid, aid])
-      await client.query('INSERT INTO Histories (uid, aid) VALUES ($1, $2)', [duid, aid])
       
       await client.query('COMMIT')
 
