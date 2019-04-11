@@ -174,8 +174,8 @@ const insertRole = async (user, uid) => {
         if (user.driver) {
             var result = await client.query('INSERT INTO Cars (make, model, modelYear, maxPassengers) VALUES ($1, $2, $3, $4) RETURNING cid', [user.make, user.model, user.year, user.maxPassengers])
             cid = result.rows[0].cid
+            await client.query("INSERT INTO drivers (uid, tripsDriven, license) VALUES ($1, $2, $3)", [uid, 0, user.license])
             await client.query('INSERT INTO CarProfiles (uid, cid, licensePlate) VALUES ($1, $2, $3)', [uid, cid, user.carlicense])
-            await client.query("INSERT INTO drivers (uid, tripsDriven, license) VALUES ($1, $2, $3, $4)", [uid, 0, user.license])
         } else {
             await client.query("INSERT INTO passengers (uid, tripsTaken) VALUES (#1, $2)", [uid, 0])
         }

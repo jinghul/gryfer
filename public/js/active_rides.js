@@ -1,7 +1,13 @@
 var ongoing_aid = null;
 var ongoing_tb_rated = null;
+var currPage = null;
 
 function toOngoing() {
+    $('#title').html('Ongoing');
+    currPage.hide(200);
+    currPage = $('#ongoing-display');
+    $('#ongoing-display').show(200);
+
     $.get('http://localhost:3000/ads/ongoing', function(results) {
         let res = results;
 
@@ -124,6 +130,20 @@ function rate_ride() {
     }
 }
 
+function toAccepted() {
+    $('#title').html('Accepted');
+    currPage.hide(200);
+    currPage = $('#accepted-display');
+    $('#accepted-display').show(200);
+}
+
+function toBidding() {
+    $('#title').html('Bidding');
+    currPage.hide(200);
+    currPage = $('#bidding-display');
+    $('#bidding-display').show(200);
+}
+
 $('document').ready(function() {
     $('#rate-ad').barrating({
         theme: 'css-stars',
@@ -137,20 +157,18 @@ $('document').ready(function() {
         });
     });
 
+    $('#ongoing-btn').on('click', toOngoing);
+    $('#accepted-btn').on('click', toAccepted);
+    $('#bidding-btn').on('click', toBidding);
+
     $('#complete-btn').on('click', function() {
         complete_ride();
     });
 
-    if (window.location.search.length != 0) {
-        let query = window.location.search.substring(1);
-        let state = JSON.parse(
-            '{"' + query.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
-            function(key, value) {
-                return key === '' ? value : decodeURIComponent(value);
-            }
-        );
+    page = $('#ongoing-display');
 
-        let page = state.page;
+    if (window.location.hash.length != 0) {
+        let page = window.location.search.substring(1);
         if (page == 'accepted') {
             toAccepted();
         } else if (page == 'Bidding') {
@@ -159,6 +177,7 @@ $('document').ready(function() {
             toOngoing();
         }
     } else {
+        window.location.hash = '#ongoing'
         toOngoing();
     }
 });
