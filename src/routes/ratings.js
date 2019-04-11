@@ -66,7 +66,7 @@ router.post('/passengers', (request, response) => {
           await client.query('BEGIN')
           
           await client.query('INSERT INTO PassengerRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *', [byUid, forUid, aid, rating])
-          await client.query('SELECT * FROM update_rating_passenger($1, $2)', [forUid, rating])
+          await client.query('UPDATE Passengers SET rating = update_rating_passenger($1, $2) WHERE $1 = Passengers.uid;', [forUid, rating])
           
           await client.query('COMMIT')
 
@@ -92,7 +92,7 @@ router.post('/drivers', (request, response) => {
           await client.query('BEGIN')
           
           await client.query('INSERT INTO DriverRatings (byUid, forUid, aid, rating) VALUES ($1, $2, $3, $4) RETURNING *', [byUid, forUid, aid, rating])
-          await client.query('SELECT * FROM update_rating_driver($1, $2)', [forUid, rating])
+          await client.query('UPDATE Drivers SET rating = update_rating_driver($1, $2) WHERE $1 = Drivers.uid', [forUid, rating])
           
           await client.query('COMMIT')
           await client.release()

@@ -86,8 +86,8 @@ exports.up = function(knex, Promise) {
     
 --     DELETE FROM Advertisements where aid=1;
                 
-	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
-	(4, 2, 1, 4.5);
+--	INSERT INTO DriverRatings(forUid, aid, byUid, rating) VALUES
+--	(4, 2, 1, 4.5);
 
 	`;
   return knex.raw(createQuery);
