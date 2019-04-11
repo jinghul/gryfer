@@ -4,6 +4,8 @@ exports.up = function(knex, Promise) {
 	nickname		VARCHAR(20),
 	address			VARCHAR(60),
 	uid				INTEGER NOT NULL,
+    lat				NUMERIC,
+    lng				NUMERIC,
 	PRIMARY KEY (nickname, uid),
 	FOREIGN KEY (uid) REFERENCES Accounts
 )`;
