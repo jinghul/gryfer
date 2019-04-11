@@ -135,14 +135,19 @@ function create_ad() {
     $.post(
         'http://localhost:3000/ads/',
         data,
-        function(results, status) {
-            display(results);
+        function(results) {
+            window.location = window.location = 'http://localhost:3000/active?page=bidding';
         },
         'json'
     );
 }
 
 $('document').ready(function() {
+
+    $('#view-creates').bind('click', function() {
+        window.location = 'http://localhost:3000/active';
+    })
+
     var forms = document.getElementsByClassName('needs-validation');
     var validation = Array.prototype.filter.call(forms, function(form) {
         form.addEventListener(

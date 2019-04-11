@@ -61,6 +61,15 @@ router.get('/profile', (request, response) => {
   })
 })
 
+router.get('/rides', (request, response) => {
+  pool.query('SELECT * FROM (users NATURAL JOIN UserProfiles NATURAL JOIN Accounts) where uid = $1', [req.session.uid], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows[0])
+  })
+})
+
 // GET a user with id = id
 router.get('/:id', (request, response) => {
   const id = parseInt(request.params.id)

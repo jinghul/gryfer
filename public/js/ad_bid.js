@@ -28,51 +28,21 @@ function refresh() {
     });
 }
 
-function initMapAndAutocomplete() {
-    var map = new google.maps.Map(document.getElementById('ad-map'), {
-        zoom: 13,
-        zoomControl: false,
-        scaleControl: false,
-        streetViewControl: false,
-        mapTypeControlOptions: { mapTypeIds: [] },
-    });
-
-    console.log('called')
-
+function initMap() {
     $.get(
         'http://localhost:3000/ads/' + aid,
         function(results) {
             let res = results
             console.log(results)
-            var bounds = new google.maps.LatLngBounds();
-            let from_pos = new google.maps.LatLng(
-                parseFloat(res.fromlat),
-                parseFloat(results.fromlng)
-            );
-            let to_pos = new google.maps.LatLng(
-                parseFloat(res.tolat),
-                parseFloat(res.tolng)
-            );
-            bounds.extend(from_pos);
-            bounds.extend(to_pos);
 
-            var from_marker = new google.maps.Marker({
-                map: map,
-                icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            });
-
-            var to_marker = new google.maps.Marker({
-                map: map,
-                icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-            });
-
-            from_marker.setPosition(from_pos);
-            to_marker.setPosition(to_pos);
-            map.fitBounds(bounds);
-
-            $('#ad-from').html(res.fromaddress);
-            $('#ad-to').html(res.toaddress);
-
+            var map = $('#ad-map');
+            var orig_src = map.attr('src');
+            orig_src = orig_src.replace('/from_coords/', res.fromlat + ',' + res.fromlng);
+            orig_src = orig_src.replace('/to_coords/', res.tolat+","+res.tolng);
+            console.log(orig_src)
+            map.attr('src', orig_src)
+            map.show(300);
+            
             // Some date parsing
             var date = new Date(res.departuretime);
             var dateString = date
@@ -99,7 +69,16 @@ function initMapAndAutocomplete() {
             var timeString =
                 hour.toString() + ':' + timeParts[1] + ' ' + timeOfDay;
 
-            $('#ad-date').html(timeString + ' on ' + dateString);
+            var context = {
+                first_style: 'style="border-top:none;"',
+                from_loc: res.fromaddress,
+                to_loc: res.toaddress,
+                date: timeString + ' on ' + dateString
+            }
+            
+            var template = Handlebars.templates['ad_details'];
+            $('#ad-desc').append($(template(context)))
+
             $('#ad-driver-name').html(res.fname);
             $('#ad-driver-rating').html(res.rating);
             $('#ad-driver-rides').html("&nbsp; | &nbsp; " + res.tripsdriven + " rides");
@@ -157,6 +136,8 @@ $('document').ready(function() {
     } else {
         aid = comps[comps.length - 1].slice(0,1);
     }
+
+    initMap();
     
     $('input').on('keyup', function(e) {
         if (e.keyCode == 13) {

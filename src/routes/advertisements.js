@@ -83,17 +83,22 @@ router.get('/search', (request, response, next) => {
     if (toLat && toLng) {
       let new_res = []
       for (var i = 0; i < res.length; i++) {
-        if (geolib.getDistance({latitude: res[i].toLat, longitude: res[i].toLng}, {latitude: toLat, longitude: toLng}) <= 1000) {
-          new_res += res[i]
+        if (res[i].tolat && res[i].tolng) {
+          if (geolib.getDistance({latitude: res[i].tolat, longitude: res[i].tolng}, {latitude: toLat, longitude: toLng}) <= 1000) {
+            new_res.push(res[i])
+          }
         }
       }
       res = new_res
     }
+
     if (fromLat && fromLng) {
       let new_res = []
       for (var i = 0; i < res.length; i++) {
-        if (geolib.getDistance({latitude: res[i].fromLat, longitude: res[i].fromLng}, {latitude: fromLat, longitude: fromLng}) <= 1000) {
-          new_res += res[i]
+        if (res[i].fromlat && res[i].fromlng) {
+          if (geolib.getDistance({latitude: res[i].fromlat, longitude: res[i].fromlng}, {latitude: fromLat, longitude: fromLng}) <= 1000) {
+            new_res.push(res[i])
+          }
         }
       }
       res = new_res
@@ -110,6 +115,25 @@ router.get('/', (request, response) => {
       throw error
     }
     response.status(200).json(results.rows)
+  })
+})
+
+// Get all ads
+router.get('/ongoing', (request, response) => {
+  const uid = request.session.uid
+  const qid = 'puid';
+  const oid = 'duid'
+  const qtable = 'drivers'
+  if (request.session.mode) {
+    qid = 'duid'
+    oid = 'puid'
+    qtable = 'passengers'
+  }
+  pool.query('SELECT * FROM advertisements natural join (accepted join ' + qtable + ' on ' + oid + '=' + qtable+ '.uid) WHERE (' + qid + '= $1 AND departureTime <= now()::timestamp AND aid NOT IN histories)', [uid], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows[0])
   })
 })
 
