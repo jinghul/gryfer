@@ -31,6 +31,11 @@
     box-shadow: none;
 }
 
+.typewrite:hover{
+    text-decoration: none;
+    cursor: auto;
+}
+
 .autocomplete-items {
     border: 1px solid #d4d4d4;
     border-bottom: none;

@@ -16,7 +16,7 @@ exports.up = function(knex, Promise) {
 
         prev_rating = COALESCE(prev_rating, 0);
 
-        RETURN (num_reviews * prev_rating + $2)/(num_reviews);
+        RETURN ((num_reviews-1) * prev_rating + $2)/(num_reviews);
 
     END;
     $$
@@ -38,7 +38,7 @@ exports.up = function(knex, Promise) {
         
         prev_rating = COALESCE(prev_rating, 0);
 
-        RETURN (num_reviews * prev_rating + $2)/(num_reviews + 1);
+        RETURN ((num_reviews-1) * prev_rating + $2)/(num_reviews);
     END;
     $$
     LANGUAGE plpgsql ;`

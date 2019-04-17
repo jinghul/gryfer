@@ -4,7 +4,6 @@ function display(res) {
 
     if (new Date(res.departuretime) < new Date()) {
         res.timeout = true;
-        res.closed = true;
     }
 
     currPrice = res.currprice;
@@ -17,7 +16,7 @@ function display(res) {
     }
     $('#curr-price').html('$' + parseFloat(currPrice).toFixed(2));
     if (res.closed) {
-        if (res.owner && !res.timeout) {
+        if (res.owner) {
             $('#ad-status').html('Bidding Closed | Accepted');
             $('#accept-btn').prop('disabled', true);
         } else if (res.winner) {
@@ -27,8 +26,6 @@ function display(res) {
             $('#ad-num-pass').prop('disabled', true);
             $('#ad-num-pass').val('');
             $('#submit-bid').prop('disabled', true);
-        } else if (res.timeout) {
-            $('#ad-status').html('Time expired | No bids accepted');
         } else {
             $('#ad-status').html('Bidding Closed | ' + res.numbids + ' bids');
         }
@@ -38,6 +35,16 @@ function display(res) {
         $('#ad-num-pass').val('');
         $('#submit-bid').prop('disabled', true);
         $('#accept-btn').prop('disabled', true);
+        $('#cancel-btn').prop('disabled', true);
+    }  else if (res.timeout) {
+        $('#ad-status').html('Time expired | No bids accepted');
+        $('#ad-bid-price').val('');
+        $('#ad-bid-price').prop('disabled', true);
+        $('#ad-num-pass').prop('disabled', true);
+        $('#ad-num-pass').val('');
+        $('#submit-bid').prop('disabled', true);
+        $('#accept-btn').prop('disabled', true);
+        $('#cancel-btn').prop('disabled', true);
     } else {
         $('#ad-status').html('Accepting Bids | ' + res.numbids + ' bids');
     }
@@ -183,7 +190,7 @@ function cancel() {
         url: 'http://localhost:3000/ads/delete/' + aid,
         type: 'DELETE',
         success: function() {
-            indow.location = 'http://localhost:3000/make';
+            window.location = 'http://localhost:3000/make';
         },
     });
 }

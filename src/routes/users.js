@@ -82,7 +82,7 @@ router.get('/profile', (req, res) => {
   if (!req.session.uid) {
       res.redirect('../auth/signin')
   } else {
-      pool.query('SELECT * FROM users NATURAL LEFT JOIN userprofiles NATURAL LEFT JOIN (drivers NATURAL LEFT JOIN carprofiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT duid as uid, sum(price) as moneyearned, count(*) as tripsdriven FROM (histories NATURAL JOIN accepted) where duid = $1 group by duid) as drides) as driverInfo NATURAL FULL OUTER JOIN (passengers NATURAL LEFT JOIN (SELECT puid as uid, max(price) as expensiveride, count(*) as tripstaken FROM (Histories NATURAL JOIN Accepted) where puid = $1 group by puid) as prides) as passengerInfo WHERE uid=$1', [req.session.uid], (error, results) => {
+      pool.query('SELECT * FROM users NATURAL LEFT JOIN userprofiles NATURAL LEFT JOIN ((SELECT uid, rating as drating from drivers) as d2 NATURAL LEFT JOIN carprofiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT duid as uid, sum(price) as moneyearned, count(*) as tripsdriven FROM (histories NATURAL JOIN accepted) where duid = $1 group by duid) as drides) as driverInfo NATURAL FULL OUTER JOIN ((SELECT uid, rating as prating FROM passengers) as p2 NATURAL LEFT JOIN (SELECT puid as uid, max(price) as expensiveride, count(*) as tripstaken FROM (Histories NATURAL JOIN Accepted) where puid = $1 group by puid) as prides) as passengerInfo WHERE uid=$1', [req.session.uid], (error, results) => {
           if (error) {
               throw error
           }
@@ -98,11 +98,11 @@ router.get('/profile', (req, res) => {
               switchable: req.session.switchable,
               google_key: config.google_key,
               tripstaken: result.tripstaken,
-              expensiveride: result.expensiveride,
-              prating: result.prating,
+              expensiveride: parseFloat(result.expensiveride).toFixed(2),
+              prating: parseFloat(result.prating).toFixed(2),
               tripsdriven: result.tripsdriven,
-              drating: result.drating,
-              moneyearned: result.moneyearned,
+              drating: parseFloat(result.drating).toFixed(2),
+              moneyearned: parseFloat(result.moneyearned).toFixed(2),
               make: result.make,
               model: result.model,
               year: result.year,

@@ -268,13 +268,13 @@ router.put('/:aid', (request, response) => {
 })
 
 // Delete ad by id
-router.delete('/:aid', (request, response) => {
+router.delete('/delete/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
-
   pool.query('DELETE FROM Advertisements WHERE aid = $1', [aid], (error, results) => {
     if (error) {
       throw error
     }
+    console.log(aid + ' deleted');  
     response.status(200).send(`Advertisements deleted with AID: ${aid}`)
   })
 })

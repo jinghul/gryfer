@@ -330,7 +330,7 @@ function display(results) {
         let id = '#search-result-' + i.toString();
         let res_id = res.aid.toString();
         $(id).on('click', function() {
-            window.open('http://localhost:3000/ads/id/' + res_id, '_blank');
+            window.location = 'http://localhost:3000/ads/id/' + res_id;
         });
 
         res_to_marker.setPosition(to_pos);

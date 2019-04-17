@@ -100,7 +100,7 @@ exports.up = function(knex, Promise) {
             RETURN NULL;
         END IF;
         
-        RETURN NULL;
+        RETURN OLD;
     END;
     $$
     LANGUAGE plpgsql ;

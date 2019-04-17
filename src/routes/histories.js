@@ -41,7 +41,7 @@ router.get('/passenger/', (request, response) => {
 // GET the driving history for specific user
 router.get('/driver/', (request, response) => {
     const uid = parseInt(request.session.uid)
-    pool.query('SELECT * FROM Histories NATURAL JOIN Accepted NATURAL JOIN advertisements LEFT JOIN passengerratings as pr on pr.byUid=duid AND pr.aid=advertisements.aid where duid = $1 ORDER BY timeCompleted DESC',[uid], (error, results) => {
+    pool.query('SELECT * FROM Histories NATURAL JOIN (SELECT aid, price as listprice, puid, duid from Accepted) as acceptedrides NATURAL JOIN advertisements LEFT JOIN passengerratings as pr on pr.byUid=duid AND pr.aid=advertisements.aid where duid = $1 ORDER BY timeCompleted DESC',[uid], (error, results) => {
         if (error) {
             throw error
         }
