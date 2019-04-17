@@ -38,8 +38,9 @@ function register() {
     $.post(
         'http://localhost:3000/auth/register',
         data,
-        function() {
+        function(result) {
             console.log('redirect')
+            console.log(result)
             if ($('#form-reg').attr('driver') == 'true') {
                 window.location = 'http://localhost:3000/make';
             } else {

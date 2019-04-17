@@ -1,6 +1,12 @@
 var aid, currPrice;
 
 function display(res) {
+
+    if (new Date(res.departuretime) < new Date()) {
+        res.timeout = true;
+        res.closed = true;
+    }
+
     currPrice = res.currprice;
     if (!currPrice) {
         currPrice = res.minbidprice;
@@ -11,7 +17,7 @@ function display(res) {
     }
     $('#curr-price').html('$' + parseFloat(currPrice).toFixed(2));
     if (res.closed) {
-        if (res.owner) {
+        if (res.owner && !res.timeout) {
             $('#ad-status').html('Bidding Closed | Accepted');
             $('#accept-btn').prop('disabled', true);
         } else if (res.winner) {
@@ -21,6 +27,8 @@ function display(res) {
             $('#ad-num-pass').prop('disabled', true);
             $('#ad-num-pass').val('');
             $('#submit-bid').prop('disabled', true);
+        } else if (res.timeout) {
+            $('#ad-status').html('Time expired | No bids accepted');
         } else {
             $('#ad-status').html('Bidding Closed | ' + res.numbids + ' bids');
         }
@@ -140,12 +148,13 @@ function initMap() {
 
             $('#ad-driver-name').html(res.fname);
             if (!res.rating) {
-                res.rating = '- ';
+                $('#ad-driver-rating').html('- ');
+            } else {
+                $('#ad-driver-rating').html(parseFloat(res.rating).toFixed(2));
             }
             if (!res.tripsdriven) {
                 res.tripsdriven = 0;
             }
-            $('#ad-driver-rating').html(parseFloat(res.rating).toFixed(2));
             $('#ad-driver-rides').html(
                 '&nbsp; | &nbsp; ' + res.tripsdriven + ' rides'
             );

@@ -116,9 +116,10 @@ function toOngoing() {
 
         $('#ad-driver-name').html(res.fname);
         if (!res.rating) {
-            res.rating = '- '
+            $('#ad-driver-rating').html('- ');
+        } else {
+            $('#ad-driver-rating').html(parseFloat(res.rating).toFixed(2));
         }
-        $('#ad-driver-rating').html(res.rating);
 
         if (!res.make) {
             $('#car-item').hide();

@@ -30,7 +30,7 @@ router.get('/', (request, response) => {
 // GET the riding history for specific user
 router.get('/passenger/', (request, response) => {
     const uid = parseInt(request.session.uid)
-    pool.query("SELECT * FROM Histories NATURAL JOIN Accepted NATURAL JOIN advertisements LEFT JOIN driverratings as dr on dr.byUid=puid AND dr.aid=advertisements.aid where puid = $1 ORDER BY timeCompleted DESC",[uid], (error, results) => {
+    pool.query("SELECT * FROM Histories NATURAL JOIN (SELECT aid, price as listprice, puid, duid from Accepted) as acceptedride NATURAL JOIN advertisements LEFT JOIN driverratings as dr on dr.byUid=puid AND dr.aid=advertisements.aid where puid = $1 ORDER BY timeCompleted DESC",[uid], (error, results) => {
         if (error) {
             throw error
         }

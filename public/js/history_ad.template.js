@@ -15,8 +15,8 @@ templates['history_ad'] = template({"compiler":[7,">= 4.0.0"],"main":function(co
     + alias4(((helper = (helper = helpers.time || (depth0 != null ? depth0.time : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"time","hash":{},"data":data}) : helper)))
     + " "
     + alias4(((helper = (helper = helpers.date || (depth0 != null ? depth0.date : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"date","hash":{},"data":data}) : helper)))
-    + "</span>\r\n            <span class=\"date-display lead\"><select id=\"rate-ride-"
+    + "</span>\r\n            <div class=\"w-100 flex\">\r\n                <div class=\"mx-auto\" style=\"display:inline-block\"><select id=\"rate-ride-"
     + alias4(((helper = (helper = helpers.index || (depth0 != null ? depth0.index : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"index","hash":{},"data":data}) : helper)))
-    + "\">\r\n                    <option value=\"1\">1</option>\r\n                    <option value=\"2\">2</option>\r\n                    <option value=\"3\">3</option>\r\n                    <option value=\"4\">4</option>\r\n                    <option value=\"5\">5</option>\r\n                </select></span>\r\n        </div>\r\n    </div>\r\n</div>";
+    + "\">\r\n                    <option value=\"1\">1</option>\r\n                    <option value=\"2\">2</option>\r\n                    <option value=\"3\">3</option>\r\n                    <option value=\"4\">4</option>\r\n                    <option value=\"5\">5</option>\r\n                </select></div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>";
 },"useData":true});
 })();

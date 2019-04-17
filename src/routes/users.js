@@ -82,7 +82,7 @@ router.get('/profile', (req, res) => {
   if (!req.session.uid) {
       res.redirect('../auth/signin')
   } else {
-      pool.query('SELECT * FROM users NATURAL LEFT JOIN userprofiles NATURAL LEFT JOIN (drivers NATURAL LEFT JOIN carprofiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT duid as uid, sum(price) as moneyearned, count(*) as tripsdriven FROM (histories NATURAL JOIN accepted) where duid = $1 group by duid) as drides) as driverInfo NATURAL LEFT JOIN (passengers NATURAL LEFT JOIN (SELECT puid as uid, max(price) as expensiveride, count(*) as tripstaken FROM (Histories NATURAL JOIN Accepted) where puid = $1 group by puid) as prides) as passengerInfo WHERE uid=$1', [req.session.uid], (error, results) => {
+      pool.query('SELECT * FROM users NATURAL LEFT JOIN userprofiles NATURAL LEFT JOIN (drivers NATURAL LEFT JOIN carprofiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT duid as uid, sum(price) as moneyearned, count(*) as tripsdriven FROM (histories NATURAL JOIN accepted) where duid = $1 group by duid) as drides) as driverInfo NATURAL FULL OUTER JOIN (passengers NATURAL LEFT JOIN (SELECT puid as uid, max(price) as expensiveride, count(*) as tripstaken FROM (Histories NATURAL JOIN Accepted) where puid = $1 group by puid) as prides) as passengerInfo WHERE uid=$1', [req.session.uid], (error, results) => {
           if (error) {
               throw error
           }

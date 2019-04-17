@@ -90,6 +90,8 @@
                 let id = "#history-result-" + i.toString();
                 let rate_id = "#rate-ride-" + i.toString();
                 let rate_uid = parseInt(res.duid);
+                var item = $(template(context));
+                $('#history-results').append(item);
                 if ($('#drive-history-btn').is('active')) {
                     rate_uid = parseInt(res.puid);
                 }
@@ -109,9 +111,7 @@
                     $(rate_id).barrating('set', parseInt(res.rating))
                     $(rate_id).barrating('readonly', true)
                 }
-
-                var item = $(template(context));
-                $('#history-results').append(item);
+                
                 item.fadeIn(300);
 
                 let res_id = res.aid.toString()
