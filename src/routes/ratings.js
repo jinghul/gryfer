@@ -57,6 +57,11 @@ router.get('/passengers/:id', (request, response) => {
 
 // Create new rating for a passenger
 router.post('/passengers', (request, response) => {
+    if (!request.session.mode) {
+        response.status(401).send('Riders cannot rate other riders.')
+        return
+    }
+
     const byUid = request.session.uid
     const {forUid, aid, rating} = request.body
 
@@ -85,6 +90,11 @@ router.post('/passengers', (request, response) => {
 
 // Create new rating for a driver
 router.post('/drivers', (request, response) => {
+    if (request.session.mode) {
+        response.status(401).send('Drivers cannot rate other drivers.')
+        return
+    }
+
     const byUid = request.session.uid
     const {forUid, aid, rating} = request.body
     const createDriverRating = async (byUid, forUid, aid, rating) => {

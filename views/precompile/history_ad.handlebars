@@ -1,0 +1,32 @@
+<div id="history-result-{{index}}" class="card none ad-result clickable">
+    <div class="card-body row">
+        <div class="col-6">
+            <ul class="list-group">
+                <li class="list-group-item flex">
+                    <div>
+                        <span class="to-place fas fa-map-marker-alt input-group-text"></span>
+                    </div>
+                    <div>{{ from }}</div>
+                </li>
+                <li class="list-group-item flex">
+                    <div>
+                        <span class="from-place fas fa-map-marker-alt input-group-text"></span>
+                    </div>
+                    <div>
+                        {{ to }}
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="col-6"><span class="price-display display-5">{{price}}</span>
+            <span class="date-display lead">Completed {{time}} {{date}}</span>
+            <span class="date-display lead"><select id="rate-ride-{{index}}">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select></span>
+        </div>
+    </div>
+</div>

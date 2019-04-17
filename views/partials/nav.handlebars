@@ -1,5 +1,5 @@
 <nav class="nav navbar-expand-lg navbar-light bg-white">
-    <a class="navbar-brand mr-auto" href="#">
+    <a class="navbar-brand mr-auto" href="http://localhost:3000/home">
         <img src="http://localhost:3000/img/logo.png" height="40">
     </a>
     <button class="navbar-toggler custom-toggler" type="button" data-toggle="collapse" data-target="#top-nav"
@@ -14,19 +14,20 @@
             <li class="nav-item">
                 <a class="nav-link" href="http://localhost:3000/home#about">About</a>
             </li>
+            {{#if driver}}
+            <li class="nav-item">
+                <a class="nav-link" href="http://localhost:3000/make">Make Rides</a>
+            </li>
+            {{else}}
             {{#if username}}
             <li class="nav-item">
                 <a class="nav-link" href="http://localhost:3000/search">Find Rides</a>
             </li>
             {{/if}}
-            {{#if driver}}
-            <li class="nav-item">
-                <a class="nav-link" href="http://localhost:3000/make">Make Rides</a>
-            </li>
             {{/if}}
             {{#if username}}
             <li class="nav-item">
-                <a class="nav-link" href="http://localhost:3000/active">Active Rides</a>
+                <a class="nav-link" href="http://localhost:3000/tracking">Tracking</a>
             </li>
             {{/if}}
             {{#if username}}
@@ -34,8 +35,9 @@
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                     aria-expanded="false"><b>{{fname}}</b></a>
                 <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="http://localhost:3000/profile">Profile</a>
-                    <a class="dropdown-item" href="http://localhost:3000/profile?page=history">Ride History</a>
+                    <a class="dropdown-item" href="http://localhost:3000/user/profile">Profile</a>
+                    <a class="dropdown-item" href="http://localhost:3000/user/history">Ride History</a>
+                    <a class="dropdown-item" href="http://localhost:3000/user/saved">Saved Places</a>
                     {{#if driver}}
                     {{#if switchable}}
                     <a class="dropdown-item" id="d-to-r">Switch to Rider Mode</a>

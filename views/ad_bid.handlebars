@@ -1,6 +1,6 @@
 <div class="row base-width" style="height:calc(100% - 57px)">
     <div class="col vertical-col h-100 px-3" style="padding-bottom: 0px">
-        <img id="ad-map" src="https://maps.googleapis.com/maps/api/staticmap?zoom=13&size=600x350&maptype=roadmap&markers=color:red%7Clabel:To%7C/to_coords/&markers=color:green%7Clabel:From%7C/from_coords/&key={{google_key}}" class="w-100"></img>
+        <div id="ad-map" class="w-100"></div>
         <div class="w-100" id="ad-desc">
         </div>
     </div>
@@ -18,7 +18,7 @@
                     <span class="bg-white list-icon fas fa-user-tie input-group-text"></span>
                 </div>
                 <div style="line-height:1.25em">
-                    <span id="ad-driver-name" class="display-8"></span> <span id="ad-driver-rating"
+                    <span id="ad-driver-name" class="display-8"></span> &nbsp; <span id="ad-driver-rating"
                         class="display-8"></span> <span class="fas fa-star bg-white" style="border:none;"></span> <span
                         id="ad-driver-rides" class="display-8"></span>
                 </div>
@@ -35,14 +35,15 @@
 
         {{#if driver}}
             <button id="accept-btn" type="button" class="w-75 mt-4 mx-auto btn btn-block btn-primary none">Accept Bid</button>
+            <button id="cancel-btn" type="button" class="w-75 mt-1 mx-auto btn btn-block btn-outline-danger none">Cancel Ride</button>
         {{else}}
         <form id="bid-form" class="mt-4 w-75 mx-auto" novalidate>
             <div class="form-row">
                 <div class="form-group col-md-6">
-                    <label class="display-7" for="ad-num-passengers">Passengers</label>
+                    <label class="display-7" for="ad-num-pass">Passengers</label>
                     <input type="number" name="numPassengers" class="form-control" id="ad-num-pass" value="1" min="1">
                     <div class="invalid-feedback">
-                        Please enter your number of passengers.
+                        Please enter a valid number of passengers.
                     </div>
                 </div>
                 <div class="form-group col-md-6">
@@ -63,3 +64,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
 <script src="http://localhost:3000/js/ad_details.template.js"></script>
 <script src="http://localhost:3000/js/ad_bid.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=places&callback=initMap" async
+    defer></script>

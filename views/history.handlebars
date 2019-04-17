@@ -1,0 +1,147 @@
+<div class="jumbotron bg-white">
+    <ul class="nav justify-content-center" style="border-bottom: none">
+        <li class="nav-item">
+            {{#if driver}}
+            <a class="nav-link display-4 clickable" id="ride-history-btn">Ride History</a>
+            {{else}}
+            <a class="nav-link display-4 active clickable" id="ride-history-btn">Ride History</a>
+            {{/if}}
+        </li>
+        <li class="display-4" style="line-height: 4.5rem">/</li>
+        <li class="nav-item">
+            {{#if driver}}
+            <a class="nav-link display-4 clickable active" id="drive-history-btn">Drive History</a>
+            {{else}}
+            <a class="nav-link display-4 clickable" id="drive-history-btn">Drive History</a>
+            {{/if}}
+        </li>
+    </ul>
+    <hr class="my-4" />
+    <div id="history-results">
+        <div id="no-history" class="text-center display-7">No history.</div>
+    </div>
+</div>
+<script src="http://localhost:3000/js/barrating.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
+<script src="http://localhost:3000/js/history_ad.template.js"></script>
+<script>
+
+    function rate_ride(val, uid) {
+        data = {
+            forUid: uid,
+            rating: val
+        };
+
+        if ($('#drive-history-btn').is('.active')) {
+            $.post('http://localhost:3000/ratings/drivers/', data);
+        } else {
+            $.post('http://localhost:3000/ratings/passengers/', data);
+        }
+    }
+
+    function getHistory(role) {
+        $.get('http://localhost:3000/history/' + role, function (results) {
+            $('#history-results > .ad-result').remove();
+            console.log(results)
+            if (results && results.length !== 0) {
+                $('#no-history').hide(200);
+            } else {
+                $('#no-history').show(200);
+                return;
+            }
+
+            var template = Handlebars.templates['history_ad'];
+            for (var i = 0; i < results.length; i++) {
+                var res = results[i];
+                // Some date parsing
+                var date = new Date(res.departuretime);
+                var dateString = date
+                    .toDateString()
+                    .split(' ')
+                    .slice(1, 3)
+                    .join(' ');
+                var timeParts = date
+                    .toTimeString()
+                    .split(':')
+                    .slice(0, 2);
+                var timeOfDay = 'AM';
+                var hour = parseInt(timeParts[0]);
+
+                if (hour >= 12) {
+                    timeOfDay = 'PM';
+                    if (hour > 12) {
+                        hour = hour - 12;
+                    }
+                } else if (hour == 0) {
+                    hour = 12;
+                }
+
+                var timeString = hour.toString() + ':' + timeParts[1] + ' ' + timeOfDay;
+
+                var context = {
+                    index: i,
+                    from: res.fromaddress,
+                    to: res.toaddress,
+                    price: '$' + parseFloat(res.listprice).toFixed(2),
+                    date: dateString,
+                    time: timeString,
+                };
+
+                let id = "#history-result-" + i.toString();
+                let rate_id = "#rate-ride-" + i.toString();
+                let rate_uid = parseInt(res.duid);
+                if ($('#drive-history-btn').is('active')) {
+                    rate_uid = parseInt(res.puid);
+                }
+
+                $(rate_id).barrating({
+                    theme: 'css-stars',
+                    onSelect: function (value, text, event) {
+                        if (typeof (event) !== 'undefined') {
+                            // rating was selected by a user
+                            rate_ride(value, rate_uid)
+                            $(rate_id).barrating('readonly', true)
+                        }
+                    }
+                });
+
+                if (res.rating) {
+                    $(rate_id).barrating('set', parseInt(res.rating))
+                    $(rate_id).barrating('readonly', true)
+                }
+
+                var item = $(template(context));
+                $('#history-results').append(item);
+                item.fadeIn(300);
+
+                let res_id = res.aid.toString()
+                $(id).on('click', function (aid) {
+                    return function () {
+                        console.log('going to http://localhost:3000/ads/id/' + aid.toString())
+                        window.open('http://localhost:3000/ads/id/' + aid.toString(), '_blank');
+                    }
+                }(res_id));
+            }
+        });
+    }
+
+    $('document').ready(function () {
+        if ($('#drive-history-btn').is('.active')) {
+            getHistory('driver');
+        } else {
+            getHistory('passenger');
+        }
+
+        $('#drive-history-btn').on('click', function () {
+            $('.nav-link').removeClass('active');
+            $('#drive-history-btn').addClass('active');
+            getHistory('driver');
+        })
+
+        $('#ride-history-btn').on('click', function () {
+            $('.nav-link').removeClass('active');
+            $('#ride-history-btn').addClass('active');
+            getHistory('passenger')
+        })
+    })
+</script>

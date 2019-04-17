@@ -2,10 +2,117 @@ var markers,
     map,
     from_marker,
     to_marker,
+    from_place,
+    to_place,
     bounds,
     autocomplete_from,
     autocomplete_to,
     path;
+
+function getFavoriteAutocomplete(input, side) {
+    var inp = input;
+
+    return function(e) {
+        var a,
+            b,
+            i,
+            val = this.value;
+
+        closeAllLists();
+        if (side === 'to') {
+            to_place = null;
+        } else {
+            from_place = null;
+        }
+        if (!val) {
+            return false;
+        }
+
+        $.get('http://localhost:3000/destinations/user', function(results) {
+            if (!results || results.length == 0) {
+                return false;
+            }
+
+            a = document.createElement('DIV');
+            a.setAttribute('id', side + 'autocomplete-list');
+            a.setAttribute('class', 'autocomplete-items');
+
+            var container;
+            if (side == 'to') {
+                container = document.getElementsByClassName('pac-container')[1];
+            } else {
+                container = document.getElementsByClassName('pac-container')[0]
+            }
+            container.appendChild(a);
+
+            countAdded = 0;
+            /*for each item in the array...*/
+            for (i = 0; i < results.length && countAdded < 5; i++) {
+                /*check if the item starts with the same letters as the text field value:*/
+                if (
+                    results[i].nickname.substr(0, val.length).toUpperCase() ==
+                    val.toUpperCase()
+                ) {
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement('DIV');
+                    /*make the matching letters bold:*/
+                    b.innerHTML =
+                        '<span class="fas fa-heart"></span>' +
+                        '<strong>' +
+                        results[i].nickname.substr(0, val.length) +
+                        '</strong>';
+                    b.innerHTML += results[i].nickname.substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML +=
+                        "<input type='hidden' value='" +
+                        results[i].nickname +
+                        "' lat='" +
+                        results[i].lat +
+                        "' lng='" +
+                        results[i].lng +
+                        "' address='" + results[i].address+ "'>";
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener('mousedown', function(e) {
+                        /*insert the value for the autocomplete text field:*/
+                        console.log('clicked');
+                        var hid_inp = this.getElementsByTagName('input')[0];
+                        inp.value = hid_inp.getAttribute('address');
+                        if (side === 'to') {
+                            to_place = new google.maps.LatLng(
+                                parseFloat(hid_inp.getAttribute('lat')),
+                                parseFloat(hid_inp.getAttribute('lng'))
+                            );
+                        } else {
+                            console.log(
+                                'from_place changed: ' +
+                                    hid_inp.getAttribute('lat') +
+                                    ' ' +
+                                    hid_inp.getAttribute('lng')
+                            );
+                            from_place = new google.maps.LatLng(
+                                parseFloat(hid_inp.getAttribute('lat')),
+                                parseFloat(hid_inp.getAttribute('lng'))
+                            );
+                        }
+                    });
+                    a.appendChild(b);
+                    countAdded++;
+                }
+            }
+        });
+
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName('autocomplete-items');
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+    };
+}
 
 function initMapAndAutocomplete() {
     map = new google.maps.Map(document.getElementById('search-map'), {
@@ -34,10 +141,33 @@ function initMapAndAutocomplete() {
     autocomplete_from = new google.maps.places.Autocomplete(
         document.getElementById('from-fr')
     );
-
     autocomplete_to = new google.maps.places.Autocomplete(
         document.getElementById('to-fr')
     );
+    document
+        .getElementById('from-fr')
+        .addEventListener(
+            'input',
+            getFavoriteAutocomplete(document.getElementById('from-fr'), 'from')
+        );
+    document
+        .getElementById('from-fr')
+        .addEventListener(
+            'focus',
+            getFavoriteAutocomplete(document.getElementById('from-fr'), 'from')
+        );
+    document
+        .getElementById('to-fr')
+        .addEventListener(
+            'input',
+            getFavoriteAutocomplete(document.getElementById('to-fr'), 'to')
+        );
+    document
+        .getElementById('to-fr')
+        .addEventListener(
+            'focus',
+            getFavoriteAutocomplete(document.getElementById('to-fr'), 'to')
+        );
 
     // Bind the map's bounds (viewport) property to the autocomplete object,
     // so that the autocomplete requests use the current map bounds for the
@@ -59,17 +189,37 @@ function initMapAndAutocomplete() {
         'name',
     ]);
 
+    autocomplete_from.addListener('place_changed', function() {
+        var place = autocomplete_from.getPlace();
+        if (place.geometry) {
+            from_place = place.geometry.location;
+        }
+    });
+
+    autocomplete_to.addListener('place_changed', function() {
+        var place = autocomplete_to.getPlace();
+        if (place.geometry) {
+            to_place = place.geometry.location;
+        }
+        console.log('here')
+    });
+
     from_marker = new google.maps.Marker({
         map: map,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
     });
 
     to_marker = new google.maps.Marker({
         map: map,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
     });
     markers = [];
 
+    onStateChange();
+    $('#loading').hide(300);
+}
+
+function onStateChange() {
     if (window.location.search.length != 0) {
         let query = window.location.search.substring(1);
         let state = JSON.parse(
@@ -78,17 +228,17 @@ function initMapAndAutocomplete() {
                 return key === '' ? value : decodeURIComponent(value);
             }
         );
-        search(window.location.search, state);
+        search(state);
     } else {
         search();
     }
-
-    $('#loading').hide();
 }
 
 function scrollToAd(ad) {
     var position = ad.position();
-    $('#search-results').stop().animate({scrollTop: position.top}, 300);
+    $('#search-results')
+        .stop()
+        .animate({ scrollTop: position.top }, 300);
     ad.addClass('outline-shadow');
     setTimeout(function() {
         ad.removeClass('outline-shadow');
@@ -109,7 +259,7 @@ function display(results) {
 
     var template = Handlebars.templates['ad'];
     for (var i = 0; i < results.length; i++) {
-        var res = results[i]
+        var res = results[i];
 
         // Some date parsing
         var date = new Date(res.departuretime);
@@ -150,42 +300,49 @@ function display(results) {
 
         item.fadeIn(300);
 
-        let from_pos = new google.maps.LatLng(parseFloat(res.fromlat), parseFloat(res.fromlng))
-        let to_pos = new google.maps.LatLng(parseFloat(res.tolat), parseFloat(res.tolng))
+        let from_pos = new google.maps.LatLng(
+            parseFloat(res.fromlat),
+            parseFloat(res.fromlng)
+        );
+        let to_pos = new google.maps.LatLng(
+            parseFloat(res.tolat),
+            parseFloat(res.tolng)
+        );
         var res_to_marker = new google.maps.Marker({
             map: map,
             position: to_pos,
             icon: {
                 url: 'http://maps.google.com/mapfiles/ms/icons/red.png',
-                labelOrigin: new google.maps.Point(16, 10)
+                labelOrigin: new google.maps.Point(16, 10),
             },
-            label: (i+1).toString()
+            label: (i + 1).toString(),
         });
         var res_from_marker = new google.maps.Marker({
             map: map,
             position: from_pos,
             icon: {
                 url: 'http://maps.google.com/mapfiles/ms/icons/green.png',
-                labelOrigin: new google.maps.Point(16, 10)
+                labelOrigin: new google.maps.Point(16, 10),
             },
-            label: (i+1).toString()
+            label: (i + 1).toString(),
         });
 
-        let id = "#search-result-" + i.toString()
+        let id = '#search-result-' + i.toString();
+        let res_id = res.aid.toString();
         $(id).on('click', function() {
-            window.open('http://localhost:3000/ads/id/' + res.aid, '_blank');
-        })
+            window.open('http://localhost:3000/ads/id/' + res_id, '_blank');
+        });
 
         res_to_marker.setPosition(to_pos);
         res_from_marker.setPosition(from_pos);
         res_to_marker.addListener('click', function() {
             scrollToAd($(id));
-        })
+        });
         res_from_marker.addListener('click', function() {
             scrollToAd($(id));
-        })
+        });
 
-        markers.push(res_to_marker)
+        markers.push(res_to_marker);
         markers.push(res_from_marker);
 
         bounds.extend(to_pos);
@@ -196,17 +353,18 @@ function display(results) {
         map.fitBounds(bounds);
     }
 
-    markers.push(to_marker)
     markers.push(from_marker);
+    markers.push(to_marker);
 }
 
-function search(params, state) {
+function search(state) {
     let qurl = 'http://localhost:3000/ads/search';
 
     console.log(JSON.stringify(state));
     $('#no-results').hide();
 
-    if (!params) {
+    var params;
+    if (!state) {
         params = $('#form-search :input')
             .filter(function(index, element) {
                 return $(element).val() != '';
@@ -219,44 +377,52 @@ function search(params, state) {
                 toAddress: $('#to-fr').val(),
                 departureTime: $('#date-fr').val(),
                 maxPrice: $('#price-fr').val(),
-                maxPassengers: $('#passengers-fr').val()
+                maxPassengers: $('#passengers-fr').val(),
             };
 
+            console.log(to_place)
             if ($('#to-fr').val() != '') {
-                let location = autocomplete_to.getPlace();
+                let location = to_place;
                 if (location) {
                     params =
                         'toLat=' +
-                        location.geometry.location.lat() +
+                        location.lat() +
                         '&toLng=' +
-                        location.geometry.location.lng() + "&" + params;
-                    new_state.toLat = location.geometry.location.lat();
-                    new_state.toLng = location.geometry.location.lng();
+                        location.lng() +
+                        '&' +
+                        params;
+                    new_state.toLat = location.lat();
+                    new_state.toLng = location.lng();
                 }
             }
 
             if ($('#from-fr').val() != '') {
-                let location = autocomplete_from.getPlace();
+                let location = from_place;
                 if (location) {
                     params =
                         'fromLat=' +
-                        location.geometry.location.lat() +
+                        location.lat() +
                         '&fromLng=' +
-                        location.geometry.location.lng() + "&" + params;
-                    new_state.fromLat = location.geometry.location.lat();
-                    new_state.fromLng = location.geometry.location.lng();
+                        location.lng() +
+                        '&' +
+                        params;
+                    new_state.fromLat = location.lat();
+                    new_state.fromLng = location.lng();
                 }
             }
 
-            params = "?" + params;
-            new_state.params = params;
+            params = '?' + params;
             window.history.pushState(new_state, 'Search', params);
         } else {
             window.history.pushState({}, 'Search', '/search');
         }
-    } else if (state !== undefined) {
-        $('#from-fr').val(state.fromAddress);
-        $('#to-fr').val(state.toAddress);
+    } else {
+        $('#from-fr')
+            .val(state.fromAddress)
+            .change();
+        $('#to-fr')
+            .val(state.toAddress)
+            .change();
         if (state.departureTime) {
             $('#date-fr')
                 .flatpickr({
@@ -269,7 +435,29 @@ function search(params, state) {
                 .setDate(new Date(state.departureTime));
         }
         $('#price-fr').val(state.maxPrice);
-        $('#passengers-fr').val(state.maxPassengers)
+        $('#passengers-fr').val(state.maxPassengers);
+
+        if (state.fromLat && state.fromLng) {
+            from_place = new google.maps.LatLng(
+                parseFloat(state.fromLat),
+                parseFloat(state.fromLng)
+            );
+        }
+        if (state.toLat && state.toLng) {
+            to_place = new google.maps.LatLng(
+                parseFloat(state.toLat),
+                parseFloat(state.toLng)
+            );
+        }
+
+        params = [];
+        for (var p in state)
+            if (state.hasOwnProperty(p)) {
+                params.push(
+                    encodeURIComponent(p) + '=' + encodeURIComponent(state[p])
+                );
+            }
+        params = '?' + params.join('&');
     }
 
     qurl += params;
@@ -280,36 +468,19 @@ function search(params, state) {
     }
 
     markers = [];
-
     bounds = null;
 
-    let from_place = autocomplete_from.getPlace()
-    if (from_place && $('from-fr').val().length > 0) {
+    if (from_place && $('#from-fr').val().length > 0) {
         from_marker.setMap(map);
-        from_marker.setPosition(from_place.geometry.location);
-        from_marker.setVisible(true);
-        bounds = new google.maps.LatLngBounds();
-        bounds.extend(from_marker.getPosition());
-    } else if (state && state.fromLat && state.fromLng) {
-        from_marker.setMap(map);
-        from_marker.setPosition(new google.maps.LatLng(state.fromLat, state.fromLng));
+        from_marker.setPosition(from_place);
         from_marker.setVisible(true);
         bounds = new google.maps.LatLngBounds();
         bounds.extend(from_marker.getPosition());
     }
 
-    let to_place = autocomplete_to.getPlace();
-    if (to_place && $('to-fr').val().length > 0) {
+    if (to_place && $('#to-fr').val().length > 0) {
         to_marker.setMap(map);
-        to_marker.setPosition(to_place.geometry.location);
-        to_marker.setVisible(true);
-        if (!bounds) {
-            bounds = new google.maps.LatLngBounds();
-        }
-        bounds.extend(to_marker.getPosition());
-    } else if (state && state.toLat && state.toLng) {
-        to_marker.setMap(map);
-        to_marker.setPosition(new google.maps.LatLng(state.toLat, state.toLng));
+        to_marker.setPosition(to_place);
         to_marker.setVisible(true);
         if (!bounds) {
             bounds = new google.maps.LatLngBounds();
@@ -334,7 +505,7 @@ $('document').ready(function() {
     setTimeout(function() {
         $('#loading').hide();
     }, 20 * 1000);
-    
+
     $('#date-fr').flatpickr({
         enableTime: true,
         dateFormat: 'Y-m-d H:i',

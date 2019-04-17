@@ -25,10 +25,32 @@ router.use((request, response, next) => {
 // Search by toaddress, fromaddress, time, maxPrice, and/or numPassengers
 router.get('/search', (request, response, next) => {
   console.log(request.query);
-  const { toAddress, toLat, toLng, fromAddress, fromLat, fromLng, departureTime, maxPrice, numPassengers  } = request.query
+  const { departureTime, maxPrice, numPassengers  } = request.query
+
+  let toAddress = request.query.toAddress;
+  let fromAddress = request.query.fromAddress;
+  let toLat = request.query.toLat;
+  let toLng = request.query.toLng;
+  let fromLat = request.query.fromLat;
+  let fromLng = request.query.fromLng;
   let whereStrings = []
   let results = []
   let paramCounter = 1
+
+  if (!toLat || !toLng || !fromLat || !fromLng) {
+    var place_dict = request.session.place_dict;
+    if (place_dict && place_dict[toAddress]) {
+      toLat = place_dict[toAddress]['lat']
+      toLng = place_dict[toAddress]['lng']
+      toAddress = place_dict[toAddress]['street']
+    }
+    if (place_dict && place_dict[fromAddress]) {
+      fromLat = place_dict[fromAddress]['lat']
+      fromLng = place_dict[fromAddress]['lng']
+      fromAddress = place_dict[fromAddress]['street']
+    }
+  }
+
   if (toAddress && (!toLat || !toLng)) {
     whereStrings.push('toAddress = $' + paramCounter.toString())
     results.push(toAddress)
@@ -70,7 +92,11 @@ router.get('/search', (request, response, next) => {
     results.push(maxPrice)
   }
 
-  queryString = queryString.concat(' ORDER BY coalesce(currPrice, minBidPrice)')
+  if (whereStrings.length > 1) {
+    queryString = queryString.concat(' ORDER BY coalesce(currPrice, minBidPrice)')
+  } else {
+    queryString = queryString.concat(' ORDER BY departureTime ASC')
+  }
   
   console.log(queryString)
 
@@ -118,31 +144,12 @@ router.get('/', (request, response) => {
   })
 })
 
-// Get all ads
-router.get('/ongoing', (request, response) => {
-  const uid = request.session.uid
-  let qid = 'puid';
-  let oid = 'duid'
-  let qtable = 'drivers'
-  if (request.session.mode) {
-    qid = 'duid'
-    oid = 'puid'
-    qtable = 'passengers'
-  }
-  pool.query('SELECT * FROM advertisements natural join (accepted join ' + qtable + ' on ' + oid + '=' + qtable+ '.uid) WHERE (' + qid + '= $1 AND departureTime <= now()::timestamp AND aid NOT IN (SELECT aid from histories))', [uid], (error, results) => {
-    if (error) {
-      throw error
-    }
-    response.status(200).json(results.rows[0])
-  })
-})
-
 // Get ad by id - for front end
 // Driver info + current bids + # of bids + ad info
 router.get('/:aid', (request, response) => {
   const aid = parseInt(request.params.aid)
-
-  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT duid as uid, count(aid) as tripsdriven FROM histories GROUP by duid) as numTrips NATURAL LEFT JOIN CarProfiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
+  console.log(aid);
+  pool.query("SELECT * FROM (Advertisements NATURAL LEFT JOIN ((SELECT aid, max(bidPrice) as currPrice FROM Bids GROUP BY aid) as b1 INNER JOIN (SELECT aid as aid2, uid as currLead, bidPrice FROM bids) as b2 on b1.aid = b2.aid2 AND b1.currPrice = b2.bidPrice) AS currprices NATURAL LEFT JOIN (SELECT aid, count(uid) as numBids from bids group by aid) as bidCounts NATURAL LEFT JOIN (SELECT aid, bidPrice as userBid FROM Bids where uid = $1) as userbids NATURAL LEFT JOIN users NATURAL LEFT JOIN drivers NATURAL LEFT JOIN (SELECT uid, coalesce(count(aid),0) as tripsdriven FROM (histories natural join (select uid, aid from advertisements) as simpads) GROUP by uid) as numTrips NATURAL LEFT JOIN CarProfiles NATURAL LEFT JOIN cars NATURAL LEFT JOIN (SELECT aid, 'CLOSED' as closed FROM accepted) as status) WHERE aid = $2", [request.session.uid, aid], (error, results) => {
     if (error) {
       console.log(error);
       response.status(400).end();
@@ -150,7 +157,12 @@ router.get('/:aid', (request, response) => {
     }
 
     result = results.rows[0]
-    if (result.closed !== undefined && result.currLead == request.session.uid) {
+    if (!result) {
+      response.status(400).end();
+      return;
+    }
+
+    if (result.closed !== undefined && result.currlead == request.session.uid) {
       result.winner = true
     }
     if (result.uid == request.session.uid) {
@@ -162,15 +174,26 @@ router.get('/:aid', (request, response) => {
 })
 
 router.get('/id/:aid', (request, response) => {
-  response.render('ad_bid', {
-    title: 'Listing',
-    username: request.session.username,
-    email: request.session.email, 
-    fname: request.session.fname, 
-    lname: request.session.lname, 
-    driver: request.session.mode, 
-    switchable: request.session.switchable,
-    google_key: config.google_key
+  pool.query('SELECT * FROM Advertisements WHERE aid = $1', [request.params.aid], (error, results) => {
+    if (error) {
+      throw error
+    }
+
+    if (results.rows.length == 0) {
+      response.status(404).end();
+      return;
+    }
+
+    response.render('ad_bid', {
+      title: 'Listing',
+      username: request.session.username,
+      email: request.session.email, 
+      fname: request.session.fname, 
+      lname: request.session.lname, 
+      driver: request.session.mode, 
+      switchable: request.session.switchable,
+      google_key: config.google_key
+    })
   })
 })
 
@@ -193,9 +216,32 @@ router.post('/', (request, response) => {
     return
   }
 
-  const { toAddress, toLat, toLng, fromAddress, fromLat, fromLng, time, minBidPrice } = request.body
+  const { time, minBidPrice } = request.body
   const uid = request.session.uid
-  pool.query('INSERT INTO Advertisements (fromAddress, fromLat, fromLng, toAddress, toLat, toLng, departureTime, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [fromAddress, fromLat, fromLng, toAddress, toLat, toLng, time, minBidPrice, uid], (error, results) => {
+
+  let toAddress = request.body.toAddress;
+  let fromAddress = request.body.fromAddress
+  let tolat = request.body.tolat;
+  let tolng = request.body.tolng;
+  let fromlat = request.body.fromlat;
+  let fromlng = request.body.fromlng;
+
+  if (!tolat || !tolng || !fromlat || !fromlng) {
+    var place_dict = request.session.place_dict;
+    console.log(place_dict)
+    if (place_dict && place_dict[toAddress]) {
+      tolat = place_dict[toAddress]['lat']
+      tolng = place_dict[toAddress]['lng']
+      toAddress = place_dict[toAddress]['street']
+    }
+    if (place_dict && place_dict[fromAddress]) {
+      fromlat = place_dict[fromAddress]['lat']
+      fromlng = place_dict[fromAddress]['lng']
+      fromAddress = place_dict[fromAddress]['street']
+    }
+  }
+
+  pool.query('INSERT INTO Advertisements (fromAddress, fromLat, fromLng, toAddress, toLat, toLng, departureTime, minBidPrice, uid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *', [fromAddress, fromlat, fromlng, toAddress, tolat, tolng, time, minBidPrice, uid], (error, results) => {
     if (error) {
       throw error
     }
@@ -239,7 +285,7 @@ router.post('/complete/:aid', (request, response) => {
 
     const aid = parseInt(request.params.aid)
 
-    pool.query('INSERT INTO History (aid, timeCompleted) VALUES ($1, $2) RETURNING *', [aid, new Date()], (error, results) => {
+    pool.query('INSERT INTO Histories (aid, timeCompleted) VALUES ($1, $2) RETURNING *', [aid, new Date()], (error, results) => {
         if (error) {
             throw error
         }

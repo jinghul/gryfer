@@ -157,6 +157,7 @@ router.post('/register', (request, response) => {
             request.session.lname = user.lname
             request.session.email = user.email
             request.session.switchable = false
+            request.session.place_dict = {}
 
             response.status(201).json(user)
         })
@@ -266,7 +267,19 @@ router.post('/signin', (request, response) => {
                         console.log('can ride')
                     }
                     request.session.switchable = request.session.canride && request.session.candrive
-                    response.status(200).json(user)
+
+                    pool.query('SELECT * FROM SavedDestinations WHERE uid = $1 ORDER BY nickname ASC', [request.session.uid], (error, results) => {
+                        if (error) {
+                          throw error
+                        }
+                        
+                        request.session.place_dict = {}
+                        for (result in results.rows) {
+                            request.session.place_dict[result.nickname] = {'street':result.address,'lat':result.lat,'lng':result.lng}
+                        }
+
+                        response.status(200).json(user)
+                    })
                 })
             })
         })
@@ -312,7 +325,7 @@ const checkPassword = (reqPassword, foundUser) => {
         if (foundUser == undefined) {
             reject(new Error('Undefined user'))
         }
-        bcrypt.compare(reqPassword, foundUser.password, (err, response) => {
+        bcrypt.compare(reqPassword, foundUser.passwordhash, (err, response) => {
             if (err) {
                 reject(err)
             } else if (response) {

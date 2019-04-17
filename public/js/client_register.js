@@ -1,7 +1,7 @@
 // Register a user into the database
 function check_then_register() {
     $.get(
-        'http://localhost:3000/users/exists/' + $('#user-reg').val(),
+        'http://localhost:3000/user/exists/' + $('#user-reg').val(),
         function(exists) {
             if (exists) {
                 $('#user-reg').addClass('is-invalid');

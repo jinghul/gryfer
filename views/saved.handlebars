@@ -1,0 +1,308 @@
+<div class="jumbotron bg-white">
+    <h1 class="display-4 text-center">Saved Locations</h1>
+    <hr class="my-4" />
+    <div id="favorite-results">
+        <button role="button" id="add-button" class="mb-4 btn-outline-primary btn btn-block">Add Destination</button>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.0/handlebars.runtime.min.js"></script>
+<script src="http://localhost:3000/js/saved.template.js"></script>
+<script>
+    var open = false;
+    var count = 0;
+    var bounds;
+
+    const typeHandler = function (e) {
+        if ($(this).hasClass('is-invalid')) {
+            $(this).removeClass('is-invalid');
+            $('.invalid-feedback').hide(150);
+        }
+    };
+
+    function checkEmptyInput(input) {
+        console.log('checking ' + input + ' ' + $(input).val())
+        if (
+            ($(input).val() == undefined || $(input).val().length == 0)
+        ) {
+            $(input).addClass('is-invalid');
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function checkEmptyFields(nickname, address) {
+        var empty = false;
+        if (checkEmptyInput(nickname)) {
+            empty = true;
+        }
+        if (checkEmptyInput(address)) {
+            empty = true;
+        }
+        return empty;
+    }
+
+    function create_saved(nickname, address, lat, lng) {
+        console.log('creating new dest.')
+        $.post('http://localhost:3000/destinations/create', { nickname: nickname, address: address, lat: lat, lng: lng });
+    }
+
+    function update_saved_nickname(oldnickname, nickname, address) {
+        console.log('updating nickname.')
+        $.ajax({
+            url: 'http://localhost:3000/destinations/update/nickname',
+            data: { nickname: nickname, oldnickname: oldnickname, address: address },
+            type: 'PUT'
+        });
+    }
+
+    function update_saved_address(oldaddress, nickname, address, lat, lng) {
+        console.log('updating address.')
+        $.ajax({
+            url: 'http://localhost:3000/destinations/update/address',
+            type: 'PUT',
+            data: { nickname: nickname, oldaddress: oldaddress, address: address, lat: lat, lng: lng }
+        });
+    }
+
+    function delete_saved(nickname) {
+        console.log('deleting dest. ' + nickname)
+        $.ajax({
+            url: 'http://localhost:3000/destinations/delete',
+            type: 'DELETE',
+            data: { nickname: nickname }
+        });
+    }
+
+    function getSaved() {
+        $.get('http://localhost:3000/destinations/user/', function (results) {
+            $('#favorite-results > .ad-result').remove();
+            console.log(results)
+            if (results && results.length == 0) {
+                return
+            }
+
+            var template = Handlebars.templates['saved'];
+            for (var i = count; i < count + results.length; i++) {
+                var res = results[i];
+
+                var context = {
+                    nickname: res.nickname,
+                    address: res.address,
+                    index: i
+                };
+
+                var item = $(template(context));
+                $('#favorite-results').append(item);
+
+                var save_btn_id = '#save-btn-' + i.toString();
+                var edit_btn_id = '#edit-btn-' + i.toString();
+                var delete_btn_id = '#delete-btn-' + i.toString();
+                var nickname_id = '#nickname-' + i.toString();
+                var address_id = '#address-' + i.toString();
+
+                $(address_id).attr('lat', res.lat);
+                $(address_id).attr('lng', res.lng);
+                $(save_btn_id).hide();
+                $(nickname_id).bind('input', typeHandler);
+                $(address_id).bind('input', typeHandler);
+
+                var autocomplete_fav = new google.maps.places.Autocomplete(
+                    document.getElementById(address_id.slice(1)), { bounds: bounds }
+                );
+                autocomplete_fav.setFields([
+                    'address_components',
+                    'geometry',
+                    'icon',
+                    'name',
+                ]);
+
+                $(save_btn_id).on('click', function (i) {
+                    return function () {
+                        var save_btn_id = '#save-btn-' + i.toString();
+                        var edit_btn_id = '#edit-btn-' + i.toString();
+                        var nickname_id = '#nickname-' + i.toString();
+                        var address_id = '#address-' + i.toString();
+                        if (!checkEmptyFields(nickname_id, address_id)) {
+                            var place = autocomplete_fav.getPlace();
+                            var lat, lng;
+                            if (!place) {
+                                lat = $(address_id).attr('lat');
+                                lng = $(address_id).attr('lng');
+                            } else {
+                                lat = place.geometry.location.lat();
+                                lng = place.geometry.location.lng();
+                            }
+                            if ($(nickname_id).attr('orig') !== undefined) {
+                                if ($(nickname_id).val() !== $(nickname_id).attr('orig')) {
+                                    if ($(address_id).attr('orig') !== $(address_id).val()) {
+                                        delete_saved($(nickname_id).attr('orig'));
+                                        create_saved($(nickname_id).val(), $(address_id).val(), lat, lng);
+                                    } else {
+                                        update_saved_nickname($(nickname_id).attr('orig'), $(nickname_id).val(), $(address_id).val())
+                                    }
+                                } else if ($(address_id).attr('orig') !== $(address_id).val()) {
+                                    update_saved_address($(address_id).attr('orig'), $(nickname_id).val(), $(address_id).val(), lat, lng)
+                                }
+                            } else {
+                                create_saved($(nickname_id).val(), $(address_id).val(), lat, lng)
+                            }
+                            $(address_id).prop('disabled', true)
+                            $(nickname_id).prop('disabled', true)
+                            $(this).hide();
+                            $(edit_btn_id).show();
+                        }
+                    }
+                }(i));
+
+                $(edit_btn_id).on('click', function (i) {
+                    return function () {
+                        var save_btn_id = '#save-btn-' + i.toString();
+                        var nickname_id = '#nickname-' + i.toString();
+                        var address_id = '#address-' + i.toString();
+                        $(address_id).prop('disabled', false)
+                        $(nickname_id).prop('disabled', false)
+                        $(address_id).attr('orig', $(address_id).val())
+                        $(nickname_id).attr('orig', $(nickname_id).val())
+                        $(this).hide();
+                        $(save_btn_id).show();
+                    }
+                }(i))
+
+                $(delete_btn_id).on('click', function (i) {
+                    return function () {
+                        var card_id = '#fav-result-' + i.toString();
+                        var nickname_id = '#nickname-' + i.toString();
+                        delete_saved($(nickname_id).val())
+                        $(card_id).remove();
+                    }
+                }(i))
+
+                item.fadeIn(300);
+            }
+            count += results.length;
+        });
+    }
+
+    function initAutocomplete() {
+        bounds = new google.maps.LatLngBounds();
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                bounds.extend(
+                    new google.maps.LatLng(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    )
+                );
+            });
+        } else {
+            bounds.extend(new google.maps.LatLng(1.2994266, 103.7784662));
+        }
+
+        $('#add-button').on('click', function () {
+            if (open)
+                open = true;
+            var template = Handlebars.templates['saved'];
+            var item = $(template({ new: true, index: count }));
+            $('#favorite-results').append(item);
+            var i = count;
+            count += 1;
+
+            var save_btn_id = '#save-btn-' + i.toString();
+            var edit_btn_id = '#edit-btn-' + i.toString();
+            var delete_btn_id = '#delete-btn-' + i.toString();
+            var nickname_id = '#nickname-' + i.toString();
+            var address_id = '#address-' + i.toString();
+
+            $(edit_btn_id).hide();
+            $(nickname_id).bind('input', typeHandler);
+            $(address_id).bind('input', typeHandler);
+            console.log(address_id.slice(1))
+            var autocomplete_fav = new google.maps.places.Autocomplete(
+                document.getElementById(address_id.slice(1)),
+                { bounds: bounds }
+            );
+            autocomplete_fav.setFields([
+                'address_components',
+                'geometry',
+                'icon',
+                'name',
+            ]);
+
+            $(save_btn_id).on('click', function (i) {
+                return function () {
+                    var save_btn_id = '#save-btn-' + i.toString();
+                    var edit_btn_id = '#edit-btn-' + i.toString();
+                    var nickname_id = '#nickname-' + i.toString();
+                    var address_id = '#address-' + i.toString();
+                    if (!checkEmptyFields(nickname_id, address_id)) {
+                        var place = autocomplete_fav.getPlace();
+                        var lat, lng;
+                        if (!place) {
+                            lat = $(address_id).attr('lat');
+                            lng = $(address_id).attr('lng');
+                        } else {
+                            lat = place.geometry.location.lat();
+                            lng = place.geometry.location.lng();
+                        }
+                        if ($(nickname_id).attr('orig') !== undefined) {
+                            if ($(nickname_id).val() !== $(nickname_id).attr('orig')) {
+                                if ($(address_id).attr('orig') !== $(address_id).val()) {
+                                    delete_saved($(nickname_id).attr('orig'));
+                                    create_saved($(nickname_id).val(), $(address_id).val(), lat, lng);
+                                } else {
+                                    update_saved_nickname($(nickname_id).attr('orig'), $(nickname_id).val(), $(address_id).val())
+                                }
+                            } else if ($(address_id).attr('orig') !== $(address_id).val()) {
+                                update_saved_address($(address_id).attr('orig'), $(nickname_id).val(), $(address_id).val(), lat, lng)
+                            }
+                        } else {
+                            create_saved($(nickname_id).val(), $(address_id).val(), lat, lng)
+                        }
+                        $(address_id).prop('disabled', true)
+                        $(nickname_id).prop('disabled', true)
+                        $(this).hide();
+                        $(edit_btn_id).show();
+                    }
+                }
+            }(i));
+
+            $(edit_btn_id).on('click', function (i) {
+                return function () {
+                    var save_btn_id = '#save-btn-' + i.toString();
+                    var nickname_id = '#nickname-' + i.toString();
+                    var address_id = '#address-' + i.toString();
+                    $(address_id).prop('disabled', false)
+                    $(nickname_id).prop('disabled', false)
+                    $(address_id).attr('orig', $(address_id).val())
+                    $(nickname_id).attr('orig', $(nickname_id).val())
+                    $(this).hide();
+                    $(save_btn_id).show();
+                }
+            }(i))
+
+            $(delete_btn_id).on('click', function (i) {
+                return function () {
+                    var card_id = '#fav-result-' + i.toString();
+                    var nickname_id = '#nickname-' + i.toString();
+                    delete_saved($(nickname_id).val())
+                    $(card_id).remove();
+                }
+            }(i))
+
+            item.fadeIn(300);
+
+            $('html, body').animate({
+                scrollTop: item.offset().top
+            }, 300);
+        });
+
+
+        getSaved();
+    }
+
+    $('document').ready(function () {
+    })
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{google_key}}&libraries=places&callback=initAutocomplete"
+    async defer></script>

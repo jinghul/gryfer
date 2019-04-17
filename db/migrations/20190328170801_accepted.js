@@ -4,7 +4,6 @@ exports.up = function(knex, Promise) {
 	aid				INTEGER NOT NULL,
 	puid			INTEGER NOT NULL,
 	duid			INTEGER NOT NULL,
-	completed 		BOOLEAN NOT NULL,
 	price			NUMERIC NOT NULL,
 	PRIMARY KEY (aid),
 	FOREIGN KEY (aid, duid) REFERENCES Advertisements (aid, uid),

@@ -76,12 +76,12 @@ app.get('/search', (req, res) => {
         })
     }
 })
-app.get('/active', (req, res) => {
+app.get('/tracking', (req, res) => {
     if (!req.session.uid) {
         res.redirect('../auth/signin')
     } else {
         res.render('active_rides', {
-            title : 'Active Rides',
+            title : 'Tracking Rides',
             username: req.session.username,
             email: req.session.email,
             fname: req.session.fname,
@@ -112,7 +112,7 @@ app.get('/make', (req, res) => {
 })
 
 // API
-app.use('/users', users)
+app.use('/user', users)
 app.use('/ads', advertisements)
 app.use('/auth', auth)
 app.use('/bids', bids)

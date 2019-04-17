@@ -1,0 +1,30 @@
+<div class="card none ad-result" id="fav-result-{{index}}">
+    <div class="card-body row">
+        <div class="col-5 flex">
+            <div class="mr-4 display-7">
+                <span class="fas fa-flag">
+                    </span>
+            </div>
+            <input type="text" class="form-control" id="nickname-{{index}}" value="{{ nickname }}" placeholder="nickname" {{#if new}}{{else}}disabled{{/if}}/>
+        </div>
+        <div class="col-5 flex">
+            <div class="mr-4 display-7">
+                <span class="fas fa-map-marker-alt">
+                </span>
+            </div>
+            
+            <input type="text" class="form-control" id="address-{{index}}" value="{{ address }}" placeholder="address" {{#if new}}{{else}}disabled{{/if}}/>
+        </div>
+        <div class="col-2 flex">
+            <div class="display-7">
+                <span id="save-btn-{{index}}" class="p-2 clickable far fa-save"></span>
+            </div>
+            <div class="display-7">
+                <span id="edit-btn-{{index}}" class="p-2 clickable fas fa-edit"></span>
+            </div>
+            <div class="display-7">
+                <span id="delete-btn-{{index}}" class="p-2 clickable fas fa-trash-alt"></span>
+            </div>
+        </div>
+    </div>
+</div>

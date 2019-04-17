@@ -70,9 +70,9 @@ router.post('/create', (request, response) => {
     [uid, aid, numPassengers, bidPrice],
     (error, results) => {
       if (error) {
-        throw error
+        response.status(400).json(error)
+        return
       }
-      console.log(results.rows[0])
       response.status(200).json(results.rows[0])
     })
 })
@@ -81,12 +81,25 @@ router.post('/create', (request, response) => {
 router.post('/accept', async (request, response) => {
 
   const { aid } = request.body
+  if (!request.session.mode) {
+    response.status(401).send('Rider cannot accept ride.')
+  }
 
-  await pool.query('SELECT * FROM (SELECT aid, uid as duid FROM advertisements) as ads natural join (SELECT aid, uid as puid, bidPrice FROM bids) as b1 JOIN (SELECT aid, max(bidPrice) as price FROM bids) as b2 on b1.aid = b2.aid AND b1.bidPrice = b2.price', (error, results) => {
-    const { puid, price, duid } = results.rows[0]
-
+  await pool.query('SELECT * FROM (SELECT aid, uid as duid FROM advertisements) as ads NATURAL JOIN (SELECT aid, uid as puid, bidPrice FROM bids) as b1 JOIN (SELECT aid as aid2, max(bidPrice) as price FROM bids group by aid2) as b2 on b1.aid = b2.aid2 AND b1.bidPrice = b2.price WHERE aid=$1',[aid], (error, results) => {
+    if (error || results.rows.length == 0 || results.rows[0].price === undefined) {
+      console.log(error)
+      console.log(results.rows)
+      response.status(400).end()
+      return
+    }
+    
+    let result = results.rows[0]
+    const { puid, price, duid } = result;
     if (duid != request.session.uid) {
       response.status(401).end();
+      return
+    } else if (!puid || !price) {
+      response.status(400).send('No bids to accept.').end();
       return
     }
 
@@ -108,6 +121,7 @@ router.post('/accept', async (request, response) => {
         throw e
       }
     }
+
     acceptBid(puid, duid, aid, price)
   })
 })

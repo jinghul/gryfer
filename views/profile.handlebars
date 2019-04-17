@@ -1,0 +1,36 @@
+<div class="jumbotron bg-white" style="margin-bottom:0px">
+    <script>
+        $('document').ready(function() {
+            var date = $('#datejoined').text();
+            var dateParts = date.split(' ').slice(1,4);
+            $('#datejoined').html('Joined ' + dateParts.join(' '))
+            $('#to-history').on('click', function() {
+                window.location = 'http://localhost:3000/user/history';
+            })
+        })
+    </script>
+    <h1 class="display-4 text-center">{{fname}} {{lname}}</h1>
+    <p class="lead text-center" id="datejoined">{{datejoined}}</p>
+    <hr class="my-4"/>
+    <ul class="list-group mx-auto w-50" style="min-width:485px" id="passenger-info">
+        <li class="list-group-item row flex"><div class="col-6 stat-label">Passenger Rating </div><div class="col-6 display-7">{{#if prating}}{{prating}}{{else}}-{{/if}} <span class="display-8 fas fa-star"></span></div></li>
+        <li class="list-group-item row flex"><div class="col-6 stat-label">Trips Taken</div><div class="col-6 display-7">{{#if tripstaken}}{{tripstaken}}{{else}}0{{/if}}</div></li>
+        <li class="list-group-item row flex"><div class="col-6 stat-label">Most Expensive Ride</div><div class="col-6 display-7">{{#if expensiveride}}${{expensiveride}}{{else}}$-{{/if}}</div></li>
+    </ul>
+
+    {{#if make}}
+    <div id="car-profile">
+        <ul class="list-group mt-4 w-50 mx-auto" id="driver-info">
+            <li class="list-group-item flex row flex">
+                <div class="col-6 stat-label">Car Driven</div><div class="col-6 display-7">{{make}} {{model}} &nbsp; | &nbsp; {{maxpassengers}} seats</div>
+            </li>
+            <li class="list-group-item row flex"><div class="col-6 stat-label">Driver Rating </div><div class="col-6 display-7">{{#if drating}}{{drating}}{{else}}-{{/if}} <span class="display-8 fas fa-star"></span></div></li>
+            <li class="list-group-item row flex"><div class="col-6 stat-label">Trips Driven</div><div class="col-6 display-7">{{#if tripsdriven}}{{tripsdriven}}{{else}}0{{/if}}</div></li>
+            <li class="list-group-item row flex"><div class="col-6 stat-label">Money Earned</div><div class="col-6 display-7">{{#if moneyearned}}${{moneyearned}}{{else}}$0{{/if}}</div></li>
+        </ul>
+    </div>
+    {{/if}}
+    <div class="w-100 flex mt-4 justify-content-center">
+        <button role="button" class="btn btn-block btn-outline-primary w-50" id="to-history">See History</button>
+    </div>
+</div>

@@ -27,11 +27,10 @@ router.get('/', (request, response) => {
     })
 })
 
-
 // GET the riding history for specific user
-router.get('/passenger/:id', (request, response) => {
-    const uid = parseInt(request.params.id)
-    pool.query("SELECT * FROM Histories NATURAL JOIN Accepted where puid = $1 ORDER BY timeCompleted",[uid], (error, results) => {
+router.get('/passenger/', (request, response) => {
+    const uid = parseInt(request.session.uid)
+    pool.query("SELECT * FROM Histories NATURAL JOIN Accepted NATURAL JOIN advertisements LEFT JOIN driverratings as dr on dr.byUid=puid AND dr.aid=advertisements.aid where puid = $1 ORDER BY timeCompleted DESC",[uid], (error, results) => {
         if (error) {
             throw error
         }
@@ -40,9 +39,9 @@ router.get('/passenger/:id', (request, response) => {
 })
 
 // GET the driving history for specific user
-router.get('/driver/:id', (request, response) => {
-    const uid = parseInt(request.params.id)
-    pool.query('SELECT * FROM Histories NATURAL JOIN Accepted where duid = $1 ORDER BY timeCompleted',[uid], (error, results) => {
+router.get('/driver/', (request, response) => {
+    const uid = parseInt(request.session.uid)
+    pool.query('SELECT * FROM Histories NATURAL JOIN Accepted NATURAL JOIN advertisements LEFT JOIN passengerratings as pr on pr.byUid=duid AND pr.aid=advertisements.aid where duid = $1 ORDER BY timeCompleted DESC',[uid], (error, results) => {
         if (error) {
             throw error
         }
